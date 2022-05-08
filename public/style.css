@@ -1,15 +1,25 @@
+* {
+	font-family: 'Koulen', cursive;
+}
+
 html, body {
-  margin: 0;
-  padding: 0;
+	margin: 0;
+	padding: 0;
 }
 
 canvas {
-  display: block;
+	display: block;
 }
 
 body {
 	width: 100vw;
 	height: 100vh;
+}
+
+#page-meta-info {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 #page-body {
@@ -20,4 +30,31 @@ body {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+}
+
+#page-title {
+	margin: 0;
+	font-size: 10vw;
+}
+
+.shooter {
+	position: relative;
+	top: 0px;
+
+	margin-top: -20px;
+	animation: blipMargin 1.5s linear infinite;
+}
+
+@keyframes blipMargin {
+	from {
+		margin-top: 0px;
+	}
+
+	50% {
+		margin-top: -20px;
+	}
+
+	to {
+		margin-top: 0px;
+	}
 }
