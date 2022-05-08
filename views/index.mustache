@@ -16,28 +16,35 @@
   <body>
 	<main id="page-body">
 		<div id="page-meta-info">
-			<div style="display: flex; flex-direction: column;">
+			<div style="display: flex; justify-content: center; align-items: center">
 				<div id="page-title">2<p class="shooter">^</p>11</div>
-				<p class="barlow">Join the tiles to get to 2E11 (2048)!</p>
-				<a href="#how-to-play">How to play 🠮</a>
-			</div>
-			<div style="display: flex; flex-direction: column">
 				<div class="scores">
-					<div class="current-score-card">
+					<div class="score-card current-score-card">
 						Score
-						<p id="current-score">
-							0
-						</p>
+						<div class="sub-scorer">
+							<p id="add-to-current-score"></p>
+							<p id="current-score">
+								0
+							</p>
+						</div>
 					</div>
-					<div class="best-score-card">
+					<div class="score-card best-score-card">
 						Best
-						<p id="best-score">
-							0
-						</p>
+					 	<div class="sub-scorer">
+							<p id="best-score">
+								0
+							</p>
+						</div>
 					</div>
 				</div>
-				<div class="new-game">
-
+			</div>
+			<div style="display: flex; justify-content: center; align-items: center">
+				<div>
+					<p class="barlow">Join the tiles to get to 2E11 (2048)!</p>
+					<a href="#how-to-play">How to play 🠮</a>
+				</div>
+				<div id="new-game">
+					New game
 				</div>
 			</div>
 		</div>
@@ -48,9 +55,16 @@
 		let board;
 		let moveBuildup;
 
+		let endGame = 0;
+		let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
+
 		// stores background color, text color, and glow for a given tile
 		let levelConverter;
-		let metaPoints;
+		let bestPoints = localStorage.getItem("bestPoints");
+		bestPoints = bestPoints ? bestPoints : 0;
+		let points = 0, metaPoints = 0;
+
+		let prevBestCounterTimeout;
 	</script>
 	<script src="piece.js"></script>
 	<script src="board.js"></script>

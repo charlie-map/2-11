@@ -22,6 +22,7 @@ body {
 
 #page-meta-info {
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 }
@@ -38,7 +39,6 @@ body {
 
 #page-title {
 	margin: 0;
-	margin-top: 20px;
 
 	font-size: 10vw;
 	display: flex;
@@ -68,4 +68,99 @@ body {
 	to {
 		margin-top: 0px;
 	}
+}
+
+.score-card {
+	width: 90px;
+	height: 40%;
+
+	padding: 5px;
+	margin-bottom: 5px;
+	background: #03b6db;
+
+	border-radius: 10px;
+
+	text-align: center;
+}
+
+.scores {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+
+	margin-left: 30px;
+}
+
+.sub-scorer {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.sub-scorer p {
+	margin: 0;
+}
+
+#current-score, #best-score {
+	position: relative;
+
+	width: 100%;
+	text-align: center;
+}
+
+#add-to-current-score {
+	position: relative;
+
+	width: 0px;
+	left: 50% !important;
+}
+
+#add-to-current-score.float {
+	animation: float-up 0.5s ease-in-out;
+}
+
+@keyframes float-up {
+	from {
+		margin-top: 0px;
+		opacity: 1;
+	}
+
+	to {
+		margin-top: 30px;
+		opacity: 0;
+	}
+}
+
+#new-game {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	margin-left: 30px;
+	font-size: 20px;
+
+	width: 90px;
+	height: 40%;
+
+	padding: 5px;
+	margin-bottom: 5px;
+	background: #ffff14;
+
+	border-radius: 10px;
+
+	-webkit-box-shadow:0px 0px 75px 8px rgba(203,239,23,0.69);
+	-moz-box-shadow: 0px 0px 75px 8px rgba(203,239,23,0.69);
+	box-shadow: 0px 0px 75px 8px rgba(203,239,23,0.69);
+}
+
+#new-game:hover {
+	cursor: pointer;
+}
+
+#defaultCanvas0 {
+	border: 5px solid rgba(10, 87, 90, 1);
+	border-radius: 5px;
+
+	margin: 5px;
 }

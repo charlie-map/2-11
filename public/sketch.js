@@ -27,21 +27,33 @@ function setup() {
 function draw() {
   background(220);
   
-  if (!board.boardMove && moveBuildup.length) {
-    if (moveBuildup[0] == 1) {
-      board.moveLeft();
-    } else if (moveBuildup[0] == 2) {
-      board.moveUp();
-    } else if (moveBuildup[0]  == 3) {
-      board.moveRight();
-    } else {
-      board.moveDown();
+  if (!endGame) {
+    if (!board.boardMove && moveBuildup.length) {
+      if (moveBuildup[0] == 1) {
+        board.moveLeft();
+      } else if (moveBuildup[0] == 2) {
+        board.moveUp();
+      } else if (moveBuildup[0]  == 3) {
+        board.moveRight();
+      } else {
+        board.moveDown();
+      }
+      
+      moveBuildup = moveBuildup.slice(1);
     }
     
-    moveBuildup = moveBuildup.slice(1);
+    board.drawBoard();
+  } else {
+    // end game screen
+    board.drawBoard();
+
+    fill(rectEndFiller[0], rectEndFiller[1], rectEndFiller[2], opacityEndRoller);
+
+    opacityEndRoller += opacityEndRoller < 85 ? 0.25 : 0;
+
+    $("#defaultCanvas0").addClass("end");
+    rect(0, 0, $("#defaultCanvas0").width(), $("#defaultCanvas0").height());
   }
-  
-  board.drawBoard();
 }
 
 function computeColor(rank) {
@@ -51,6 +63,9 @@ function computeColor(rank) {
 }
 
 function keyPressed() {
+  if (endGame)
+    return;
+
   if (keyCode == LEFT_ARROW) {
     if (board.boardMove) {
       moveBuildup.push(1);

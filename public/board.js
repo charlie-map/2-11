@@ -12,6 +12,9 @@ class Board {
         this.board[setBoardX][setBoardY] = null;
       }
     }
+
+    // this.board[0][0] = new Piece(0, 0, 90, 90, 1024);
+    // this.board[1][0] = new Piece(100, 0, 90, 90, 2048);
     
     // pick 2 random initial positions
     this.addPiece(tileSize);
@@ -46,12 +49,14 @@ class Board {
       }
       
       if (x == 4 || y == 4)
-        return;
+        return 0;
     }
     
     let choose_start = floor(random(100));
     let start_number = choose_start < 89 ? 2 : choose_start < 99 ? 4 : 8;
     this.board[findOpenX][findOpenY] = new Piece(100 * findOpenX, 100 * findOpenY, tileSize, tileSize, start_number);
+  
+    return 1;
   }
   
   drawBoard() {
@@ -76,14 +81,15 @@ class Board {
     fill(255);
     strokeWeight(1);
     
-    let isMoving = 0;
+    let isMoving = 0, movingPieces = 0;
     
     for (let x = 0; x < 4; x++) {
       for (let y = 0; y < 4; y++) {
         if (this.board[x][y]) {
           this.board[x][y].drawPiece();
           
-          isMoving += this.board[x][y].moveAmount > 0 ? 1 : 0;
+          movingPieces += this.board[x][y].moveAmount > 0 ? 1 : 0;
+          isMoving += this.board[x][y].moveAmount > 0 ? this.board[x][y].moveAmount : 0;
           
           if (this.board[x][y].moveAmount <= 90 && this.board[x][y].merging) {
             this.board[x][y].merging = 0;
@@ -96,19 +102,45 @@ class Board {
       }
     }
     
-    this.boardMove = isMoving ? 1 : 0;
-
-    if (!this.boardMove && points) {
+    if (isMoving < (45 * movingPieces) && points) {
+      let prevScore = metaPoints;
       
+      if (prevScore + points > bestPoints && prevScore + points > metaPoints) {
+        $("#best-score").text(prevScore);
+
+        metaPoints = prevScore + points;
+        bestPoints = metaPoints;
+        let newScore = metaPoints + "";
+
+        $("#best-score").stop();
+        $("#best-score").animate({
+          opacity: 0.4
+        }, 150).animate({
+          opacity: 1
+        }, 150);
+
+        setTimeout(function(newScore) {
+          $("#best-score").text(newScore);
+
+        }, 150, newScore);
+      }
+
+      if (prevScore + points > metaPoints) {
+        
+      }
     }
+
+
+
+    this.boardMove = isMoving ? 1 : 0;
   }
   
   // moveDirection = 1
   moveLeft() {
-    let points = 0;
+    points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0;
+    let somethingMoved = 0, isSpace = 0;
     for (let y = 0; y < 4; y++) {
       let prevNum = 0;
       let maxMoveLeft = 0;
@@ -138,18 +170,24 @@ class Board {
         this.board[x - maxMoveLeft][y] = this.board[x][y];
         this.board[x][y] = null;
       }
+
+      isSpace += maxMoveLeft;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
+
+    if (!isSpace) { // end game
+      endGame = 1;
+    }
   }
 
   // moveDirection = 2
   moveUp() {
-    let points = 0;
+    points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0;
+    let somethingMoved = 0, isSpace = 0;
     for (let x = 0; x < 4; x++) {
       let prevNum = 0;
       let maxMoveUp = 0;
@@ -179,18 +217,24 @@ class Board {
         this.board[x][y - maxMoveUp] = this.board[x][y];
         this.board[x][y] = null;
       }
+
+      isSpace += maxMoveUp;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
+
+    if (!isSpace) { // end game
+      endGame = 1;
+    }
   }
 
   // moveDirection = 3
   moveRight() {
-    let points = 0;
+    points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0;
+    let somethingMoved = 0, isSpace = 0;
     for (let y = 0; y < 4; y++) {
       let prevNum = 0;
       let maxMoveRight = 0;
@@ -220,18 +264,24 @@ class Board {
         this.board[x + maxMoveRight][y] = this.board[x][y];
         this.board[x][y] = null;
       }
+
+      isSpace += maxMoveRight;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
+
+    if (!isSpace) { // end game
+      endGame = 1;
+    }
   }
 
   // moveDirection = 4
   moveDown() {
-    let points = 0;
+    points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0;
+    let somethingMoved = 0, isSpace = 0;
     for (let x = 0; x < 4; x++) {
       let prevNum = 0;
       let maxMoveDown = 0;
@@ -261,9 +311,15 @@ class Board {
         this.board[x][y + maxMoveDown] = this.board[x][y];
         this.board[x][y] = null;
       }
+
+      isSpace += maxMoveDown;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
+
+    if (!isSpace) { // end game
+      endGame = 1;
+    }
   }
 }
