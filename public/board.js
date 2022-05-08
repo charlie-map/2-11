@@ -104,13 +104,14 @@ class Board {
     
     if (isMoving < (45 * movingPieces) && points) {
       let prevScore = metaPoints;
-      
+      let newMetaPoints = prevScore + points;
+
+      console.log(bestPoints);
       if (prevScore + points > bestPoints && prevScore + points > metaPoints) {
         $("#best-score").text(prevScore);
 
-        metaPoints = prevScore + points;
-        bestPoints = metaPoints;
-        let newScore = metaPoints + "";
+        bestPoints = newMetaPoints;
+        let newScore = newMetaPoints + "";
 
         $("#best-score").stop();
         $("#best-score").animate({
@@ -126,11 +127,26 @@ class Board {
       }
 
       if (prevScore + points > metaPoints) {
+        $("#add-to-current-score").text("+" + points);
+        $("#add-to-current-score").addClass("float");
         
+        setTimeout(function(newMetaPoints) {
+          $("#current-score").text(newMetaPoints);
+        }, 100, newMetaPoints);
+
+        if (currentScoreAnimationTimeout) {
+          clearTimeout(currentScoreAnimationTimeout);
+          currentScoreAnimationTimeout = null;
+        }
+
+        currentScoreAnimationTimeout = setTimeout(function(newMetaPoints) {
+          $("#add-to-current-score").removeClass("float");
+          $("#add-to-current-score").text("");
+          currentScoreAnimationTimeout = null;
+        }, 300);
       }
+      metaPoints = newMetaPoints;
     }
-
-
 
     this.boardMove = isMoving ? 1 : 0;
   }

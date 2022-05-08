@@ -1,2 +1,5 @@
 node_modules/
 package-lock.json
+public/jquery-3.6.0.min.js
+public/p5.js
+public/p5.sound.min.js

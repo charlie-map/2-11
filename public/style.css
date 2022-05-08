@@ -113,22 +113,22 @@ body {
 	position: relative;
 
 	width: 0px;
-	left: 50% !important;
+	left: 40% !important;
 }
 
 #add-to-current-score.float {
-	animation: float-up 0.5s ease-in-out;
+	animation: float-up 0.3s ease-in-out;
 }
 
 @keyframes float-up {
 	from {
-		margin-top: 0px;
+		margin-top: -5px;
 		opacity: 1;
 	}
 
 	to {
-		margin-top: 30px;
-		opacity: 0;
+		margin-top: -45px;
+		opacity: 0.2;
 	}
 }
 
