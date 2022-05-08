@@ -6,7 +6,7 @@
 
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Koulen&display=swap" rel="stylesheet"> 
+	<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet"> 
 
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
@@ -17,17 +17,23 @@
 	<main id="page-body">
 		<div id="page-meta-info">
 			<div style="display: flex; flex-direction: column;">
-				<p id="page-title">2<p class="shooter">^</p>11</p>
-				<p>Join the tiles to get to 2E11 (2048)!</p>
+				<div id="page-title">2<p class="shooter">^</p>11</div>
+				<p class="barlow">Join the tiles to get to 2E11 (2048)!</p>
 				<a href="#how-to-play">How to play 🠮</a>
 			</div>
 			<div style="display: flex; flex-direction: column">
 				<div class="scores">
-					<div class="current-score">
-						0
+					<div class="current-score-card">
+						Score
+						<p id="current-score">
+							0
+						</p>
 					</div>
-					<div class="best-score">
-						0
+					<div class="best-score-card">
+						Best
+						<p id="best-score">
+							0
+						</p>
 					</div>
 				</div>
 				<div class="new-game">
@@ -37,6 +43,15 @@
 		</div>
 	</main>
 
+	<!-- META DATA -->
+	<script>
+		let board;
+		let moveBuildup;
+
+		// stores background color, text color, and glow for a given tile
+		let levelConverter;
+		let metaPoints;
+	</script>
 	<script src="piece.js"></script>
 	<script src="board.js"></script>
 	<script src="sketch.js"></script>

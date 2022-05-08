@@ -1,5 +1,9 @@
 * {
-	font-family: 'Koulen', cursive;
+    font-family: 'Koulen', cursive
+}
+
+.barlow {
+	font-family: 'Barlow', sans-serif;
 }
 
 html, body {
@@ -37,6 +41,9 @@ body {
 	margin-top: 20px;
 
 	font-size: 10vw;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .shooter {
@@ -44,9 +51,9 @@ body {
 	top: 0px;
 
 	display: inline-block;
+	margin-bottom: 0;
 
-	margin-bottom: 20px;
-	/*animation: blipMargin 1.5s linear infinite;*/
+	animation: blipMargin 1.5s linear infinite;
 }
 
 @keyframes blipMargin {

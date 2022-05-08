@@ -97,10 +97,15 @@ class Board {
     }
     
     this.boardMove = isMoving ? 1 : 0;
+
+    if (!this.boardMove && points) {
+      
+    }
   }
   
   // moveDirection = 1
   moveLeft() {
+    let points = 0;
     this.boardMove = 1;
     
     let somethingMoved = 0;
@@ -117,6 +122,7 @@ class Board {
         if (this.board[x][y].num == prevNum) { // merge
           maxMoveLeft++;
           
+          points += this.board[x][y].num * 2;
           this.board[x][y].merging = 1;
           this.board[x][y].itemToMerge = this.board[x - maxMoveLeft][y];
           
@@ -140,6 +146,7 @@ class Board {
 
   // moveDirection = 2
   moveUp() {
+    let points = 0;
     this.boardMove = 1;
     
     let somethingMoved = 0;
@@ -156,6 +163,7 @@ class Board {
         if (this.board[x][y].num == prevNum) { // merge
           maxMoveUp++;
           
+          points += this.board[x][y].num * 2;
           this.board[x][y].merging = 1;
           this.board[x][y].itemToMerge = this.board[x][y - maxMoveUp];
           
@@ -179,6 +187,7 @@ class Board {
 
   // moveDirection = 3
   moveRight() {
+    let points = 0;
     this.boardMove = 1;
     
     let somethingMoved = 0;
@@ -195,6 +204,7 @@ class Board {
         if (this.board[x][y].num == prevNum) { // merge
           maxMoveRight++;
           
+          points += this.board[x][y].num * 2;
           this.board[x][y].merging = 1;
           this.board[x][y].itemToMerge = this.board[x + maxMoveRight][y];
           
@@ -218,6 +228,7 @@ class Board {
 
   // moveDirection = 4
   moveDown() {
+    let points = 0;
     this.boardMove = 1;
     
     let somethingMoved = 0;
@@ -234,6 +245,7 @@ class Board {
         if (this.board[x][y].num == prevNum) { // merge
           maxMoveDown++;
           
+          points += this.board[x][y].num * 2;
           this.board[x][y].merging = 1;
           this.board[x][y].itemToMerge = this.board[x][y + maxMoveDown];
           

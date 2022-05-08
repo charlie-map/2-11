@@ -1,9 +1,3 @@
-let board;
-let moveBuildup;
-
-// stores background color, text color, and glow for a given tile
-let levelConverter;
-
 function setup() {
   createCanvas(400, 400);
   
