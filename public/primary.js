@@ -3,6 +3,8 @@ $("#new-game").click(function() {
 	endGame = 0;
 	opacityEndRoller = 60
 
+	$("#new-game").text("New game");
+
 	$("#current-score").text("0");
 
 	setup();

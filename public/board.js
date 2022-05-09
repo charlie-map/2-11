@@ -151,12 +151,38 @@ class Board {
     this.boardMove = isMoving ? 1 : 0;
   }
   
+  canMove() {
+    // check for empty cell:
+    let rowPrevNum = [0, 0, 0, 0];
+
+    for (let x = 0; x < 4; x++) {
+      let prevNum = 0;
+
+      for (let y = 0; y < 4; y++) {
+        if (!this.board[x][y])
+          return 1;
+
+        if (prevNum == this.board[x][y].num)
+          return 1;
+        else
+          prevNum = this.board[x][y].num;
+
+        if (rowPrevNum[y] == this.board[x][y].num)
+          return 1;
+        else
+          rowPrevNum[y] = this.board[x][y].num;
+      }
+    }
+
+    return 0;
+  }
+
   // moveDirection = 1
   moveLeft() {
     points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0, isSpace = 0;
+    let somethingMoved = 0;
     for (let y = 0; y < 4; y++) {
       let prevNum = 0;
       let maxMoveLeft = 0;
@@ -186,14 +212,14 @@ class Board {
         this.board[x - maxMoveLeft][y] = this.board[x][y];
         this.board[x][y] = null;
       }
-
-      isSpace += maxMoveLeft;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
 
-    if (!isSpace) { // end game
+    if (!this.canMove()) { // end game
+      $("#new-game").text("Try again");
+
       endGame = 1;
     }
   }
@@ -203,7 +229,7 @@ class Board {
     points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0, isSpace = 0;
+    let somethingMoved = 0;
     for (let x = 0; x < 4; x++) {
       let prevNum = 0;
       let maxMoveUp = 0;
@@ -233,15 +259,15 @@ class Board {
         this.board[x][y - maxMoveUp] = this.board[x][y];
         this.board[x][y] = null;
       }
-
-      isSpace += maxMoveUp;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
 
-    if (!isSpace) { // end game
+    if (!this.canMove()) { // end game
       endGame = 1;
+
+      $("#new-game").text("Try again");
     }
   }
 
@@ -250,7 +276,7 @@ class Board {
     points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0, isSpace = 0;
+    let somethingMoved = 0;
     for (let y = 0; y < 4; y++) {
       let prevNum = 0;
       let maxMoveRight = 0;
@@ -280,15 +306,15 @@ class Board {
         this.board[x + maxMoveRight][y] = this.board[x][y];
         this.board[x][y] = null;
       }
-
-      isSpace += maxMoveRight;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
 
-    if (!isSpace) { // end game
+    if (!this.canMove()) { // end game
       endGame = 1;
+
+      $("#new-game").text("Try again");
     }
   }
 
@@ -297,7 +323,7 @@ class Board {
     points = 0;
     this.boardMove = 1;
     
-    let somethingMoved = 0, isSpace = 0;
+    let somethingMoved = 0;
     for (let x = 0; x < 4; x++) {
       let prevNum = 0;
       let maxMoveDown = 0;
@@ -327,15 +353,15 @@ class Board {
         this.board[x][y + maxMoveDown] = this.board[x][y];
         this.board[x][y] = null;
       }
-
-      isSpace += maxMoveDown;
     }
     
     if (somethingMoved)
       this.addPiece(this.tileS);
 
-    if (!isSpace) { // end game
+    if (!this.canMove()) { // end game
       endGame = 1;
+
+      $("#new-game").text("Try again");
     }
   }
 }

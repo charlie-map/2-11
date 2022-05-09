@@ -53,6 +53,11 @@ function draw() {
 
     $("#defaultCanvas0").addClass("end");
     rect(0, 0, $("#defaultCanvas0").width(), $("#defaultCanvas0").height());
+
+    textSize(62);
+    stroke(220);
+    fill(220);
+    text("Game over", width * 0.5 - 165, height * 0.5 + 15);
   }
 }
 
