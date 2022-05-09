@@ -1,0 +1,59 @@
+DROP DATABASE IF EXISTS 2_11;
+CREATE DATABASE 2_11;
+
+USE 2_11;
+
+CREATE TABLE user (
+	id INT AUTO_INCREMENT,
+
+	username VARCHAR(255) NOT NULL,
+	email VARCHAR(511) NOT NULL,
+	password VARCHAR(60) NOT NULL,
+
+	birthdate DATE NOT NULL,
+	gender VARCHAR(255),
+
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE streak (
+	user_id INT,
+
+	lastLogin DATETIME NOT NULL,
+
+	currentStreak INT NOT NULL DEFAULT 0,
+	bestStreak INT NOT NULL DEFAULT 0,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE game (
+	user_id INT,
+
+	currentScore INT NOT NULL DEFAULT 0,
+	bestScore INT NOT NULL DEFAULT 0,
+
+	averageScore FLOAT NOT NULL DEFAULT 0,
+
+	wins INT NOT NULL DEFAULT 0,
+	totalGames INT NOT NULL DEFAULT 0,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
+);
+
+CREATE TABLE boardX (
+	id INT NOT NULL,
+	user_id INT NOT NULL,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
+	PRIMARY KEY(id)
+);
+
+CREATE TABLE boardY (
+	id INT NOT NULL,
+	boardX_id INT NOT NULL,
+
+	num INT NOT NULL,
+
+	FOREIGN KEY (boardX_id) REFERENCES boardX(id) ON DELETE CASCADE
+);
