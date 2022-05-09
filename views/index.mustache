@@ -18,8 +18,32 @@
   </head>
   <body>
 
-  	<div id="all-content">
+  <div id="all-content">
 		<main id="page-body">
+			<div class="dropdown-noti {{#LOGGED_IN}}logged-in-box{{/LOGGED_IN}}{{^LOGGED_IN}}logged-out-box{{/LOGGED_IN}}">
+				{{^LOGGED_IN}}
+					<p class="barlow">
+						You are not logged in
+					</p>
+					<div class="signup-sys">
+						<a href="/login">
+							<div>
+								Login
+							</div>
+						</a>
+						<a href="/signup">
+							<div>
+								Signup
+							</div>
+						</a>
+					</div>
+				{{/LOGGED_IN}}
+				{{#LOGGED_IN}}
+					<p class="barlow">
+						You are not in
+					</p>
+				{{/LOGGED_IN}}
+			</div>
 			<div id="page-meta-info">
 				<div style="display: flex; justify-content: center; align-items: center">
 					<div id="page-title">2<p class="shooter">^</p>11</div>

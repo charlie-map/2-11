@@ -22,8 +22,8 @@ class Board {
       }
     }
 
-    // this.board[0][0] = new Piece(0, 0, 90, 90, 512);
-    // this.board[1][0] = new Piece(100, 0, 90, 90, 1024);
+    // this.board[0][0] = new Piece(0, 0, 90, 90, 2048);
+    // this.board[1][0] = new Piece(100, 0, 90, 90, 16384);
     
     // pick 2 random initial positions
     if (!oldBoard) {
