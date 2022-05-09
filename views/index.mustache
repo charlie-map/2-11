@@ -61,8 +61,8 @@
 
 		// stores background color, text color, and glow for a given tile
 		let levelConverter;
-		let bestPoints = localStorage.getItem("bestPoints");
-		bestPoints = bestPoints ? bestPoints : 0;
+		let bestPoints = localStorage.getItem("savedBest2-11Score");
+		bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
 		let points = 0, metaPoints = 0;
 
 		let currentScoreAnimationTimeout;

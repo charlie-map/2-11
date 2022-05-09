@@ -7,5 +7,5 @@ $("#new-game").click(function() {
 
 	$("#current-score").text("0");
 
-	setup();
+	setup(1);
 });

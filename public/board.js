@@ -1,5 +1,5 @@
 class Board {
-  constructor(size, tileSize) {
+  constructor(size, tileSize, oldBoard) {
     this.board = [];
     this.tileS = tileSize;
     
@@ -9,6 +9,15 @@ class Board {
       for (let setBoardY = 0; setBoardY < size; setBoardY++) {
         // let num = pow(2, (setBoardX * size) + setBoardY + 1);
         // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
+        if (oldBoard && oldBoard[setBoardX][setBoardY]) {
+          let oldPieceData = oldBoard[setBoardX][setBoardY];
+
+          this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
+            90, 90, oldPieceData.num);
+
+          continue;
+        }
+
         this.board[setBoardX][setBoardY] = null;
       }
     }
@@ -17,10 +26,19 @@ class Board {
     // this.board[1][0] = new Piece(100, 0, 90, 90, 2048);
     
     // pick 2 random initial positions
-    this.addPiece(tileSize);
-    this.addPiece(tileSize);
+    if (!oldBoard) {
+      this.addPiece(tileSize);
+      this.addPiece(tileSize);
+    }
     
     this.boardMove = 0;
+  }
+
+  saveGame() {
+    localStorage.setItem("saved2-11Board", JSON.stringify(this.board));
+  
+    localStorage.setItem("savedCurr2-11Score", metaPoints);
+    localStorage.setItem("savedBest2-11Score", bestPoints);
   }
   
   addPiece(tileSize) {
@@ -55,7 +73,7 @@ class Board {
     let choose_start = floor(random(100));
     let start_number = choose_start < 89 ? 2 : choose_start < 99 ? 4 : 8;
     this.board[findOpenX][findOpenY] = new Piece(100 * findOpenX, 100 * findOpenY, tileSize, tileSize, start_number);
-  
+
     return 1;
   }
   
@@ -106,7 +124,6 @@ class Board {
       let prevScore = metaPoints;
       let newMetaPoints = prevScore + points;
 
-      console.log(bestPoints);
       if (prevScore + points > bestPoints && prevScore + points > metaPoints) {
         $("#best-score").text(prevScore);
 
@@ -145,10 +162,21 @@ class Board {
           currentScoreAnimationTimeout = null;
         }, 300);
       }
+
       metaPoints = newMetaPoints;
+      this.saveGame();
     }
 
-    this.boardMove = isMoving ? 1 : 0;
+    this.boardMove = movingPieces ? 1 : 0;
+
+    if (!this.boardMove && !this.canMove()) {
+      endGame = 1;
+
+      localStorage.setItem("saved2-11Board", null);
+      localStorage.setItem("savedCurr2-11Score", 0);
+
+      $("#new-game").text("Try again");
+    }
   }
   
   canMove() {
@@ -216,12 +244,6 @@ class Board {
     
     if (somethingMoved)
       this.addPiece(this.tileS);
-
-    if (!this.canMove()) { // end game
-      $("#new-game").text("Try again");
-
-      endGame = 1;
-    }
   }
 
   // moveDirection = 2
@@ -263,12 +285,6 @@ class Board {
     
     if (somethingMoved)
       this.addPiece(this.tileS);
-
-    if (!this.canMove()) { // end game
-      endGame = 1;
-
-      $("#new-game").text("Try again");
-    }
   }
 
   // moveDirection = 3
@@ -310,12 +326,6 @@ class Board {
     
     if (somethingMoved)
       this.addPiece(this.tileS);
-
-    if (!this.canMove()) { // end game
-      endGame = 1;
-
-      $("#new-game").text("Try again");
-    }
   }
 
   // moveDirection = 4
@@ -357,11 +367,5 @@ class Board {
     
     if (somethingMoved)
       this.addPiece(this.tileS);
-
-    if (!this.canMove()) { // end game
-      endGame = 1;
-
-      $("#new-game").text("Try again");
-    }
   }
 }
