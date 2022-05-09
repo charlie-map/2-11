@@ -13,43 +13,72 @@
 
 	<script src="jquery-3.6.0.min.js" defer></script>
 
+	<link rel="icon" href="2-11TileIcon.png">
+	<title>2^11</title>
   </head>
   <body>
-	<main id="page-body">
-		<div id="page-meta-info">
-			<div style="display: flex; justify-content: center; align-items: center">
-				<div id="page-title">2<p class="shooter">^</p>11</div>
-				<div class="scores">
-					<div class="score-card current-score-card">
-						Score
-						<div class="sub-scorer">
-							<p id="add-to-current-score"></p>
-							<p id="current-score">
-								0
-							</p>
+
+  	<div id="all-content">
+		<main id="page-body">
+			<div id="page-meta-info">
+				<div style="display: flex; justify-content: center; align-items: center">
+					<div id="page-title">2<p class="shooter">^</p>11</div>
+					<div class="scores">
+						<div class="score-card current-score-card">
+							Score
+							<div class="sub-scorer">
+								<p id="add-to-current-score"></p>
+								<p id="current-score">
+									0
+								</p>
+							</div>
+						</div>
+						<div class="score-card best-score-card">
+							Best
+						 	<div class="sub-scorer">
+								<p id="best-score">
+									0
+								</p>
+							</div>
 						</div>
 					</div>
-					<div class="score-card best-score-card">
-						Best
-					 	<div class="sub-scorer">
-							<p id="best-score">
-								0
-							</p>
-						</div>
+				</div>
+				<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+					<div style="display: flex; flex-direction: column; justify-content: center;">
+						<p class="barlow">Join the tiles to get to 2^11 (2048)!</p>
+						<a id="go-to-how-to" href="#how-to-play">How to play ➞</a>
+					</div>
+					<div id="new-game">
+						New game
 					</div>
 				</div>
 			</div>
-			<div style="display: flex; justify-content: center; align-items: center">
-				<div>
-					<p class="barlow">Join the tiles to get to 2E11 (2048)!</p>
-					<a href="#how-to-play">How to play 🠮</a>
-				</div>
-				<div id="new-game">
-					New game
-				</div>
+		</main>
+
+		<div id="how-to-play">
+			<p>How to play:</p>
+			<p class="barlow" style="line-height: 26px">
+				Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
+			</p>
+			<a id="go-to-title" href="#page-title">Start playing ➞</a>
+
+			<hr>
+
+			<p class="barlow" style="line-height: 26px">
+				This is the <span class="barlow" style="font-weight: bold">original version of</span> <span style="font-weight: bold">2^11 / 2-11</span>. Maintain
+				 <span class="barlow" style="font-weight: bold; display: inline">prudence</span> towards all other versions that do not have the name <span style="font-weight: bold">2^11</span> or <span style="font-weight: bold">2-11</span>.
+			</p>
+
+			<hr>
+
+			<div class="final-tag">
+				<p class="barlow">
+					Created by <a class="barlow" href="https://charlie.city" target="_blank">charlie-map.</a> Based on <a class="barlow" href="https://apps.apple.com/us/app/1024/id823499224" target="_blank">1024 by Veewo Studio.</a>
+				</p>
+				<div class="card counter"></div>
 			</div>
 		</div>
-	</main>
+	</div>
 
 	<!-- META DATA -->
 	<script>

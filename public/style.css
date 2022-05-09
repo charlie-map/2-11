@@ -18,6 +18,16 @@ canvas {
 body {
 	width: 100vw;
 	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+	overflow-x: hidden;
+}
+
+a {
+	color: black;
 }
 
 #page-meta-info {
@@ -28,9 +38,6 @@ body {
 }
 
 #page-body {
-	width: 100%;
-	height: 100%;
-
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -40,7 +47,7 @@ body {
 #page-title {
 	margin: 0;
 
-	font-size: 10vw;
+	font-size: 120px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -78,7 +85,7 @@ body {
 	margin-bottom: 5px;
 	background: #03b6db;
 
-	border-radius: 10px;
+	border-radius: 5px;
 
 	text-align: center;
 }
@@ -147,15 +154,19 @@ body {
 	margin-bottom: 5px;
 	background: #ffff14;
 
-	border-radius: 10px;
+	border-radius: 2px;
 
-	-webkit-box-shadow:0px 0px 75px 8px rgba(203,239,23,0.69);
-	-moz-box-shadow: 0px 0px 75px 8px rgba(203,239,23,0.69);
-	box-shadow: 0px 0px 75px 8px rgba(203,239,23,0.69);
+	-webkit-box-shadow:0px 0px 26px 12px rgba(225,225,0,0.8);
+	-moz-box-shadow: 0px 0px 26px 12px rgba(225,225,0,0.8);
+	box-shadow: 0px 0px 26px 12px rgba(225,225,0,0.8);
 }
 
 #new-game:hover {
 	cursor: pointer;
+}
+
+#how-to-play {
+	margin-top: 20px;
 }
 
 #defaultCanvas0 {
@@ -164,3 +175,72 @@ body {
 
 	margin: 5px;
 }
+
+.final-tag {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Counter -- From Henry Zarza*/
+.card {
+  align-items: center;
+  border-radius: 0.25rem;
+  box-shadow: 3px 4px 5px rgba(0, 0, 0, 0.25);
+  display: flex;
+  height: 120px;
+  justify-content: center;
+  position: relative;
+  width: 80%;
+}
+
+.counter {
+  animation: counter 5s linear infinite alternate;
+  background-color: #ffff14;
+  counter-reset: count 0;
+}
+
+.counter::before {
+  content: counter(count);
+  font-size: 7rem;
+  line-height: 1.1;
+  text-shadow: 1px 2px 3px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes counter {
+  0% {
+    counter-increment: count 2;
+  }
+  10% {
+    counter-increment: count 4;
+  }
+  20% {
+    counter-increment: count 8;
+  }
+  30% {
+    counter-increment: count 16;
+  }
+  40% {
+    counter-increment: count 32;
+  }
+  50% {
+    counter-increment: count 64;
+  }
+  60% {
+    counter-increment: count 128;
+  }
+  70% {
+    counter-increment: count 256;
+  }
+  80% {
+    counter-increment: count 512;
+  }
+  90% {
+    counter-increment: count 1024;
+  }
+  100% {
+    counter-increment: count 2048;
+  }
+}
+/* End counter */

@@ -1,6 +1,8 @@
 function setup(isRestart) {
   createCanvas(400, 400);
   
+  $("#how-to-play").outerWidth($("#defaultCanvas0").outerWidth());
+  
   levelConverter = {
   	2: [color(3, 182, 219), color(143, 37, 16), 0],
   	4: [color(4, 200, 220), color(143, 42, 10), 0],

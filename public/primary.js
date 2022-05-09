@@ -9,3 +9,21 @@ $("#new-game").click(function() {
 
 	setup(1);
 });
+
+window.addEventListener("keydown", function(e) {
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+$("#go-to-title").click(function(e) {
+	e.preventDefault();
+
+	$("html, body").animate({ scrollTop: -200 }, "slow");
+});
+
+$("#go-to-how-to").click(function(e) {
+	e.preventDefault();
+
+	$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+});
