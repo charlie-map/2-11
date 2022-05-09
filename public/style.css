@@ -196,9 +196,9 @@ a {
 }
 
 .counter {
-  animation: counter 5s linear infinite alternate;
-  background-color: #ffff14;
-  counter-reset: count 0;
+	animation: bg-c 9s ease-in-out infinite alternate, counter 9s linear infinite alternate;
+
+	counter-reset: count 0;
 }
 
 .counter::before {
@@ -242,5 +242,41 @@ a {
   100% {
     counter-increment: count 2048;
   }
+}
+
+@keyframes bg-c {
+	0% { /* 2 */
+		background-color: #03b6db;
+	}
+	10% { /* 4 */
+		background-color: #04c8dc;
+	}
+	20% { /* 8 */
+		background-color: #05f0dd;
+	}
+	30% { /* 16 */
+		background-color: #35ffff;
+	}
+	40% { /* 32 */
+		background-color: #35ffff;
+	}
+	50% { /* 64 */
+		background-color: #00ffa6;
+	}
+	60% { /* 128 */
+		background-color: #00e68d;
+	}
+	70% { /* 256 */
+		background-color: #78c732;
+	}
+	80% { /* 512 */
+		background-color: #acd100;
+	}
+	90% { /* 1024 */
+		background-color: #caef17;
+	}
+	100% { /* 2048 */
+		background-color: #ffff14;
+	}
 }
 /* End counter */
