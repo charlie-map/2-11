@@ -333,6 +333,37 @@ a {
 }
 /* End counter */
 
+#password-container.Signup {
+	margin-bottom: 42px;
+
+	transition: all 1s ease-in-out;
+}
+
+#password-container.Signup.select {
+	margin-bottom: 4px;
+}
+
+.gender-noti {
+	height: 0px;
+	margin-top: -38px;
+	opacity: 0;
+
+	z-index: 2;
+
+	background: ;
+
+	transition: all 1s ease-in-out;
+}
+
+.gender-noti.select {
+	margin-top: 0px;
+	opacity: 0.8;
+}
+
+.gender-noti ul {
+	list-style-type:  none;
+}
+
 /* Login / Signup page (from Pablo Eugenio Lujambio Martinez) */
 h4 {
   font-size: 24px;
@@ -477,7 +508,7 @@ input:focus {
   opacity: 0.15;
   transition: all 0.3s ease;
 }
-.floating-label .icon svg path {
+.floating-label .icon svg path, .floating-label .icon svg rect {
   transition: all 0.3s ease;
 }
 .floating-label input:not(:-moz-placeholder-shown) {
@@ -511,15 +542,18 @@ input:focus {
   opacity: 1;
 }
 .floating-label input:valid:not(:-moz-placeholder-shown) + label + .icon svg path,
-.floating-label input:valid:not(:-moz-placeholder-shown) + label + .icon svg rect {
+.floating-label input:valid:not(:-moz-placeholder-shown) + label + .icon svg rect,
+.floating-label input:valid:not(:-moz-placeholder-shown) + label + .icon svg circle {
   color: #b69de6;
 }
 .floating-label input:valid:not(:-ms-input-placeholder) + label + .icon svg path,
-.floating-label input:valid:not(:-ms-input-placeholder) + label + .icon svg rect {
+.floating-label input:valid:not(:-ms-input-placeholder) + label + .icon svg rect
+.floating-label input:valid:not(:-ms-input-placeholder) + label + .icon svg circle {
   color: #b69de6;
 }
 .floating-label input:valid:not(:placeholder-shown) + label + .icon svg path,
-.floating-label input:valid:not(:placeholder-shown) + label + .icon svg rect {
+.floating-label input:valid:not(:placeholder-shown) + label + .icon svg rect,
+.floating-label input:valid:not(:placeholder-shown) + label + .icon svg circle {
   color: #b69de6;
 }
 .floating-label input:not(:valid):not(:focus) + label + .icon {

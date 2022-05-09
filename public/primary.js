@@ -27,3 +27,21 @@ $("#go-to-how-to").click(function(e) {
 
 	$("html, body").animate({ scrollTop: $(document).height() }, "slow");
 });
+
+$("#gender").focus(function() {
+	let img_width = $("#nice-image").outerWidth();
+
+	$(".gender-noti").outerWidth(img_width);
+	$(".gender-noti").addClass("select");
+	$("#password-container").addClass("select");
+
+	$(".gender-noti").offset({
+		left: $("#nice-image").offset().left,
+		top: $("#gender").offset().top
+	});
+});
+
+$("#gender").focusout(function() {
+	$(".gender-noti").removeClass("select");
+	$("#password-container").removeClass("select");
+});
