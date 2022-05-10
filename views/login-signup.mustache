@@ -44,7 +44,7 @@
 				{{^LOGGING_IN}}
 					<div class="floating-label">
 						<input class="barlow" placeholder="Email" type="email" name="email" id="email" autocomplete="off">
-						<label class="barlow" for="email">Email:</label>
+						<label class="barlow" for="email">Email: <span id="email-taken" class="barlow">taken</span></label>
 						
 						<div class="icon">
 							<?xml version="1.0" encoding="UTF-8"?>
@@ -53,7 +53,7 @@
 					</div>
 					<div class="floating-label">
 						<input class="barlow" placeholder="Username" type="text" name="username" id="username" autocomplete="off">
-						<label class="barlow" for="username">Username:</label>
+						<label id="username-label" class="barlow" for="username">Username: <span id="username-taken" class="barlow">taken</span></label>
 						
 						<div class="icon">
 							<?xml version="1.0" encoding="UTF-8"?>

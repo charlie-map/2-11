@@ -455,6 +455,17 @@ a {
   }
 }
 
+
+#username-taken, #email-taken {
+	color: #ce5c24;
+	opacity: 0;
+
+	transition: opacity 1s ease-in-out;
+}
+
+#username-taken.is-taken, #email-taken.is-taken {
+	opacity: 1;
+}
 /* Login / Signup page (from Pablo Eugenio Lujambio Martinez) */
 h4 {
   font-size: 24px;

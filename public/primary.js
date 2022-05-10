@@ -5,12 +5,14 @@ $(document).ready(function() {
 
 	let img_width = $("#nice-image").outerWidth();
 
-	$(".gender-noti").outerWidth(img_width - 8);
+	if ($(".gender-noti")) {
+		$(".gender-noti").outerWidth(img_width - 8);
 
-	$(".gender-noti").offset({
-		left: $("#nice-image").offset().left + 4,
-		top: $("#gender").offset().top - 40
-	});
+		$(".gender-noti").offset({
+			left: $("#nice-image").offset().left + 4,
+			top: $("#gender").offset().top - 40
+		});
+	}
 });
 
 window.resize = function() {
@@ -79,38 +81,67 @@ $(".gender-pick").click(function() {
 
 	$("#big-ol-form").validate().element("#gender");
 	$("#gender").addClass("color");
+	$("#gender").parent().removeClass("invalid");
 
 	$("#birthday").focus();
 });
 
-$("#email").on('input', function() {
+$("#username").focus(function() {
+	$("#username").removeClass("taken");
+	$("#username-taken").removeClass("is-taken");
+});
+
+$("#username").focusout(function() {
 	if (logging_in)
 		return;
 
-	$.get("/available/email/" + this.value, (res) => {
+	let username = $("#username").val();
+
+	if (!username.length)
+		return;
+
+	$.get("/username-available/" + username, (res) => {
 		if (res == "0") { // username taken
+			invalidate($("#username"));
 
-		} else { // username not taken
-
+			$("#username-taken").addClass("is-taken");
+			$("#username").addClass("taken");
+		} else {
+			$("#username-taken").removeClass("is-taken");
+			$("#username").removeClass("taken");
 		}
 	});
 });
 
-$("#username").on('input', function() {
+$("#email").focus(function() {
+	$("#email").removeClass("taken");
+	$("#email-taken").removeClass("is-taken");
+});
+
+$("#email").focusout(function() {
 	if (logging_in)
 		return;
 
-	$.get("/available/username/" + this.value, (res) => {
-		if (res == "0") { // username taken
+	let email = $("#email").val();
 
-		} else { // username not taken
+	if (!email.length)
+		return;
 
+	$.get("/email-available/" + email, (res) => {
+		if (res == "0") { // email taken
+			invalidate($("#email"));
+
+			$("#email-taken").addClass("is-taken");
+			$("#email").addClass("taken");
+		} else {
+			$("#email-taken").removeClass("is-taken");
+			$("#email").removeClass("taken");
 		}
 	});
 });
-
 function invalidate(el) {
 	$(el).parent().addClass("invalid");
+	$(el).removeClass("valid");
 }
 
 $("#register").click(function(e) {
@@ -129,24 +160,27 @@ $("#register").click(function(e) {
 			invalidate($("#password"));
 		}
 
-		console.log(username_or_email, password);
 		$.post("/login", {
 			username_email: username_or_email,
 			password
 		}, (res) => {
-
+			if (res[0] == "0") {
+				window.location.href = window.location.href.split("/")[0] + "/dashboard";
+			
+				return;
+			}
 		});
 	} else {
 		let invalids = 0;
 
 		let email = $("#email").val();
-		if (!email.length) {
+		if (!email.length || $("#email").hasClass("taken")) {
 			invalids++;
 			invalidate($("#email"));
 		}
 
 		let username = $("#username").val();
-		if (!username.length) {
+		if (!username.length || $("#username").hasClass("taken")) {
 			invalids++;
 			invalidate($("#username"));
 		}
@@ -170,15 +204,33 @@ $("#register").click(function(e) {
 		if (invalids)
 			return;
 
-		console.log(email, username, password, gender, birthday);
 		$.post("/signup", {
 			email,
 			username,
 			password,
 			gender,
-			birthday
+			birthdate: birthday
 		}, (res) => {
+			if (res[0] == "0") {
+				window.location.href = window.location.href.split("/")[0] + "/dashboard";
+			
+				return;
+			}
 
+			let errorNumbers = res.split("-")[1];
+
+			let errorNumberSplit = errorNumbers.split(",");
+			let formInputs = {
+				"0": $("#email"),
+				"1": $("#username"),
+				"2": $("#password"),
+				"3": $("#gender"),
+				"4": $("#birthday")
+			}
+
+			for (let i = 0; i < errorNumberSplit.length; i++) {
+				invalidate(formInputs[errorNumberSplit[i]]);
+			}
 		});
 	}
 });

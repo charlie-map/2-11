@@ -3,7 +3,7 @@ CREATE DATABASE 2_11;
 
 USE 2_11;
 
-CREATE TABLE user (
+CREATE TABLE user ( 
 	id INT AUTO_INCREMENT,
 
 	username VARCHAR(255) NOT NULL UNIQUE,
@@ -18,6 +18,15 @@ CREATE TABLE user (
 	joindate DATE NOT NULL,
 
 	PRIMARY KEY(id)
+);
+
+CREATE TABLE auth (
+	user_id INT,
+
+	authToken VARCHAR(36) NOT NULL,
+	tokenDeath DATETIME NOT NULL,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 CREATE TABLE streak (
