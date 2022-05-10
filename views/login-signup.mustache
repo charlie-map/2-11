@@ -76,19 +76,19 @@
 
 				{{^LOGGING_IN}}
 					<div class="gender-noti barlow">
-						Gender expects either:
-						<ul>
-							<li class="barlow">Male</li>
-							<li class="barlow">Female</li>
-							<li class="barlow">Non-binary</li>
-							<li class="barlow">Transgender</li>
-							<li class="barlow">Intersex</li>
-							<li class="barlow">Other</li>
-							<li class="barlow">Prefer not to say</li>
-						</ul>
+						Which one best describes you?
+						<div>
+							<p value="Male" class="gender-pick barlow male">Male</p>
+							<p value="Female" class="gender-pick barlow female">Female</p>
+							<p value="Non-binary" class="gender-pick barlow non-binary">Non-binary</p>
+							<p value="Transgender" class="gender-pick barlow transgender">Transgender</p>
+							<p value="Intersex" class="gender-pick barlow intersex">Intersex</p>
+							<p value="Other" class="gender-pick barlow other">Other</p>
+							<p value="Prefer not to say" class="gender-pick barlow prefer-not-to-say">Prefer not to say</p>
+						</div>
 					</div>
 					<div class="floating-label">
-						<input class="barlow" placeholder="Gender" type="text" name="gender" id="gender" autocomplete="off">
+						<input readonly class="barlow" placeholder="Gender" type="text" name="gender" id="gender" autocomplete="off">
 						<label class="barlow" for="gender">Gender:</label>
 				
 						<div class="icon">
@@ -98,7 +98,7 @@
 					</div>
 
 					<div class="floating-label">
-						<input class="barlow" placeholder="Birthday" type="date" name="birthday" id="birthday" autocomplete="off">
+						<input class="barlow" placeholder="Birthday (mm/dd/yyyy)" type="date" name="birthday" id="birthday" autocomplete="off">
 						<label class="barlow" for="birthday">Birthday:</label>
 				
 						<div class="icon">
@@ -107,7 +107,7 @@
 						</div>
 					</div>
 				{{/LOGGING_IN}}
-				<button class="yellow-button" type="submit" onClick="return false;">Log in</button>
+				<button id="register" class="yellow-button" type="submit" onClick="return false;">{{LOG_OR_SIGN}}</button>
 			</form>
 		</div>
 

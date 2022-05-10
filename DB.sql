@@ -15,6 +15,8 @@ CREATE TABLE user (
 	birthdate DATE NOT NULL,
 	gender VARCHAR(255),
 
+	joindate DATE NOT NULL DEFAULT CURRDATE(),
+
 	PRIMARY KEY(id)
 );
 

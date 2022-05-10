@@ -1,3 +1,33 @@
+$(document).ready(function() {
+	$("#gender").parent().css({
+		"margin-top": -1 * $(".gender-noti").outerHeight()
+	});
+
+	let img_width = $("#nice-image").outerWidth();
+
+	$(".gender-noti").outerWidth(img_width - 8);
+
+	$(".gender-noti").offset({
+		left: $("#nice-image").offset().left + 4,
+		top: $("#gender").offset().top - 40
+	});
+});
+
+window.resize = function() {
+	$("#gender").parent().css({
+		"margin-top": -1 * $(".gender-noti").outerHeight()
+	});
+
+	let img_width = $("#nice-image").outerWidth();
+
+	$(".gender-noti").outerWidth(img_width - 8);
+
+	$(".gender-noti").offset({
+		left: $("#nice-image").offset().left + 4,
+		top: $("#gender").offset().top - 40
+	});
+}
+
 $("#new-game").click(function() {
 	metaPoints = 0, points = 0;
 	endGame = 0;
@@ -29,19 +59,20 @@ $("#go-to-how-to").click(function(e) {
 });
 
 $("#gender").focus(function() {
-	let img_width = $("#nice-image").outerWidth();
-
-	$(".gender-noti").outerWidth(img_width);
 	$(".gender-noti").addClass("select");
 	$("#password-container").addClass("select");
-
-	$(".gender-noti").offset({
-		left: $("#nice-image").offset().left,
-		top: $("#gender").offset().top
-	});
 });
 
 $("#gender").focusout(function() {
 	$(".gender-noti").removeClass("select");
 	$("#password-container").removeClass("select");
+});
+
+$(".gender-pick").click(function() {
+	$("#gender").attr("value", $(this).attr("value"));
+	$("#gender").addClass("is-clear");
+});
+
+$("#register").click(function() {
+
 });

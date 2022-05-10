@@ -19,7 +19,8 @@ function setup(isRestart) {
   	8192: [color(225, 160, 25), color(90, 30, 54), 12],
   	16384: [color(206, 92, 36), color(70, 50, 75), 20], // glow shift
   	32768: [color(210, 140, 220), color(60, 38, 67), 20],
-  	65536: [color(245, 245, 245), color(0, 0, 0), 25]
+  	65536: [color(245, 245, 245), color(0, 0, 0), 25],
+    131072: [color(0, 0, 0), color(220, 220, 220), 25]
   };
   
   let oldBoard = null;
