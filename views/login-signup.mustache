@@ -3,24 +3,24 @@
 	<head>
 		<link rel="stylesheet" type="text/css" href="style.css">
 		<meta charset="utf-8" />
-
+		
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-		<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet"> 
-
+		<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet">
+		
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
+		<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+		
 		<link rel="icon" href="2-11TileIcon.png">
 		<title>2^11 ● {{LOG_OR_SIGN}}</title>
 	</head>
 	<body>
 		<div id="page-title">2<p class="shooter">^</p>11 {{LOG_OR_SIGN}}</div>
-
 		<div class="session">
 			<div id="nice-image" class="left">
-				<img src="2-11TileIcon.png" alt="2-11 Favicon">    
+				<img src="2-11TileIcon.png" alt="2-11 Favicon">
 			</div>
-			<form action="" class="log-in" autocomplete="off"> 
+			<form action="" id="big-ol-form" class="log-in" autocomplete="off">
 				<h4 class="barlow">{{LOG_OR_SIGN}} <span>2^11</span></h4>
 				<p class="barlow">
 					{{#LOGGING_IN}}
@@ -30,7 +30,6 @@
 						Welcome! Sign up to start your <span>2^11</span> journey:
 					{{/LOGGING_IN}}
 				</p>
-
 				{{#LOGGING_IN}}
 					<div class="floating-label">
 						<input class="barlow" placeholder="Username or Email" type="username" name="username" id="username" autocomplete="off">
@@ -52,7 +51,6 @@
 							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Mail</title><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
 						</div>
 					</div>
-
 					<div class="floating-label">
 						<input class="barlow" placeholder="Username" type="text" name="username" id="username" autocomplete="off">
 						<label class="barlow" for="username">Username:</label>
@@ -63,17 +61,16 @@
 						</div>
 					</div>
 				{{/LOGGING_IN}}
-			
+				
 				<div id="password-container" class="floating-label {{LOG_OR_SIGN}}">
 					<input class="barlow" placeholder="Password" type="password" name="password" id="password" autocomplete="off">
 					<label class="barlow" for="password">Password:</label>
-			
+					
 					<div class="icon">
 						<?xml version="1.0" encoding="UTF-8"?>
 						<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Lock Closed</title><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 					</div>
 				</div>
-
 				{{^LOGGING_IN}}
 					<div class="gender-noti barlow">
 						Which one best describes you?
@@ -88,29 +85,38 @@
 						</div>
 					</div>
 					<div class="floating-label">
-						<input readonly class="barlow" placeholder="Gender" type="text" name="gender" id="gender" autocomplete="off">
+						<input readonly class="no-value barlow" placeholder="Gender" type="text" name="gender" id="gender" autocomplete="off">
 						<label class="barlow" for="gender">Gender:</label>
-				
+						
 						<div class="icon">
 							<?xml version="1.0" encoding="UTF-8"?>
 							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Transgender</title><circle cx="256" cy="256" r="128" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M448 352l-96 96M176 80l-95.98 95.98M464 128V48h-80M48 128V48h80M464 48L346.5 165.5M48 48l117.49 117.49M464 464L346.65 346.37"/></svg>
 						</div>
 					</div>
-
 					<div class="floating-label">
-						<input class="barlow" placeholder="Birthday (mm/dd/yyyy)" type="date" name="birthday" id="birthday" autocomplete="off">
-						<label class="barlow" for="birthday">Birthday:</label>
-				
+						<input class="barlow" placeholder="Birthday (mm/dd/yyyy)" type="text" pattern="[0-9]{2}/[0-9]{2}/[0-9]{4}" name="birthday" id="birthday" autocomplete="off">
+						<label class="barlow" for="birthday">Birthday (mm/dd/yyyy):</label>
+						
 						<div class="icon">
 							<?xml version="1.0" encoding="UTF-8"?>
 							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Gift</title><path d="M256 104v56h56a56 56 0 10-56-56zM256 104v56h-56a56 56 0 1156-56z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><rect x="64" y="160" width="384" height="112" rx="32" ry="32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M416 272v144a48 48 0 01-48 48H144a48 48 0 01-48-48V272M256 160v304" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 						</div>
 					</div>
 				{{/LOGGING_IN}}
-				<button id="register" class="yellow-button" type="submit" onClick="return false;">{{LOG_OR_SIGN}}</button>
+
+				<div class="registration-button-group">
+					{{#LOGGING_IN}}
+						<span class="barlow">No account? <a href="/signup">Signup</a></span>
+					{{/LOGGING_IN}}
+					{{^LOGGING_IN}}
+						<span class="barlow">Already have an account? <a href="/login">Login</a></span>
+					{{/LOGGING_IN}}
+					<button id="register" class="yellow-button" type="submit">{{LOG_OR_SIGN}}</button>
+				</div>
 			</form>
 		</div>
 
+		<script>let logging_in = {{LOGGING_IN}};</script>
 		<script src="primary.js"></script>
 	</body>
 </html>
