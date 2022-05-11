@@ -25,19 +25,18 @@ const connection = mysql.createConnection({
 });
 
 function loggedIn(req, res, next) {
-	console.log("try log", req.session);
-
 	if (!req.session.user_id || !req.session.auth_token)
 		return res.redirect("/login");
 
-	connection.query("SELECT authToken FROM auth WHERE user_id=?", req.session.user_id, (err, authToken) => {
+	connection.query("SELECT authToken, username FROM auth INNER JOIN user ON auth.user_id=user.id WHERE user_id=?", req.session.user_id, (err, authToken) => {
 		if (err) {
 			return next(err);
 		}
 
-		if (authToken[0].authToken == req.session.auth_token)
+		if (authToken.length && authToken[0].authToken == req.session.auth_token) {
+			req.session.username = authToken[0].username;
 			return next();
-		else
+		} else
 			return res.redirect("/login");
 	});
 }
@@ -47,12 +46,13 @@ app.use(bodyParser.urlencoded({
 	extended: false
 }));
 
-app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: true,
+	cookie: { 
+		maxAge: 600000
+	}
 }))
 
 app.use((err, req, res, next) => {
@@ -128,7 +128,7 @@ function signup_valid(body) {
 	if (!email_validator.validate(body.email))
 		invalid_response += "0,";
 
-	if (!body.username || !body.username.length)
+	if (!body.username || !body.username.length || body.username.includes("@"))
 		invalid_response += "1,";
 
 	if (!body.password || !body.password.length)
@@ -231,9 +231,10 @@ app.post("/signup", async (req, res, next) => {
 					if (err)
 						return next(err);
 
-					req.session.id = u_id;
+					req.session.cookie.expires = false;
+					req.session.user_id = u_id;
 					req.session.auth_token = newUUID;
-
+					
 					res.send("0");
 					return;
 				});
@@ -248,12 +249,56 @@ app.get("/login", (req, res) => {
 	});
 });
 
-app.post("/login", (req, res) => {
-	console.log("login", req.body);
+// status codes:
+// 0: success
+// 1: error with inputs (no email / no password)
+// 2: could not find username
+// 3: invalid password
+app.post("/login", (req, res, next) => {
+	if (!req.body.username_email || !req.body.password) {
+		res.send("1-" + (req.body.username_email ? "" : "0,") + (req.body.password ? "" : "1,"));
+		return;
+	}
+
+	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
+	connection.query("SELECT id, password FROM user WHERE " + email_or_username + "=?", req.body.username_email, (err, user_password) => {
+		if (err || !user_password) return next(err);
+
+		if (!user_password.length) {
+			res.send("2");
+			return;
+		}
+
+		bcrypt.compare(req.body.password, user_password[0].password, function(err, result) {
+			if (err) return next(err);
+
+			if (result) {
+				let newUUID = uuidv4();
+
+				connection.query("UPDATE auth SET authToken=? WHERE user_id=?;",
+					[newUUID, user_password[0].id], (err) => {
+					if (err)
+						return next(err);
+
+					req.session.cookie.expires = false;
+					req.session.user_id = user_password[0].id;
+					req.session.auth_token = newUUID;
+
+					console.log("update session", req.session);
+
+					res.send("0");
+					return;
+				});
+			} else
+				return res.send("3");
+		});
+	});
 });
 
-app.get("/dashboard", loggedIn, (req, res) => {
-
+app.get("/dashboard", loggedIn, (req, res, next) => {
+	res.render("dashboard", {
+		USERNAME: req.session.username
+	});
 });
 
 app.listen("2048", () => {

@@ -1,21 +1,25 @@
 $(document).ready(function() {
+
+	if (logging_in == undefined || logging_in)
+		return;
 	$("#gender").parent().css({
 		"margin-top": -1 * $(".gender-noti").outerHeight()
 	});
 
 	let img_width = $("#nice-image").outerWidth();
 
-	if ($(".gender-noti")) {
-		$(".gender-noti").outerWidth(img_width - 8);
+	$(".gender-noti").outerWidth(img_width - 8);
 
-		$(".gender-noti").offset({
-			left: $("#nice-image").offset().left + 4,
-			top: $("#gender").offset().top - 40
-		});
-	}
+	$(".gender-noti").offset({
+		left: $("#nice-image").offset().left + 4,
+		top: $("#gender").offset().top - 40
+	});
 });
 
 window.resize = function() {
+
+	if (logging_in == undefined || logging_in)
+		return;
 	$("#gender").parent().css({
 		"margin-top": -1 * $(".gender-noti").outerHeight()
 	});
@@ -100,10 +104,20 @@ $("#username").focusout(function() {
 	if (!username.length)
 		return;
 
+	console.log(username, username.includes("@"));
+	if (username.includes("@")) {
+		$("#username-taken").html("no @ in username");
+		$("#username-taken").addClass("is-taken");
+		$("#username").addClass("taken");
+
+		return;
+	}
+
 	$.get("/username-available/" + username, (res) => {
 		if (res == "0") { // username taken
 			invalidate($("#username"));
 
+			$("#username-taken").html("taken");
 			$("#username-taken").addClass("is-taken");
 			$("#username").addClass("taken");
 		} else {

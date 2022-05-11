@@ -141,8 +141,6 @@ function swiped(event) {
   if (endGame)
     return;
 
-  console.log(event.angle);
-
   if (event.angle > 135 || event.angle < -135) {
     if (board.boardMove) {
       moveBuildup.push(1);
