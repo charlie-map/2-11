@@ -47,15 +47,28 @@ a {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	
+	margin-right: 8px;
 }
 
 .leaderboard-entry-meta {
+	width: calc(100% - 60px);
+
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	margin-bottom: 4px;
 }
 
 .leaderboard-entry-rank {
+	width: 18px;
+	height: 18px;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
 	padding: 5px;
 	background: white;
 
@@ -67,18 +80,19 @@ a {
 	margin-right: 8px;
 
 	line-height: 18px;
-	vertical-align: middle;
 
 	z-index: 2;
 }
 
 .leaderboard-entry-username {
-	padding: 5px;
 	background: #ddcee2;
+
+	width: 78%;
 
 	font-size: 14px;
 
 	padding: 16px;
+	padding-left: 20px;
 	border-radius: 2px;
 
 	margin-right: 8px;
@@ -92,6 +106,12 @@ a {
 .leaderboard-entry-score {
 	padding: 5px;
 	background: #ddcee2;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+	width: 18%;
 
 	font-size: 14px;
 
@@ -113,6 +133,8 @@ a {
   -webkit-box-shadow:0px 0px 30px 15px rgba(0,0,0,0.79);
   -moz-box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
   box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
+
+  z-index: 11;
 }
 
 .rank-color2 {
@@ -122,6 +144,8 @@ a {
   -webkit-box-shadow:0px 0px 100px 36px rgba(245,245,245,0.75);
   -moz-box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
   box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
+
+  z-index: 10;
 }
 
 .rank-color3 {
@@ -131,6 +155,8 @@ a {
   -webkit-box-shadow:0px 0px 40px 18px rgba(211,140,220,0.8);
   -moz-box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
   box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
+
+  z-index: 9;
 }
 
 .rank-color4 {
@@ -140,6 +166,8 @@ a {
   -webkit-box-shadow:0px 0px 46px 26px rgba(207,93,36,0.0.8);
   -moz-box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
   box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
+
+  z-index: 8;
 }
 
 .rank-color5 {
@@ -149,6 +177,8 @@ a {
   -webkit-box-shadow:0px 0px 50px 16px rgba(225,158,25,0.61);
   -moz-box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
   box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
+
+  z-index: 7;
 }
 
 .rank-color6 {
@@ -160,6 +190,8 @@ a {
   -webkit-box-shadow:0px 0px 64px 15px rgba(255,224,20,0.53);
   -moz-box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
   box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
+
+  z-index: 6;
 }
 
 .rank-color7 {
@@ -171,6 +203,8 @@ a {
   -webkit-box-shadow:0px 0px 34px 17px rgba(255,255,20,0.5);
   -moz-box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
   box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
+
+  z-index: 5;
 }
 
 .rank-color8 {
@@ -182,6 +216,8 @@ a {
   -webkit-box-shadow:0px 0px 40px 14px rgba(199,239,23,0.45);
   -moz-box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
   box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
+
+  z-index: 4;
 }
 
 .rank-color9 {
@@ -193,6 +229,7 @@ a {
   -webkit-box-shadow:0px 0px 48px 12px rgba(171,209,0,0.4);
   -moz-box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
   box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
+  z-index: 3;
 }
 
 .rank-color10 {
@@ -204,6 +241,8 @@ a {
   -webkit-box-shadow:0px 0px 55px 11px rgba(120,199,50,0.39);
   -moz-box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
   box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
+
+  z-index: 2;
 }
 
 .dropdown-noti {

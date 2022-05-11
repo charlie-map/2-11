@@ -125,11 +125,11 @@
 		<div id="leaderboard" class="leaderboard">
 			{{#LEADERBOARD}}
 			<div class="leaderboard-entry">
-				<div class="leaderboard-entry-meta">
-					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+				<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+				<div class="leaderboard-entry-meta">	
 					<div class="leaderboard-entry-username">{{{username}}}</div>
+					<div class="leaderboard-entry-score">{{bestScore}}</div>
 				</div>
-				<div class="leaderboard-entry-score">{{bestScore}}</div>
 			</div>
 			{{/LEADERBOARD}}
 		</div>

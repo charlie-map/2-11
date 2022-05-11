@@ -78,7 +78,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
 
-		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore LIMIT 20`, (err, users) => {
+		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
 
 			let u_dat = user_data[0];
@@ -89,7 +89,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
 			});
 
-			res.render("index.mustache", {
+			res.render("index", {
 				LOGGED_IN: true,
 				USERNAME: u_dat.username,
 
@@ -314,7 +314,11 @@ app.post("/signup", async (req, res, next) => {
 					req.session.user_id = u_id;
 					req.session.auth_token = newUUID;
 
-					res.send("0");
+					res.json({
+						failure: 0,
+						best: 0,
+						wholeBoard: null
+					});
 					return;
 				});
 			});
@@ -363,7 +367,10 @@ app.post("/login", (req, res, next) => {
 					req.session.user_id = user_password[0].id;
 					req.session.auth_token = newUUID;
 
-					res.send("0");
+					res.json({
+						failure: 0,
+						best: 
+					});
 					return;
 				});
 			} else
