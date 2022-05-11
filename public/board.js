@@ -7,6 +7,9 @@ class Board {
       this.board[setBoardX] = [];
       
       for (let setBoardY = 0; setBoardY < size; setBoardY++) {
+        // if (setBoardX + setBoardY == 0)
+        //   continue;
+
         // let num = pow(2, (setBoardX * size) + setBoardY + 1);
         // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
         if (oldBoard && oldBoard[setBoardX][setBoardY]) {
@@ -22,7 +25,7 @@ class Board {
       }
     }
 
-    // this.board[0][0] = new Piece(0, 0, 90, 90, 16384);
+    // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
     // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
     
     // pick 2 random initial positions

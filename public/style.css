@@ -17,7 +17,7 @@ canvas {
 
 body {
 	width: 100vw;
-	height: 100vh;
+  height: 100%;
 
 	display: flex;
   justify-content: center;
@@ -98,11 +98,193 @@ a {
 .user-column {
   min-width: 100px;
   width: auto;
+  height: 380px;
+
+  position: sticky;
+  top: 10%;
+
+  margin-right: 5px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+
+  background: #03b6db;
+  border-radius: 4px;
 }
 
 .column-tab {
   width: 90px;
   height: 90px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 10px;
+}
+
+.best-sq-descript {
+  font-size: 16px !important;
+}
+
+.best-num {
+  line-height: 1;
+}
+
+.bs-2 {
+  background: #03b6db;
+  color: #8f2510;
+
+  font-size: 60px;
+
+  border: 1px solid #919499;
+}
+.bs-4 {
+  background: #04c8dc;
+  color: #8f2a0a;
+
+  font-size: 60px;
+}
+.bs-8 {
+  background: #05f0dd;
+  color: #8f2f00;
+
+  font-size: 60px;
+}
+.bs-16 {
+  background: #35ffff;
+  color: #7b470f;
+
+  font-size: 46px;
+}
+.bs-32 {
+  background: #35ffff;
+  color: #7b3d05;
+
+  font-size: 46px;
+}
+.bs-64 {
+  background: #00ffa6;
+  color: #7b3d05;
+
+  font-size: 46px;
+
+  -webkit-box-shadow:0px 0px 65px 6px rgba(0,230,142,0.24);
+  -moz-box-shadow: 0px 0px 65px 6px rgba(0,230,142,0.24);
+  box-shadow: 0px 0px 65px 6px rgba(0,230,142,0.24);
+}
+.bs-128 {
+  background: #00e68d;
+  color: #761f32;
+
+  font-size: 40px;
+
+  -webkit-box-shadow:0px 0px 58px 9px rgba(0,230,142,0.35);
+  -moz-box-shadow: 0px 0px 58px 9px rgba(0,230,142,0.35);
+  box-shadow: 0px 0px 58px 9px rgba(0,230,142,0.35);
+}
+.bs-256 {
+  background: #78c732;
+  color: #7b202d;
+
+  font-size: 40px;
+
+  -webkit-box-shadow:0px 0px 55px 11px rgba(120,199,50,0.39);
+  -moz-box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
+  box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
+}
+.bs-512 {
+  background: #acd100;
+  color: #7b202d;
+
+  font-size: 40px;
+
+  -webkit-box-shadow:0px 0px 48px 12px rgba(171,209,0,0.4);
+  -moz-box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
+  box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
+}
+.bs-1024 {
+  background: #caef17;
+  color: #7b202d;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 40px 14px rgba(199,239,23,0.45);
+  -moz-box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
+  box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
+}
+.bs-2048 {
+  background: #ffff14;
+  color: #711623;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 34px 17px rgba(255,255,20,0.5);
+  -moz-box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
+  box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
+}
+.bs-4096 {
+  background: #ffe014;
+  color: #711623;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 64px 15px rgba(255,224,20,0.53);
+  -moz-box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
+  box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
+}
+.bs-8192 {
+  background: #e1a019;
+  color: #5a1e36;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 50px 16px rgba(225,158,25,0.61);
+  -moz-box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
+  box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
+}
+.bs-16384 {
+  background: #ce5c24;
+  color: #46324b;
+
+  font-size: 30px;
+
+  -webkit-box-shadow:0px 0px 46px 26px rgba(207,93,36,0.0.8);
+  -moz-box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
+  box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
+}
+.bs-32768 {
+  background: #d28cdc;
+  color: #3c2643;
+
+  font-size: 30px;
+
+  -webkit-box-shadow:0px 0px 40px 18px rgba(211,140,220,0.8);
+  -moz-box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
+  box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
+}
+.bs-65536 {
+  background: #f5f5f5;
+  color: #000000;
+
+  font-size: 30px;
+
+  -webkit-box-shadow:0px 0px 100px 36px rgba(245,245,245,0.75);
+  -moz-box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
+  box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
+}
+.bs-131072 {
+  background: #000000;
+  color: #dcdcdc;
+
+  font-size: 26px;
+
+  -webkit-box-shadow:0px 0px 30px 15px rgba(0,0,0,0.79);
+  -moz-box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
+  box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
 }
 
 #page-meta-info {

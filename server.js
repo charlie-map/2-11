@@ -70,14 +70,15 @@ app.engine('mustache', mustache());
 
 app.get("/", async (req, res, next) => {
 	if (await loggedIn(req, next)) {
-		connection.query(`SELECT game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM game INNER JOIN streak ON
-			game.user_id=streak.user_id WHERE id=?`, req.session.user_id, (err, user_data) => {
+		connection.query(`SELECT username, game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM user INNER JOIN game
+			ON user.id=game.user_id INNER JOIN streak ON
+			user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
 			if (err || !user_data || !user_data.length) return res.render("error");
 
 			let u_dat = user_data[0];
 			res.render("index.mustache", {
 				LOGGED_IN: true,
-				USERNAME: req.session.username,
+				USERNAME: u_dat.username,
 
 				CURRENT_SCORE: u_dat.currentScore,
 				BEST_BLOCK: u_dat.bestBlock,
@@ -230,7 +231,7 @@ app.post("/signup", async (req, res, next) => {
 
 				await new Promise((resolve, reject) => {
 					connection.query("INSERT INTO current_board (user_id, startTime) VALUES (?, ?)", [u_id, new Date()], (err) => {
-						if (err) return next(err);
+						if (err) console.log(err);
 
 						resolve();
 					});

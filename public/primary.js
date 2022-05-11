@@ -4,6 +4,13 @@ $(document).ready(function() {
 			$(".dropdown-noti").addClass("slide-out");
 		}, 4800);
 
+	// /* COLUMN DATA SETUP */
+	// let columnNum = $(".best-num").text();
+	// console.log(columnNum);
+	// $(".best-num").css({
+	// 	"font-size": 88 * (1 / (columnNum.length * 0.5))
+	// });
+
 	if (logging_in == undefined || logging_in)
 		return;
 	$("#gender").parent().css({
