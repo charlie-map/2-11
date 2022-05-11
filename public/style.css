@@ -20,10 +20,14 @@ body {
 	height: 100vh;
 
 	display: flex;
-	flex-direction: column;
-	align-items: center;
+  justify-content: center;
 
 	overflow-x: hidden;
+}
+
+body.column {
+  flex-direction: column !important;
+  align-items: center;
 }
 
 a {
@@ -31,8 +35,8 @@ a {
 }
 
 .dropdown-noti {
-	margin-top: -40px;
-	margin-bottom: 40px;
+	margin-top: -80px;
+	margin-bottom: 80px;
 
 	width: 100%;
 
@@ -44,6 +48,11 @@ a {
 
 	animation: drop-in 1s ease-out;
 	animation-fill-mode: forwards;
+}
+
+.dropdown-noti.slide-out {
+  animation: drop-out 1s ease-out;
+  animation-fill-mode: forwards;
 }
 
 .logged-in-box {
@@ -64,14 +73,36 @@ a {
 
 @keyframes drop-in {
 	from {
-		margin-top: -40px;
-		margin-bottom: 40px;
+		margin-top: -80px;
+		margin-bottom: 80px;
 	}
 
 	to {
 		margin-top: 0;
 		margin-bottom: 0;
 	}
+}
+
+@keyframes drop-out {
+  from {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  to {
+    margin-top: -80px;
+    margin-bottom: 80px;
+  }
+}
+
+.user-column {
+  min-width: 100px;
+  width: auto;
+}
+
+.column-tab {
+  width: 90px;
+  height: 90px;
 }
 
 #page-meta-info {
@@ -721,8 +752,7 @@ input:focus {
   display: flex;
   flex-direction: row;
   width: auto;
-  margin: auto auto;
-  margin-bottom: 8px;
+
   background: #ffffff;
   border-radius: 4px;
   box-shadow: 0px 2px 6px -1px rgba(0, 0, 0, 0.12);

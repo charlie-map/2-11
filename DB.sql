@@ -44,6 +44,7 @@ CREATE TABLE game (
 	user_id INT,
 
 	currentScore INT NOT NULL DEFAULT 0,
+	bestBlock INT NOT NULL DEFAULT 2,
 	bestScore INT NOT NULL DEFAULT 0,
 
 	averageScore FLOAT NOT NULL DEFAULT 0,
@@ -58,21 +59,24 @@ CREATE TABLE game (
 	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE boardX (
-	id INT NOT NULL,
+CREATE TABLE current_board (
 	user_id INT NOT NULL,
 
-	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-	PRIMARY KEY(id)
+	wholeBoard TEXT,
+	startTime DATETIME,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
-CREATE TABLE boardY (
-	id INT NOT NULL UNIQUE,
-	boardX_id INT NOT NULL,
+CREATE TABLE board_history (
+	user_id INT NOT NULL,
 
-	num INT NOT NULL DEFAULT 0,
+	wholeBoard TEXT,
 
-	FOREIGN KEY (boardX_id) REFERENCES boardX(id) ON DELETE CASCADE
+	startTime DATETIME,
+	endTime DATETIME,
+
+	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
 
 /*

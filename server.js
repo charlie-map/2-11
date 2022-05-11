@@ -24,21 +24,24 @@ const connection = mysql.createConnection({
 	password: process.env.PASSWORD
 });
 
-function loggedIn(req, res, next) {
+function loggedIn(req, next) {
 	if (!req.session.user_id || !req.session.auth_token)
-		return res.redirect("/login");
+		return 0;
 
-	connection.query("SELECT authToken, username FROM auth INNER JOIN user ON auth.user_id=user.id WHERE user_id=?", req.session.user_id, (err, authToken) => {
-		if (err) {
-			return next(err);
-		}
+	try {
+		return new Promise((resolve, reject) => {
+			connection.query("SELECT authToken FROM auth WHERE user_id=?", req.session.user_id, (err, authToken) => {
+				if (err) reject(err);
 
-		if (authToken.length && authToken[0].authToken == req.session.auth_token) {
-			req.session.username = authToken[0].username;
-			return next();
-		} else
-			return res.redirect("/login");
-	});
+				if (authToken.length && authToken[0].authToken == req.session.auth_token)
+					resolve(1);
+				else
+					resolve(0);
+			});
+		});
+	} catch (error) {
+		next(error);
+	}
 }
 
 app.use(express.static(__dirname + "/public"));
@@ -65,8 +68,38 @@ app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustache());
 
-app.get("/", (req, res, next) => {
-	res.render("index");
+app.get("/", async (req, res, next) => {
+	if (await loggedIn(req, next)) {
+		connection.query(`SELECT game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM game INNER JOIN streak ON
+			game.user_id=streak.user_id WHERE id=?`, req.session.user_id, (err, user_data) => {
+			if (err || !user_data || !user_data.length) return res.render("error");
+
+			let u_dat = user_data[0];
+			res.render("index.mustache", {
+				LOGGED_IN: true,
+				USERNAME: req.session.username,
+
+				CURRENT_SCORE: u_dat.currentScore,
+				BEST_BLOCK: u_dat.bestBlock,
+				BEST_SCORE: u_dat.bestScore,
+
+				AVERAGE_SCORE: u_dat.averageScore,
+
+				WINS: u_dat.wins,
+				GIVE_UPS: u_dat.giveUps,
+				KILLED_BY_2: u_dat.killedBy2,
+				KILLED_BY_4: u_dat.killedBy4,
+				KILLED_BY_8: u_dat.killedBy8,
+				TOTAL_GAMES: u_dat.totalGames,
+
+				LAST_LOGIN: u_dat.lastLogin,
+
+				CURRENT_STREAK: u_dat.currentStreak,
+				BEST_STREAK: u_dat.bestStreak,
+			});
+		});
+	} else
+		res.render("index");
 });
 
 app.get("/username-available/:username", (req, res, next) => {
@@ -195,34 +228,13 @@ app.post("/signup", async (req, res, next) => {
 					});
 				});
 
-				let internal_board = [0, 1, 2, 3];
-				let placeBoardX = internal_board.map(x => {
-					return new Promise((resolve, reject) => {
-						connection.query("INSERT INTO boardX (id, user_id) VALUES (?, ?)", [4 * u_id + x, u_id], async (err) => {
-							if (err) reject(err);
+				await new Promise((resolve, reject) => {
+					connection.query("INSERT INTO current_board (user_id, startTime) VALUES (?, ?)", [u_id, new Date()], (err) => {
+						if (err) return next(err);
 
-							try {
-								let placeBoardY = internal_board.map(y => {
-									return new Promise((inner_resolve, inner_reject) => {
-										connection.query("INSERT INTO boardY (id, boardX_id) VALUES (?, ?)", [4 * (4 * u_id + x) + y, 4 * u_id + x], (err) => {
-											if (err) return inner_reject(err);
-
-											return inner_resolve();
-										});
-									});
-								});
-
-								await Promise.all(placeBoardY);
-
-								resolve();
-							} catch (error) {
-								return reject(error);
-							}
-						})
+						resolve();
 					});
 				});
-
-				await Promise.all(placeBoardX);
 
 				let newUUID = uuidv4();
 
@@ -234,7 +246,7 @@ app.post("/signup", async (req, res, next) => {
 					req.session.cookie.expires = false;
 					req.session.user_id = u_id;
 					req.session.auth_token = newUUID;
-					
+
 					res.send("0");
 					return;
 				});
@@ -284,20 +296,12 @@ app.post("/login", (req, res, next) => {
 					req.session.user_id = user_password[0].id;
 					req.session.auth_token = newUUID;
 
-					console.log("update session", req.session);
-
 					res.send("0");
 					return;
 				});
 			} else
 				return res.send("3");
 		});
-	});
-});
-
-app.get("/dashboard", loggedIn, (req, res, next) => {
-	res.render("dashboard", {
-		USERNAME: req.session.username
 	});
 });
 

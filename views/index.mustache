@@ -1,131 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-	<link rel="stylesheet" type="text/css" href="style.css">
-	<meta charset="utf-8" />
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta charset="utf-8" />
 
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet"> 
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet"> 
 
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
-    <script src="swipe.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/addons/p5.sound.min.js"></script>
+		<script src="swipe.min.js"></script>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
-	<link rel="icon" href="2-11TileIcon.png">
-	<title>2^11</title>
-  </head>
-  <body>
-
-  <div id="all-content">
-		<main id="page-body">
-			<div class="dropdown-noti {{#LOGGED_IN}}logged-in-box{{/LOGGED_IN}}{{^LOGGED_IN}}logged-out-box{{/LOGGED_IN}}">
-				{{^LOGGED_IN}}
-					<p class="barlow">
-						You are not logged in
-					</p>
-					<div class="signup-sys">
-						<a href="/login">
-							<div>
-								Login
+		<link rel="icon" href="2-11TileIcon.png">
+		<title>2^11</title>
+	</head>
+	<body>
+	  	<div id="all-content">
+			<main id="page-body">
+				<div class="dropdown-noti {{#LOGGED_IN}}logged-in-box{{/LOGGED_IN}}{{^LOGGED_IN}}logged-out-box{{/LOGGED_IN}}">
+					{{^LOGGED_IN}}
+						<p class="barlow">
+							You are not logged in
+						</p>
+						<div class="signup-sys">
+							<a href="/login">
+								<div>
+									Login
+								</div>
+							</a>
+							<a href="/signup">
+								<div>
+									Signup
+								</div>
+							</a>
+						</div>
+					{{/LOGGED_IN}}
+					{{#LOGGED_IN}}
+						<p class="barlow">
+							Logged in as {{USERNAME}}
+						</p>
+					{{/LOGGED_IN}}
+				</div>
+				<div id="page-meta-info">
+					<div style="display: flex; justify-content: center; align-items: center">
+						<div id="page-title">2<p class="shooter">^</p>11</div>
+						<div class="scores">
+							<div class="score-card current-score-card">
+								Score
+								<div class="sub-scorer">
+									<p id="add-to-current-score"></p>
+									<p id="current-score">
+										0
+									</p>
+								</div>
 							</div>
-						</a>
-						<a href="/signup">
-							<div>
-								Signup
-							</div>
-						</a>
-					</div>
-				{{/LOGGED_IN}}
-				{{#LOGGED_IN}}
-					<p class="barlow">
-						You are not in
-					</p>
-				{{/LOGGED_IN}}
-			</div>
-			<div id="page-meta-info">
-				<div style="display: flex; justify-content: center; align-items: center">
-					<div id="page-title">2<p class="shooter">^</p>11</div>
-					<div class="scores">
-						<div class="score-card current-score-card">
-							Score
-							<div class="sub-scorer">
-								<p id="add-to-current-score"></p>
-								<p id="current-score">
-									0
-								</p>
+							<div class="score-card best-score-card">
+								Best
+							 	<div class="sub-scorer">
+									<p id="best-score">
+										0
+									</p>
+								</div>
 							</div>
 						</div>
-						<div class="score-card best-score-card">
-							Best
-						 	<div class="sub-scorer">
-								<p id="best-score">
-									0
-								</p>
-							</div>
+					</div>
+					<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+						<div style="display: flex; flex-direction: column; justify-content: center;">
+							<p class="barlow">Join the tiles to get to 2^11 (2048)!</p>
+							<a id="go-to-how-to" href="#how-to-play">How to play ➞</a>
+						</div>
+						<div id="new-game">
+							New game
 						</div>
 					</div>
 				</div>
-				<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
-					<div style="display: flex; flex-direction: column; justify-content: center;">
-						<p class="barlow">Join the tiles to get to 2^11 (2048)!</p>
-						<a id="go-to-how-to" href="#how-to-play">How to play ➞</a>
-					</div>
-					<div id="new-game">
-						New game
-					</div>
-				</div>
-			</div>
-		</main>
+			</main>
 
-		<div id="how-to-play">
-			<p>How to play:</p>
-			<p class="barlow" style="line-height: 26px">
-				Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
-			</p>
-			<a id="go-to-title" href="#page-title">Start playing ➞</a>
-
-			<hr>
-
-			<p class="barlow" style="line-height: 26px">
-				This is the <span class="barlow" style="font-weight: bold">original version of</span> <span style="font-weight: bold">2^11 / 2-11</span>. Maintain
-				 <span class="barlow" style="font-weight: bold; display: inline">prudence</span> towards all other versions that do not have the name <span style="font-weight: bold">2^11</span> or <span style="font-weight: bold">2-11</span>.
-			</p>
-
-			<hr>
-
-			<div class="final-tag">
-				<p class="barlow">
-					Created by <a class="barlow" href="https://charlie.city" target="_blank">charlie-map.</a> Based on <a class="barlow" href="https://apps.apple.com/us/app/1024/id823499224" target="_blank">1024 by Veewo Studio.</a>
+			<div id="how-to-play">
+				<p>How to play:</p>
+				<p class="barlow" style="line-height: 26px">
+					Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
 				</p>
-				<div class="card counter"></div>
+				<a id="go-to-title" href="#page-title">Start playing ➞</a>
+
+				<hr>
+
+				<p class="barlow" style="line-height: 26px">
+					This is the <span class="barlow" style="font-weight: bold">original version of</span> <span style="font-weight: bold">2^11 / 2-11</span>. Maintain
+					 <span class="barlow" style="font-weight: bold; display: inline">prudence</span> towards all other versions that do not have the name <span style="font-weight: bold">2^11</span> or <span style="font-weight: bold">2-11</span>.
+				</p>
+
+				<hr>
+
+				<div class="final-tag">
+					<p class="barlow">
+						Created by <a class="barlow" href="https://charlie.city" target="_blank">charlie-map.</a> Based on <a class="barlow" href="https://apps.apple.com/us/app/1024/id823499224" target="_blank">1024 by Veewo Studio.</a>
+					</p>
+					<div class="card counter"></div>
+				</div>
 			</div>
 		</div>
-	</div>
+		{{#LOGGED_IN}}
+		<div class="user-column">
+			<div class="column-tab profile">
+				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
+			</div>
+			<div class="column-tab settings">
+				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Settings</title><path d="M262.29 192.31a64 64 0 1057.4 57.4 64.13 64.13 0 00-57.4-57.4zM416.39 256a154.34 154.34 0 01-1.53 20.79l45.21 35.46a10.81 10.81 0 012.45 13.75l-42.77 74a10.81 10.81 0 01-13.14 4.59l-44.9-18.08a16.11 16.11 0 00-15.17 1.75A164.48 164.48 0 01325 400.8a15.94 15.94 0 00-8.82 12.14l-6.73 47.89a11.08 11.08 0 01-10.68 9.17h-85.54a11.11 11.11 0 01-10.69-8.87l-6.72-47.82a16.07 16.07 0 00-9-12.22 155.3 155.3 0 01-21.46-12.57 16 16 0 00-15.11-1.71l-44.89 18.07a10.81 10.81 0 01-13.14-4.58l-42.77-74a10.8 10.8 0 012.45-13.75l38.21-30a16.05 16.05 0 006-14.08c-.36-4.17-.58-8.33-.58-12.5s.21-8.27.58-12.35a16 16 0 00-6.07-13.94l-38.19-30A10.81 10.81 0 0149.48 186l42.77-74a10.81 10.81 0 0113.14-4.59l44.9 18.08a16.11 16.11 0 0015.17-1.75A164.48 164.48 0 01187 111.2a15.94 15.94 0 008.82-12.14l6.73-47.89A11.08 11.08 0 01213.23 42h85.54a11.11 11.11 0 0110.69 8.87l6.72 47.82a16.07 16.07 0 009 12.22 155.3 155.3 0 0121.46 12.57 16 16 0 0015.11 1.71l44.89-18.07a10.81 10.81 0 0113.14 4.58l42.77 74a10.8 10.8 0 01-2.45 13.75l-38.21 30a16.05 16.05 0 00-6.05 14.08c.33 4.14.55 8.3.55 12.47z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+			</div>
+			<div class="column-tab best-square {{BEST_SQUARE}}">
 
-	<!-- META DATA -->
-	<script>
-		let board;
-		let moveBuildup;
+			</div>
+		</div>
+		{{/LOGGED_IN}}
 
-		let endGame = 0;
-		let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
+		<!-- META DATA -->
+		<script>
+			let board;
+			let moveBuildup;
 
-		// stores background color, text color, and glow for a given tile
-		let levelConverter;
-		let bestPoints = localStorage.getItem("savedBest2-11Score");
-		bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
-		let points = 0, metaPoints = 0;
+			let endGame = 0;
+			let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
 
-		let currentScoreAnimationTimeout;
-		let logging_in = undefined;
-	</script>
-	<script src="piece.js"></script>
-	<script src="board.js"></script>
-	<script src="sketch.js"></script>
+			// stores background color, text color, and glow for a given tile
+			let levelConverter;
+			let bestPoints = localStorage.getItem("savedBest2-11Score");
+			bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
+			let points = 0, metaPoints = 0;
 
-	<script src="primary.js" defer></script>
-  </body>
+			let currentScoreAnimationTimeout;
+			let logging_in = undefined;
+		</script>
+		<script src="piece.js"></script>
+		<script src="board.js"></script>
+		<script src="sketch.js"></script>
+
+		<script src="primary.js" defer></script>
+	</body>
 </html>

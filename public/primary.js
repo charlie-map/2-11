@@ -1,4 +1,8 @@
 $(document).ready(function() {
+	if ($(".dropdown-noti").hasClass("logged-in-box"))
+		setTimeout(function() {
+			$(".dropdown-noti").addClass("slide-out");
+		}, 4800);
 
 	if (logging_in == undefined || logging_in)
 		return;
@@ -179,7 +183,7 @@ $("#register").click(function(e) {
 			password
 		}, (res) => {
 			if (res[0] == "0") {
-				window.location.href = window.location.href.split("/")[0] + "/dashboard";
+				window.location.href = window.location.href.split("/")[0] + "/";
 			
 				return;
 			}
@@ -226,7 +230,7 @@ $("#register").click(function(e) {
 			birthdate: birthday
 		}, (res) => {
 			if (res[0] == "0") {
-				window.location.href = window.location.href.split("/")[0] + "/dashboard";
+				window.location.href = window.location.href.split("/")[0] + "/";
 			
 				return;
 			}
