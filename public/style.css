@@ -110,7 +110,8 @@ a {
   justify-content: space-around;
   align-items: center;
 
-  background: #03b6db;
+  padding: 2px;
+  background: rgba(120, 207, 210, 0.3);
   border-radius: 4px;
 }
 
@@ -126,11 +127,17 @@ a {
   border-radius: 10px;
 }
 
-.best-sq-descript {
+
+
+.current-streak {
+  font-size: 32px;
+}
+
+.best-sq-descript, .current-streak-descript {
   font-size: 16px !important;
 }
 
-.best-num {
+.best-num, .curr-streak {
   line-height: 1;
 }
 
@@ -139,8 +146,6 @@ a {
   color: #8f2510;
 
   font-size: 60px;
-
-  border: 1px solid #919499;
 }
 .bs-4 {
   background: #04c8dc;
