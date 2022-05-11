@@ -121,7 +121,7 @@ class Piece {
     
     pop();
     
-    this.animation_time -= this.animation_time >= 0 ? 1 : 0;
+    this.animation_time -= this.animation_time > 0 ? 1 : 0;
     this.og_growth -= this.og_growth > 0 ? 1 : 0;
   }
 }

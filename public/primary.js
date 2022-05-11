@@ -4,15 +4,17 @@ $(document).ready(function() {
 			$(".dropdown-noti").addClass("slide-out");
 		}, 4800);
 
-	// /* COLUMN DATA SETUP */
-	// let columnNum = $(".best-num").text();
-	// console.log(columnNum);
-	// $(".best-num").css({
-	// 	"font-size": 88 * (1 / (columnNum.length * 0.5))
-	// });
 
-	if (logging_in == undefined || logging_in)
+	if (logging_in == undefined || logging_in || loggedIn) {
+		if (logging_in)
+			$("#username").focus();
+
+		if (loggedIn) {
+			$("#leaderboard").width($(document).outerWidth() - (460 + 104));
+		}
+
 		return;
+	}
 	$("#gender").parent().css({
 		"margin-top": -1 * $(".gender-noti").outerHeight()
 	});
@@ -25,12 +27,19 @@ $(document).ready(function() {
 		left: $("#nice-image").offset().left + 4,
 		top: $("#gender").offset().top - 40
 	});
+
+	$("#email").focus();
 });
 
 window.resize = function() {
 
+	if (loggedIn) {
+		$("#leaderboard").width($(document).outerWidth() - (460 + 104));
+	}
+
 	if (logging_in == undefined || logging_in)
 		return;
+
 	$("#gender").parent().css({
 		"margin-top": -1 * $(".gender-noti").outerHeight()
 	});
@@ -189,8 +198,10 @@ $("#register").click(function(e) {
 			username_email: username_or_email,
 			password
 		}, (res) => {
+			console.log(res);
+
 			if (res[0] == "0") {
-				window.location.href = window.location.href.split("/")[0] + "/";
+				window.location.href = window.location.href.split("/")[0] + "/l";
 			
 				return;
 			}
@@ -237,7 +248,7 @@ $("#register").click(function(e) {
 			birthdate: birthday
 		}, (res) => {
 			if (res[0] == "0") {
-				window.location.href = window.location.href.split("/")[0] + "/";
+				window.location.href = window.location.href.split("/")[0] + "/l";
 			
 				return;
 			}

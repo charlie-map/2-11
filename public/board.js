@@ -2,6 +2,10 @@ class Board {
   constructor(size, tileSize, oldBoard) {
     this.board = [];
     this.tileS = tileSize;
+    // all current tiles from smallest to largest
+    //---used for drawing to make large glow effects
+    //---cast over smaller tiles
+    this.orderedPieces = [];
     
     for (let setBoardX = 0; setBoardX < size; setBoardX++) {
       this.board[setBoardX] = [];
@@ -35,13 +39,23 @@ class Board {
     }
     
     this.boardMove = 0;
+    this.canMove();
   }
 
   saveGame() {
-    localStorage.setItem("saved2-11Board", JSON.stringify(this.board));
+    let stringedBoard = JSON.stringify(this.board)
+
+    localStorage.setItem("saved2-11Board", stringedBoard);
   
     localStorage.setItem("savedCurr2-11Score", metaPoints);
     localStorage.setItem("savedBest2-11Score", bestPoints);
+
+    $.post("/save-game", {
+      board: stringedBoard,
+      currentScore: "83e0a301" + metaPoints
+    }, (res) => {
+      console.log(res);
+    });
   }
   
   addPiece(tileSize) {
@@ -104,22 +118,18 @@ class Board {
     
     let isMoving = 0, movingPieces = 0;
     
-    for (let x = 0; x < 4; x++) {
-      for (let y = 0; y < 4; y++) {
-        if (this.board[x][y]) {
-          this.board[x][y].drawPiece();
-          
-          movingPieces += this.board[x][y].moveAmount > 0 ? 1 : 0;
-          isMoving += this.board[x][y].moveAmount > 0 ? this.board[x][y].moveAmount : 0;
-          
-          if (this.board[x][y].moveAmount <= 90 && this.board[x][y].merging) {
-            this.board[x][y].merging = 0;
-            this.board[x][y].itemToMerge = null;
-            
-            this.board[x][y].upgrade();
-            this.board[x][y].animation_time = 6;
-          }
-        }
+    for (let i = 0; i < this.orderedPieces.length; i++) {
+      this.orderedPieces[i].drawPiece();
+      
+      movingPieces += this.orderedPieces[i].moveAmount > 0 ? 1 : 0;
+      isMoving += this.orderedPieces[i].moveAmount > 0 ? this.orderedPieces[i].moveAmount : 0;
+      
+      if (this.orderedPieces[i].moveAmount <= 90 && this.orderedPieces[i].merging) {
+        this.orderedPieces[i].merging = 0;
+        this.orderedPieces[i].itemToMerge = null;
+        
+        this.orderedPieces[i].upgrade();
+        this.orderedPieces[i].animation_time = 6;
       }
     }
     
@@ -182,30 +192,64 @@ class Board {
     }
   }
   
+  orderPiece(piece) {
+    if (!this.orderedPieces.length) {
+      this.orderedPieces[0] = piece;
+      return;
+    }
+
+    for (let i = 0; i < this.orderedPieces.length; i++) {
+      if (piece.num >= this.orderedPieces[i].num) {
+        // slot in at the current position
+        this.orderedPieces.splice(i, 0, piece);
+        return;
+      }
+    }
+
+    this.orderedPieces.push(piece);
+  }
+
   canMove() {
+    let newHighestPiece = highestPiece;
+    this.orderedPieces = [];
     // check for empty cell:
     let rowPrevNum = [0, 0, 0, 0];
+    let canMove = 0;
 
     for (let x = 0; x < 4; x++) {
       let prevNum = 0;
 
       for (let y = 0; y < 4; y++) {
-        if (!this.board[x][y])
-          return 1;
+        if (!this.board[x][y]) {
+          canMove = 1;
+          continue;
+        } else
+          this.orderPiece(this.board[x][y]);
 
+        newHighestPiece = newHighestPiece < this.board[x][y].num ? this.board[x][y].num : newHighestPiece;
         if (prevNum == this.board[x][y].num)
-          return 1;
+          canMove = 1;
         else
           prevNum = this.board[x][y].num;
 
         if (rowPrevNum[y] == this.board[x][y].num)
-          return 1;
+          canMove = 1;
         else
           rowPrevNum[y] = this.board[x][y].num;
       }
     }
 
-    return 0;
+    if (loggedIn && newHighestPiece > highestPiece) {
+      $("#column-best-square").removeClass("bs-" + highestPiece);
+      $("#column-best-square").addClass("bs-" + newHighestPiece);
+
+      $("#column-best-square").children(".best-num").text(newHighestPiece);
+
+      highestPiece = newHighestPiece;
+
+      $.get("/update-best-block/" + highestPiece);
+    }
+    return canMove;
   }
 
   // moveDirection = 1

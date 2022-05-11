@@ -24,24 +24,21 @@ const connection = mysql.createConnection({
 	password: process.env.PASSWORD
 });
 
-function loggedIn(req, next) {
+function loggedIn(req, res, next) {
 	if (!req.session.user_id || !req.session.auth_token)
-		return 0;
+		return res.redirect("/");
 
-	try {
-		return new Promise((resolve, reject) => {
-			connection.query("SELECT authToken FROM auth WHERE user_id=?", req.session.user_id, (err, authToken) => {
-				if (err) reject(err);
-
-				if (authToken.length && authToken[0].authToken == req.session.auth_token)
-					resolve(1);
-				else
-					resolve(0);
+	connection.query("SELECT authToken FROM auth WHERE user_id=?", req.session.user_id, (err, authToken) => {
+		if (err) 
+			return res.render("error", {
+				error
 			});
-		});
-	} catch (error) {
-		next(error);
-	}
+
+		if (authToken.length && authToken[0].authToken == req.session.auth_token)
+			return next();
+		else
+			res.redirect("/");
+	});
 }
 
 app.use(express.static(__dirname + "/public"));
@@ -68,17 +65,35 @@ app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustache());
 
-app.get("/", async (req, res, next) => {
-	if (await loggedIn(req, next)) {
-		connection.query(`SELECT username, game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM user INNER JOIN game
-			ON user.id=game.user_id INNER JOIN streak ON
-			user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
-			if (err || !user_data || !user_data.length) return res.render("error");
+app.get("/", (req, res, next) => {
+	res.render("index", {
+		LOGGED_IN: false,
+		BEST_BLOCK: 2
+	});
+});
+
+app.get("/l", loggedIn, (req, res, next) => {
+	connection.query(`SELECT username, game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM user INNER JOIN game
+		ON user.id=game.user_id INNER JOIN streak ON
+		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
+		if (err || !user_data || !user_data.length) return res.render("error");
+
+		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore LIMIT 20`, (err, users) => {
+			if (err || !users) return res.render("error", { error: err });
 
 			let u_dat = user_data[0];
+			users.forEach((u, i) => {
+				u.rank = i + 1;
+
+				if (u.username == u_dat.username)
+					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
+			});
+
 			res.render("index.mustache", {
 				LOGGED_IN: true,
 				USERNAME: u_dat.username,
+
+				LEADERBOARD: users,
 
 				CURRENT_SCORE: u_dat.currentScore,
 				BEST_BLOCK: u_dat.bestBlock,
@@ -99,8 +114,59 @@ app.get("/", async (req, res, next) => {
 				BEST_STREAK: u_dat.bestStreak,
 			});
 		});
-	} else
-		res.render("index");
+	});
+});
+
+app.post("/save-game", loggedIn, (req, res, next) => {
+	if (!req.body.board || !req.body.currentScore)
+		return res.send("1");
+
+	let realCurrentScore = req.body.currentScore.substr(8);
+	connection.query("SELECT bestScore FROM game WHERE user_id=?", req.session.user_id, (err, bestscore) => {
+		if (err || !bestscore || !bestscore.length) return next(err);
+
+		let newBestScore = bestscore[0].bestScore < realCurrentScore ? realCurrentScore : bestscore[0].bestScore;
+
+		connection.query("UPDATE game SET bestScore=?, currentScore=? WHERE user_id=?", [newBestScore, realCurrentScore, req.session.user_id], (err) => {
+			if (err) return next(err);
+
+			connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [req.body.board, req.session.user_id], (err) => {
+				if (err) return next(err);
+
+				res.send("0");
+			});
+		});
+	});
+});
+
+let allowed_blocks = {
+	2: 1,
+	4: 1,
+	8: 1,
+	16: 1,
+	32: 1,
+	64: 1,
+	128: 1,
+	256: 1,
+	512: 1,
+	1024: 1,
+	2048: 1,
+	4096: 1,
+	8192: 1,
+	16384: 1,
+	32768: 1,
+	65536: 1,
+	131072: 1
+};
+app.get("/update-best-block/:newblock", loggedIn, (req, res, next) => {
+	if (!allowed_blocks[req.params["newblock"]])
+		return res.send("1");
+
+	connection.query("UPDATE game SET bestBlock=? WHERE user_id=?", [req.params["newblock"], req.session.user_id], (err) => {
+		if (err) return next(err);
+
+		return res.send("0");
+	});
 });
 
 app.get("/username-available/:username", (req, res, next) => {

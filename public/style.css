@@ -34,6 +34,178 @@ a {
 	color: black;
 }
 
+#leaderboard {
+	position: sticky;
+	top: 10%;
+
+	margin-left: 5px;
+
+	height: 80%;
+}
+
+.leaderboard-entry {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.leaderboard-entry-meta {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.leaderboard-entry-rank {
+	padding: 5px;
+	background: white;
+
+	font-size: 28px;
+
+	padding: 16px;
+	border-radius: 10px;
+
+	margin-right: 8px;
+
+	line-height: 18px;
+	vertical-align: middle;
+
+	z-index: 2;
+}
+
+.leaderboard-entry-username {
+	padding: 5px;
+	background: #ddcee2;
+
+	font-size: 14px;
+
+	padding: 16px;
+	border-radius: 2px;
+
+	margin-right: 8px;
+
+	line-height: 18px;
+	vertical-align: middle;
+
+	z-index: 1;
+}
+
+.leaderboard-entry-score {
+	padding: 5px;
+	background: #ddcee2;
+
+	font-size: 14px;
+
+	padding: 16px;
+	border-radius: 2px;
+
+	margin-right: 8px;
+
+	line-height: 18px;
+	vertical-align: middle;
+
+	z-index: 1;
+}
+
+.rank-color1 {
+	background: #000000 !important;
+  color: #dcdcdc;
+
+  -webkit-box-shadow:0px 0px 30px 15px rgba(0,0,0,0.79);
+  -moz-box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
+  box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
+}
+
+.rank-color2 {
+	background: #f5f5f5;
+  color: #000000;
+
+  -webkit-box-shadow:0px 0px 100px 36px rgba(245,245,245,0.75);
+  -moz-box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
+  box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
+}
+
+.rank-color3 {
+	background: #d28cdc;
+  color: #3c2643;
+
+  -webkit-box-shadow:0px 0px 40px 18px rgba(211,140,220,0.8);
+  -moz-box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
+  box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
+}
+
+.rank-color4 {
+	 background: #ce5c24;
+  color: #46324b;
+
+  -webkit-box-shadow:0px 0px 46px 26px rgba(207,93,36,0.0.8);
+  -moz-box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
+  box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
+}
+
+.rank-color5 {
+	background: #e1a019;
+  color: #5a1e36;
+
+  -webkit-box-shadow:0px 0px 50px 16px rgba(225,158,25,0.61);
+  -moz-box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
+  box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
+}
+
+.rank-color6 {
+	background: #ffe014;
+  color: #711623;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 64px 15px rgba(255,224,20,0.53);
+  -moz-box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
+  box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
+}
+
+.rank-color7 {
+	background: #ffff14;
+  color: #711623;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 34px 17px rgba(255,255,20,0.5);
+  -moz-box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
+  box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
+}
+
+.rank-color8 {
+	background: #caef17;
+  color: #7b202d;
+
+  font-size: 32px;
+
+  -webkit-box-shadow:0px 0px 40px 14px rgba(199,239,23,0.45);
+  -moz-box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
+  box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
+}
+
+.rank-color9 {
+	background: #acd100;
+  color: #7b202d;
+
+  font-size: 40px;
+
+  -webkit-box-shadow:0px 0px 48px 12px rgba(171,209,0,0.4);
+  -moz-box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
+  box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
+}
+
+.rank-color10 {
+	background: #78c732;
+  color: #7b202d;
+
+  font-size: 40px;
+
+  -webkit-box-shadow:0px 0px 55px 11px rgba(120,199,50,0.39);
+  -moz-box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
+  box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
+}
+
 .dropdown-noti {
 	margin-top: -80px;
 	margin-bottom: 80px;
@@ -127,7 +299,9 @@ a {
   border-radius: 10px;
 }
 
-
+.column-tab.profile:hover, .column-tab.leaderboard-tab:hover {
+	cursor: pointer;
+}
 
 .current-streak {
   font-size: 32px;
@@ -447,6 +621,7 @@ a {
 
 #how-to-play {
 	margin-top: 20px;
+	padding-left: 5px;
 }
 
 #defaultCanvas0 {
@@ -674,14 +849,14 @@ a {
 }
 
 
-#username-taken, #email-taken {
+#username-taken, #email-taken, #leaderboard-personal {
 	color: #ce5c24;
 	opacity: 0;
 
 	transition: opacity 1s ease-in-out;
 }
 
-#username-taken.is-taken, #email-taken.is-taken {
+#username-taken.is-taken, #email-taken.is-taken, #leaderboard-personal.is-taken {
 	opacity: 1;
 }
 /* Login / Signup page (from Pablo Eugenio Lujambio Martinez) */

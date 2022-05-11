@@ -73,6 +73,8 @@ CREATE TABLE board_history (
 
 	wholeBoard TEXT,
 
+	score INT NOT NULL,
+
 	startTime DATETIME,
 	endTime DATETIME,
 
