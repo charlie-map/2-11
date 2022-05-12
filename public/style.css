@@ -88,7 +88,7 @@ a {
 
 	line-height: 18px;
 
-	z-index: 2;
+	z-index: 3;
 }
 
 .leaderboard-entry-username {
@@ -107,7 +107,7 @@ a {
 	line-height: 18px;
 	vertical-align: middle;
 
-	z-index: 2;
+	z-index: 3;
 }
 
 .leaderboard-entry-score {
@@ -130,7 +130,7 @@ a {
 	line-height: 18px;
 	vertical-align: middle;
 
-	z-index: 2;
+	z-index: 3;
 }
 
 .rank-color1 {
@@ -141,7 +141,7 @@ a {
   -moz-box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
   box-shadow: 0px 0px 30px 15px rgba(0,0,0,0.79);
 
-  z-index: 12;
+  z-index: 13;
 }
 
 .rank-color2 {
@@ -152,7 +152,7 @@ a {
   -moz-box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
   box-shadow: 0px 0px 100px 36px rgba(245,245,245,0.75);
 
-  z-index: 11;
+  z-index: 12;
 }
 
 .rank-color3 {
@@ -163,7 +163,7 @@ a {
   -moz-box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
   box-shadow: 0px 0px 40px 18px rgba(211,140,220,0.8);
 
-  z-index: 10;
+  z-index: 11;
 }
 
 .rank-color4 {
@@ -174,7 +174,7 @@ a {
   -moz-box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
   box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
 
-  z-index: 9;
+  z-index: 10;
 }
 
 .rank-color5 {
@@ -185,7 +185,7 @@ a {
   -moz-box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
   box-shadow: 0px 0px 50px 16px rgba(225,158,25,0.61);
 
-  z-index: 8;
+  z-index: 9;
 }
 
 .rank-color6 {
@@ -198,7 +198,7 @@ a {
   -moz-box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
   box-shadow: 0px 0px 64px 15px rgba(255,224,20,0.53);
 
-  z-index: 7;
+  z-index: 8;
 }
 
 .rank-color7 {
@@ -211,7 +211,7 @@ a {
   -moz-box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
   box-shadow: 0px 0px 34px 17px rgba(255,255,20,0.5);
 
-  z-index: 6;
+  z-index: 7;
 }
 
 .rank-color8 {
@@ -224,7 +224,7 @@ a {
   -moz-box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
   box-shadow: 0px 0px 40px 14px rgba(199,239,23,0.45);
 
-  z-index: 5;
+  z-index: 6;
 }
 
 .rank-color9 {
@@ -236,7 +236,7 @@ a {
   -webkit-box-shadow:0px 0px 48px 12px rgba(171,209,0,0.4);
   -moz-box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
   box-shadow: 0px 0px 48px 12px rgba(171,209,0,0.4);
-  z-index: 4;
+  z-index: 5;
 }
 
 .rank-color10 {
@@ -249,7 +249,7 @@ a {
   -moz-box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
   box-shadow: 0px 0px 55px 11px rgba(120,199,50,0.39);
 
-  z-index: 3;
+  z-index: 4;
 }
 
 .dropdown-noti {

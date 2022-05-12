@@ -87,22 +87,77 @@ $("#new-game").click(function() {
 	setup(1);
 });
 
+function checkUserRankLeaderboard(newMetaPoints) {
+	needLeaderboardCheck = 0;
+	let personal_user = $(".personal-user-points").parent().parent();
+
+	let upper_sibling_check = $(personal_user).prev();
+	let sib_to_switch = null;
+	while (upper_sibling_check) {
+		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints)
+			break;
+
+		sib_to_switch = upper_sibling_check;
+		upper_sibling_check = $(upper_sibling_check).is(":first-child") ? null : $(upper_sibling_check).prev();
+	}
+
+	console.log("switch sibs?", sib_to_switch);
+	if (sib_to_switch) {
+		let pre_sib_to_switch = $(sib_to_switch).is(":first-child") ? $("#leaderboard") : $(sib_to_switch).prev();
+		let pre_personal_user = $(personal_user).prev().is(sib_to_switch) ? $(personal_user) : $(personal_user).prev();
+
+		$(sib_to_switch).css("z-index", 1);
+		$(personal_user).css("z-index", 2);
+
+		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
+
+		console.log("animating", sib_to_switch, personal_user, space_diff);
+
+		activelyMovingLeaderboardRank = 1;
+		$(personal_user).animate({
+			"margin-top": -1 * space_diff
+		}, 800, function(animation_data) {
+			console.log(animation_data);
+			let personal_user_dat = $(animation_data[0]).outerHTML;
+			$(animation_data[0]).remove();
+
+			$(animation_data[1]).after(personal_user_dat);
+
+
+			let sib_to_switch_dat = $(animation_data[2]).outerHTML;
+			$(animation_data[2]).remove();
+
+			$(animation_data[3]).after(personal_user_dat);
+
+			activelyMovingLeaderboardRank = 0;
+		}, [personal_user, pre_sib_to_switch, sib_to_switch, pre_sib_to_switch]);
+
+		$(sib_to_switch).animate({
+			"margin-top": space_diff
+		}, 800);
+	}
+}
+
 window.addEventListener("keydown", function(e) {
-    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
-        e.preventDefault();
-    }
+	if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].indexOf(e.code) > -1) {
+		e.preventDefault();
+	}
 }, false);
 
 $("#go-to-title").click(function(e) {
 	e.preventDefault();
 
-	$("html, body").animate({ scrollTop: -200 }, "slow");
+	$("html, body").animate({
+		scrollTop: -200
+	}, "slow");
 });
 
 $("#go-to-how-to").click(function(e) {
 	e.preventDefault();
 
-	$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+	$("html, body").animate({
+		scrollTop: $(document).height()
+	}, "slow");
 });
 
 $("#gender").focus(function() {
@@ -194,6 +249,7 @@ $("#email").focusout(function() {
 		}
 	});
 });
+
 function invalidate(el) {
 	$(el).parent().addClass("invalid");
 	$(el).removeClass("valid");
@@ -321,8 +377,10 @@ $("#register").click(function(e) {
 		}, (res) => {
 			if (res.success) {
 				localStorage.setItem("savedBest2-11Score", 0);
+				localStorage.setItem("savedCurr2-11Score", 0);
+				localStorage.setitem("saved2-11Board", null);
 				window.location.href = window.location.href.split("/")[0] + "/l";
-			
+
 				return;
 			}
 
