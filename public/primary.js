@@ -5,14 +5,24 @@ $(document).ready(function() {
 		}, 4800);
 
 
+	$("body").css("height", $("#all-content").outerHeight());
+
 	if (logging_in == undefined || logging_in || loggedIn) {
 		if (logging_in)
 			$("#username").focus();
 
 		if (loggedIn) {
-			let set_width = $(document).outerWidth() - (460 + 104);
-			set_width = set_width > 450 ? 450 : set_width;
-			$("#leaderboard").width(set_width);
+			let set_width = $(document).outerWidth() - 460;
+			set_width = set_width > 400 ? 400 : set_width;
+			$("#leaderboard").css({
+				width: set_width,
+				left: "calc(50% + " + (430 * 0.5) + "px)"
+			});
+
+			let user_column_left = $(document).outerWidth() * 0.5 - 230;
+			$(".user-column").css({
+				left: user_column_left - $(".user-column").outerWidth()
+			});
 		}
 
 		return;
@@ -33,10 +43,19 @@ $(document).ready(function() {
 	$("#email").focus();
 });
 
-window.resize = function() {
-
+window.onresize = function() {
 	if (loggedIn) {
-		$("#leaderboard").width($(document).outerWidth() - (460 + 104));
+		let set_width = $(document).outerWidth() - 460;
+		set_width = set_width > 400 ? 400 : set_width;
+		$("#leaderboard").css({
+			width: set_width,
+			left: "calc(50% + " + (430 * 0.5) + "px)"
+		});
+
+		let user_column_left = $(document).outerWidth() * 0.5 - 230;
+		$(".user-column").css({
+			left: user_column_left - $(".user-column").outerWidth()
+		});
 	}
 
 	if (logging_in == undefined || logging_in)
@@ -245,6 +264,7 @@ $("#register").click(function(e) {
 			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
 			let JSONres_board = JSON.parse(res.board);
 			if (!currentLocalBoard || !res.board || !differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
+				localStorage.setItem("savedBest2-11Score", res.bestScore);
 				window.location.href = window.location.href.split("/")[0] + "/l";
 				return;
 			}
@@ -300,6 +320,7 @@ $("#register").click(function(e) {
 			birthdate: birthday
 		}, (res) => {
 			if (res.success) {
+				localStorage.setItem("savedBest2-11Score", 0);
 				window.location.href = window.location.href.split("/")[0] + "/l";
 			
 				return;
@@ -328,6 +349,7 @@ $("#choose-local-board").click(function() {
 		board: localStorage.getItem("saved2-11Board"),
 		currentScore: "83e0a301" + localStorage.getItem("savedCurr2-11Score")
 	}, (res) => {
+		localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
 		window.location.href = window.location.href.split("/")[0] + "/l";
 	});
 });

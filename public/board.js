@@ -140,8 +140,25 @@ class Board {
       if (newMetaPoints > bestPoints && newMetaPoints > metaPoints) {
         $("#best-score").text(newMetaPoints);
         $(".personal-user-points").text(newMetaPoints);
+        let personal_user = $(".personal-user-points").parent().parent();
 
+        let upper_sibling_check = $(personal_user).prev();
+        let sib_to_switch = null;
+        while (upper_sibling_check) {
+          if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score"), 10) >= newMetaPoints)
+            break;
+          
+          sib_to_switch = upper_sibling_check;
+        }
 
+        if (sib_to_switch) {
+          $(sib_to_switch).css("z-index", 1);
+          $(personal_user).css("z-index", 1);
+
+          let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
+
+          
+        }
 
         bestPoints = newMetaPoints;
         let newScore = newMetaPoints + "";

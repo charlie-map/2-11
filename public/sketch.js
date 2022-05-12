@@ -22,7 +22,7 @@ function setup(isRestart) {
     65536: [color(245, 245, 245), color(0, 0, 0), 25],
     131072: [color(0, 0, 0), color(220, 220, 220), 25]
   };
-  
+
   let oldBoard = null;
   if (!isRestart) {
     oldBoard = localStorage.getItem("saved2-11Board");
