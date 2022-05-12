@@ -10,7 +10,9 @@ $(document).ready(function() {
 			$("#username").focus();
 
 		if (loggedIn) {
-			$("#leaderboard").width($(document).outerWidth() - (460 + 104));
+			let set_width = $(document).outerWidth() - (460 + 104);
+			set_width = set_width > 450 ? 450 : set_width;
+			$("#leaderboard").width(set_width);
 		}
 
 		return;
@@ -198,13 +200,19 @@ $("#register").click(function(e) {
 			username_email: username_or_email,
 			password
 		}, (res) => {
-			console.log(res);
-
-			if (res[0] == "0") {
-				window.location.href = window.location.href.split("/")[0] + "/l";
-			
+			if (!res.success) {
+				// error
 				return;
 			}
+
+			let currentLocalBoard = localStorage.getItem("saved2-11Board");
+			let currentLocalScore = localStorage.getItem("savedCurr2-11Score");
+
+			// choose which board to continue with
+
+
+			window.location.href = window.location.href.split("/")[0] + "/l";
+			return;
 		});
 	} else {
 		let invalids = 0;

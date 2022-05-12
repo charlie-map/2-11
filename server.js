@@ -204,6 +204,7 @@ app.get("/email-available/:email", (req, res, next) => {
 app.get("/signup", (req, res) => {
 	res.render("login-signup", {
 		LOG_OR_SIGN: "Signup",
+		LOGGED_IN: false,
 		LOGGING_IN: false
 	});
 });
@@ -328,6 +329,7 @@ app.post("/signup", async (req, res, next) => {
 app.get("/login", (req, res) => {
 	res.render("login-signup", {
 		LOG_OR_SIGN: "Login",
+		LOGGED_IN: false,
 		LOGGING_IN: true
 	});
 });
@@ -344,7 +346,8 @@ app.post("/login", (req, res, next) => {
 	}
 
 	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
-	connection.query("SELECT id, password FROM user WHERE " + email_or_username + "=?", req.body.username_email, (err, user_password) => {
+	connection.query(`SELECT id, password, bestScore, currentScore, wholeBoard FROM user INNER JOIN
+		game ON user.id=game.user_id INNER JOIN current_board ON user.id=current_board.user_id WHERE ${email_or_username}=?`, req.body.username_email, (err, user_password) => {
 		if (err || !user_password) return next(err);
 
 		if (!user_password.length) {
@@ -368,8 +371,10 @@ app.post("/login", (req, res, next) => {
 					req.session.auth_token = newUUID;
 
 					res.json({
-						failure: 0,
-						best: 
+						success: 1,
+						bestScore: user_password[0].bestScore,
+						currentScore: user_password[0].currentScore,
+						board: user_password[0].wholeBoard
 					});
 					return;
 				});
