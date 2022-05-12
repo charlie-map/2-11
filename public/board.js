@@ -54,7 +54,7 @@ class Board {
       board: stringedBoard,
       currentScore: "83e0a301" + metaPoints
     }, (res) => {
-      console.log(res);
+
     });
   }
   
@@ -137,8 +137,11 @@ class Board {
       let prevScore = metaPoints;
       let newMetaPoints = prevScore + points;
 
-      if (prevScore + points > bestPoints && prevScore + points > metaPoints) {
-        $("#best-score").text(prevScore);
+      if (newMetaPoints > bestPoints && newMetaPoints > metaPoints) {
+        $("#best-score").text(newMetaPoints);
+        $(".personal-user-points").text(newMetaPoints);
+
+
 
         bestPoints = newMetaPoints;
         let newScore = newMetaPoints + "";

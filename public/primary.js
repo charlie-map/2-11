@@ -180,6 +180,40 @@ function invalidate(el) {
 	$(el).removeClass("valid");
 }
 
+function stringBoardToVisual(mainDiv, fullBoard) {
+	for (let y = 3; y >= 0; y--) {
+		$(mainDiv).prepend(`<div class="board-display-row row-${y}"></div>`);
+
+		let current_row = $(mainDiv).children(`.row-${y}`);
+		for (let x = 0; x < 4; x++) {
+			if (fullBoard[x][y])
+				current_row.append(`
+				<div class="column-tab best-square bs-${fullBoard[x][y].num} column-${x}">
+					<div class="best-num">${fullBoard[x][y].num}</div>
+				</div>`);
+			else
+				current_row.append(`<div class="column-tab best-square bs-0 column-${x}"></div>`);
+		}
+	}
+}
+
+function differentNumbers(board1, board2) {
+	for (let x = 0; x < 4; x++) {
+		for (let y = 0; y < 4; y++) {
+			if (board1[x][y] && board2[x][y]) {
+				if (board1[x][y].num != board2[x][y].num)
+					return 1;
+			} else if (board1[x][y])
+				return 1;
+			else if (board2[x][y])
+				return 1
+		}
+	}
+
+	return 0;
+}
+
+let res_buffer;
 $("#register").click(function(e) {
 	e.preventDefault();
 
@@ -208,11 +242,21 @@ $("#register").click(function(e) {
 			let currentLocalBoard = localStorage.getItem("saved2-11Board");
 			let currentLocalScore = localStorage.getItem("savedCurr2-11Score");
 
+			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
+			let JSONres_board = JSON.parse(res.board);
+			if (!currentLocalBoard || !res.board || !differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
+				window.location.href = window.location.href.split("/")[0] + "/l";
+				return;
+			}
+
+			stringBoardToVisual($("#local-board"), JSONcurrentLocalBoard);
+			stringBoardToVisual($("#remote-board"), JSONres_board);
+
 			// choose which board to continue with
+			$("#choose-board-username").text(res.username);
+			$("#choose-board").addClass("fix-conflict");
 
-
-			window.location.href = window.location.href.split("/")[0] + "/l";
-			return;
+			res_buffer = res;
 		});
 	} else {
 		let invalids = 0;
@@ -255,7 +299,7 @@ $("#register").click(function(e) {
 			gender,
 			birthdate: birthday
 		}, (res) => {
-			if (res[0] == "0") {
+			if (res.success) {
 				window.location.href = window.location.href.split("/")[0] + "/l";
 			
 				return;
@@ -277,4 +321,21 @@ $("#register").click(function(e) {
 			}
 		});
 	}
+});
+
+$("#choose-local-board").click(function() {
+	$.post("/save-game", {
+		board: localStorage.getItem("saved2-11Board"),
+		currentScore: "83e0a301" + localStorage.getItem("savedCurr2-11Score")
+	}, (res) => {
+		window.location.href = window.location.href.split("/")[0] + "/l";
+	});
+});
+
+$("#choose-remote-board").click(function() {
+	localStorage.setItem("saved2-11Board", res_buffer.board);
+	localStorage.setItem("savedCurr2-11Score", res_buffer.currentScore);
+	localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
+
+	window.location.href = window.location.href.split("/")[0] + "/l";
 });

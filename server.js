@@ -85,8 +85,10 @@ app.get("/l", loggedIn, (req, res, next) => {
 			users.forEach((u, i) => {
 				u.rank = i + 1;
 
-				if (u.username == u_dat.username)
+				if (u.username == u_dat.username) {
+					u.personal_user = "personal-user-points";
 					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
+				}
 			});
 
 			res.render("index", {
@@ -316,7 +318,7 @@ app.post("/signup", async (req, res, next) => {
 					req.session.auth_token = newUUID;
 
 					res.json({
-						failure: 0,
+						success: 1,
 						best: 0,
 						wholeBoard: null
 					});
@@ -346,7 +348,7 @@ app.post("/login", (req, res, next) => {
 	}
 
 	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
-	connection.query(`SELECT id, password, bestScore, currentScore, wholeBoard FROM user INNER JOIN
+	connection.query(`SELECT id, username, password, bestScore, currentScore, wholeBoard FROM user INNER JOIN
 		game ON user.id=game.user_id INNER JOIN current_board ON user.id=current_board.user_id WHERE ${email_or_username}=?`, req.body.username_email, (err, user_password) => {
 		if (err || !user_password) return next(err);
 
@@ -372,6 +374,7 @@ app.post("/login", (req, res, next) => {
 
 					res.json({
 						success: 1,
+						username: user_password[0].username,
 						bestScore: user_password[0].bestScore,
 						currentScore: user_password[0].currentScore,
 						board: user_password[0].wholeBoard
