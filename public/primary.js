@@ -89,12 +89,12 @@ $("#new-game").click(function() {
 
 function checkUserRankLeaderboard(newMetaPoints) {
 	needLeaderboardCheck = 0;
+	activelyMovingLeaderboardRank = 1;
 	let personal_user = $(".personal-user-points").parent().parent();
 
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
-	while (upper_sibling_check) {
-		console.log("LOOKING");
+	while (!$(upper_sibling_check).is(personal_user) && upper_sibling_check && upper_sibling_check.length) {
 		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints)
 			break;
 
@@ -102,7 +102,6 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		upper_sibling_check = $(upper_sibling_check).is(":first-child") ? null : $(upper_sibling_check).prev();
 	}
 
-	console.log("switch?", sib_to_switch);
 	if (sib_to_switch) {
 		$(sib_to_switch).css("z-index", 1);
 		$(sib_to_switch).addClass("swapping");
@@ -111,10 +110,9 @@ function checkUserRankLeaderboard(newMetaPoints) {
 
 		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
 
-		console.log("animating", sib_to_switch, personal_user, space_diff);
-
 		$(personal_user).css({
-			"margin-top": -2 * space_diff
+			"margin-top": -2 * space_diff,
+			"margin-bottom": space_diff
 		});
 		$(sib_to_switch).css({
 			"margin-top": space_diff
@@ -125,7 +123,8 @@ function checkUserRankLeaderboard(newMetaPoints) {
 			$(animation_data[1]).removeClass("swapping");
 
 			$(animation_data[0]).css({
-				"margin-top": 0
+				"margin-top": 0,
+				"margin-bottom": 0
 			});
 			$(animation_data[1]).css({
 				"margin-top": 0
@@ -145,9 +144,16 @@ function checkUserRankLeaderboard(newMetaPoints) {
 			$(animation_data[0]).find(".leaderboard-entry-score").text(other_score);
 			$(animation_data[1]).find(".leaderboard-entry-score").text(personal_score);
 
+			// $.get("/updated-leaderboards", (res) => {
+			// 	let l_boards = JSON.parse(res);
+
+
+			// });
 			activelyMovingLeaderboardRank = 0;
 		}, 800, [personal_user, sib_to_switch]);
 	}
+
+	activelyMovingLeaderboardRank = 0;
 }
 
 window.addEventListener("keydown", function(e) {
@@ -212,11 +218,10 @@ $("#username").focusout(function() {
 	if (!username.length)
 		return;
 
-	console.log(username, username.includes("@"));
 	if (username.includes("@")) {
 		$("#username-taken").html("no @ in username");
 		$("#username-taken").addClass("is-taken");
-		$("#username").addClass("taken");
+		invalidate($("#username"));
 
 		return;
 	}
@@ -390,7 +395,7 @@ $("#register").click(function(e) {
 			if (res.success) {
 				localStorage.setItem("savedBest2-11Score", 0);
 				localStorage.setItem("savedCurr2-11Score", 0);
-				localStorage.setitem("saved2-11Board", null);
+				localStorage.setItem("saved2-11Board", null);
 				window.location.href = window.location.href.split("/")[0] + "/l";
 
 				return;

@@ -119,6 +119,24 @@ app.get("/l", loggedIn, (req, res, next) => {
 	});
 });
 
+app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
+	connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+		if (err || !users) return res.render("error", { error: err });
+
+		let u_dat = user_data[0];
+		users.forEach((u, i) => {
+			u.rank = i + 1;
+
+			if (u.username == u_dat.username) {
+				u.personal_user = "personal-user-points";
+				u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
+			}
+		});
+
+		res.json(users);
+	});
+});
+
 app.post("/save-game", loggedIn, (req, res, next) => {
 	if (!req.body.board || !req.body.currentScore)
 		return res.send("1");

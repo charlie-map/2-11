@@ -187,6 +187,7 @@ class Board {
       }
 
       metaPoints = newMetaPoints;
+      points = 0;
       this.saveGame();
     }
 
