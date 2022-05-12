@@ -78,7 +78,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
 
-		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+		connection.query(`SELECT bestScore, leaderboardOpen, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
 
 			let u_dat = user_data[0];
@@ -120,21 +120,34 @@ app.get("/l", loggedIn, (req, res, next) => {
 });
 
 app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
-	connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
-		if (err || !users) return res.render("error", { error: err });
+	connection.query("SELECT username FROM user WHERE id=?", req.session.user_id, (err, user_data) => {
+		if (err) return next(err);
 
-		let u_dat = user_data[0];
-		users.forEach((u, i) => {
-			u.rank = i + 1;
+		connection.query(`SELECT bestScore, leaderboardOpen, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+			if (err || !users) return next(err);
 
-			if (u.username == u_dat.username) {
-				u.personal_user = "personal-user-points";
-				u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
-			}
+			let u_dat = user_data[0];
+			let wantsLeaderboardOpen = 0;
+			users.forEach((u, i) => {
+				u.rank = i + 1;
+
+				if (u.username == u_dat.username) {
+					wantsLeaderboardOpen = u.leaderboardOpen;
+					u.personal_user = "personal-user-points";
+					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
+				}
+			});
+
+			res.json({
+				leaderboardOpen: wantsLeaderboardOpen,
+				users
+			});
 		});
-
-		res.json(users);
 	});
+});
+
+app.get("/toggle-leaderboard", loggedIn, (req, res, next) => {
+	
 });
 
 app.post("/save-game", loggedIn, (req, res, next) => {

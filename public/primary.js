@@ -1,3 +1,5 @@
+let LEADERBOARD_USERS;
+
 $(document).ready(function() {
 	if ($(".dropdown-noti").hasClass("logged-in-box"))
 		setTimeout(function() {
@@ -12,11 +14,16 @@ $(document).ready(function() {
 			$("#username").focus();
 
 		if (loggedIn) {
-			let set_width = $(document).outerWidth() - 460;
-			set_width = set_width > 400 ? 400 : set_width;
-			$("#leaderboard").css({
-				width: set_width,
-				left: "calc(50% + " + (430 * 0.5) + "px)"
+			$.get("/updated-leaderboard", (res) => {
+				let set_width = $(document).outerWidth() - 460;
+				set_width = set_width > 400 ? 400 : set_width;
+				$("#leaderboard").css({
+					width: set_width,
+					left: "calc(50% + " + (430 * 0.5) + "px)"
+				});
+
+				$("#leaderboard").html("");
+				LEADERBOARD_USERS = res.users;
 			});
 
 			let user_column_left = $(document).outerWidth() * 0.5 - 230;
@@ -114,7 +121,6 @@ function checkUserRankLeaderboard(newMetaPoints) {
 
 		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
 
-		console.log(space_diff, number_of_spaces, $(sib_to_switch).outerWidth());
 		$(personal_user).css({
 			"margin-top": -1 * (space_diff + (space_diff / number_of_spaces)),
 			"margin-bottom": space_diff
@@ -124,6 +130,7 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		});
 
 		setTimeout(function(animation_data) {
+			console.log("flip", animation_data[0], animation_data[1]);
 			$(animation_data[0]).removeClass("swapping");
 			$(animation_data[1]).removeClass("swapping");
 
@@ -149,16 +156,10 @@ function checkUserRankLeaderboard(newMetaPoints) {
 			$(animation_data[0]).find(".leaderboard-entry-score").text(other_score);
 			$(animation_data[1]).find(".leaderboard-entry-score").text(personal_score);
 
-			// $.get("/updated-leaderboards", (res) => {
-			// 	let l_boards = JSON.parse(res);
-
-
-			// });
 			activelyMovingLeaderboardRank = 0;
 		}, 800, [personal_user, sib_to_switch]);
-	}
-
-	activelyMovingLeaderboardRank = 0;
+	} else
+		activelyMovingLeaderboardRank = 0;
 }
 
 window.addEventListener("keydown", function(e) {
@@ -440,4 +441,42 @@ $("#choose-remote-board").click(function() {
 	localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
 
 	window.location.href = window.location.href.split("/")[0] + "/l";
+});
+
+
+
+$(".leaderboard-tab").click(function() {
+	$(this).toggleClass("open");
+
+	if ($(this).hasClass("open")) {
+		$(this).find("rect").attr("fill", "#ddcee2");
+
+		$.get("/updated-leaderboard", (res) => {
+			LEADERBOARD_USERS = res.users;
+
+			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
+				setTimeout(function(e) {
+					$("#leaderboard").append(`
+					<div class="leaderboard-entry">
+						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
+						<div class="leaderboard-entry-meta">	
+							<div class="leaderboard-entry-username">${e.username}</div>
+							<div class="leaderboard-entry-score ${e.personal_user}">${e.bestScore}</div>
+						</div>
+					</div>
+					`);
+				}, i * 40, LEADERBOARD_USERS[i]);
+			}
+		});
+	} else {
+		$(this).find("rect").attr("fill", "none");
+
+		let delete_child = $("#leaderboard").children("div");
+
+		for (let i = delete_child.length - 1; i >= 0; i--) {
+			setTimeout(function(e) {
+				$(e).remove();
+			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 15, $(delete_child[i]));
+		}
+	}
 });

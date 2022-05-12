@@ -43,6 +43,8 @@ CREATE TABLE streak (
 CREATE TABLE game (
 	user_id INT,
 
+	leaderboardOpen INT NOT NULL DEFAULT 0,
+
 	currentScore INT NOT NULL DEFAULT 0,
 	bestBlock INT NOT NULL DEFAULT 2,
 	bestScore INT NOT NULL DEFAULT 0,
