@@ -22,7 +22,13 @@ $(document).ready(function() {
 					left: "calc(50% + " + (430 * 0.5) + "px)"
 				});
 
-				$("#leaderboard").html("");
+				if (!wantsLeaderboardOpen) {
+					$("#leaderboard").html("");
+				} else {
+					$(".leaderboard-entry").addClass("fade-in");
+					$(".leaderboard-tab").addClass("open");
+					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
+				}
 				LEADERBOARD_USERS = res.users;
 			});
 
@@ -34,18 +40,6 @@ $(document).ready(function() {
 
 		return;
 	}
-	$("#gender").parent().css({
-		"margin-top": -1 * $(".gender-noti").outerHeight()
-	});
-
-	let img_width = $("#nice-image").outerWidth();
-
-	$(".gender-noti").outerWidth(img_width - 8);
-
-	$(".gender-noti").offset({
-		left: $("#nice-image").offset().left + 4,
-		top: $("#gender").offset().top - 40
-	});
 
 	$("#email").focus();
 });
@@ -67,19 +61,6 @@ window.onresize = function() {
 
 	if (logging_in == undefined || logging_in)
 		return;
-
-	$("#gender").parent().css({
-		"margin-top": -1 * $(".gender-noti").outerHeight()
-	});
-
-	let img_width = $("#nice-image").outerWidth();
-
-	$(".gender-noti").outerWidth(img_width - 8);
-
-	$(".gender-noti").offset({
-		left: $("#nice-image").offset().left + 4,
-		top: $("#gender").offset().top - 40
-	});
 }
 
 $("#new-game").click(function() {
@@ -102,6 +83,7 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
 	let number_of_spaces = 0;
+	console.log(metaPoints);
 	while (!$(upper_sibling_check).is(personal_user) && upper_sibling_check && upper_sibling_check.length) {
 		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints) {
 			number_of_spaces++;
@@ -113,6 +95,7 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		number_of_spaces++;
 	}
 
+	console.log(sib_to_switch, personal_user);
 	if (sib_to_switch) {
 		$(sib_to_switch).css("z-index", 1);
 		$(sib_to_switch).addClass("swapping");
@@ -130,13 +113,12 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		});
 
 		setTimeout(function(animation_data) {
-			console.log("flip", animation_data[0], animation_data[1]);
 			$(animation_data[0]).removeClass("swapping");
 			$(animation_data[1]).removeClass("swapping");
 
 			$(animation_data[0]).css({
 				"margin-top": 0,
-				"margin-bottom": 0
+				"margin-bottom": "8px"
 			});
 			$(animation_data[1]).css({
 				"margin-top": 0
@@ -332,6 +314,8 @@ $("#register").click(function(e) {
 			username_email: username_or_email,
 			password
 		}, (res) => {
+			console.log(res);
+
 			if (!res.success) {
 				// error
 				return;
@@ -342,7 +326,17 @@ $("#register").click(function(e) {
 
 			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
 			let JSONres_board = JSON.parse(res.board);
-			if (!currentLocalBoard || !res.board || !differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
+
+			if ((!currentLocalBoard || !JSONcurrentLocalBoard) && (!res.board || !JSONres_board)) {
+				localStorage.setItem("saved2-11Board", null);
+				localStorage.setItem("savedBest2-11Score", 0);
+
+				window.location.href = window.location.href.split("/")[0] + "/l";
+				return;
+			}
+
+			if (((!currentLocalBoard || !JSONcurrentLocalBoard) || (!res.board || !JSONres_board))
+				|| !differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
 				localStorage.setItem("savedBest2-11Score", res.bestScore);
 				window.location.href = window.location.href.split("/")[0] + "/l";
 				return;
@@ -377,27 +371,16 @@ $("#register").click(function(e) {
 			invalidate($("#password"));
 		}
 
-		let gender = $("#gender").val();
-		if (!gender.length) {
-			invalids++;
-			invalidate($("#gender"));
-		}
-		let birthday = $("#birthday").val();
-		if (!birthday.length) {
-			invalids++;
-			invalidate($("#birthday"));
-		}
-
 		if (invalids)
 			return;
 
 		$.post("/signup", {
 			email,
 			username,
-			password,
-			gender,
-			birthdate: birthday
+			password
 		}, (res) => {
+			console.log(res);
+
 			if (res.success) {
 				localStorage.setItem("savedBest2-11Score", 0);
 				localStorage.setItem("savedCurr2-11Score", 0);
@@ -413,9 +396,7 @@ $("#register").click(function(e) {
 			let formInputs = {
 				"0": $("#email"),
 				"1": $("#username"),
-				"2": $("#password"),
-				"3": $("#gender"),
-				"4": $("#birthday")
+				"2": $("#password")
 			}
 
 			for (let i = 0; i < errorNumberSplit.length; i++) {
@@ -457,9 +438,9 @@ $(".leaderboard-tab").click(function() {
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
 				setTimeout(function(e) {
 					$("#leaderboard").append(`
-					<div class="leaderboard-entry">
+					<div class="leaderboard-entry fade-in">
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
-						<div class="leaderboard-entry-meta">	
+						<div class="leaderboard-entry-meta">
 							<div class="leaderboard-entry-username">${e.username}</div>
 							<div class="leaderboard-entry-score ${e.personal_user}">${e.bestScore}</div>
 						</div>
@@ -468,6 +449,10 @@ $(".leaderboard-tab").click(function() {
 				}, i * 40, LEADERBOARD_USERS[i]);
 			}
 		});
+
+		$.get("/toggle-leaderboard/1", (res) => {
+			return;
+		});
 	} else {
 		$(this).find("rect").attr("fill", "none");
 
@@ -475,8 +460,17 @@ $(".leaderboard-tab").click(function() {
 
 		for (let i = delete_child.length - 1; i >= 0; i--) {
 			setTimeout(function(e) {
-				$(e).remove();
-			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 15, $(delete_child[i]));
+				$(e).removeClass("fade-in");
+				$(e).addClass("fade-out");
+
+				setTimeout(function(e) {
+					$(e).remove();
+				}, 800, e);
+			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 60, $(delete_child[i]));
 		}
+
+		$.get("/toggle-leaderboard/0", (res) => {
+			return;
+		});
 	}
 });

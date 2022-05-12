@@ -68,6 +68,7 @@ app.engine('mustache', mustache());
 app.get("/", (req, res, next) => {
 	res.render("index", {
 		LOGGED_IN: false,
+		LEADERBOARD_OPEN: 0,
 		BEST_BLOCK: 2
 	});
 });
@@ -78,9 +79,10 @@ app.get("/l", loggedIn, (req, res, next) => {
 		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
 
-		connection.query(`SELECT bestScore, leaderboardOpen, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
 
+			let userBoardOpen;
 			let u_dat = user_data[0];
 			users.forEach((u, i) => {
 				u.rank = i + 1;
@@ -95,6 +97,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 				LOGGED_IN: true,
 				USERNAME: u_dat.username,
 
+				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
 				LEADERBOARD: users,
 
 				CURRENT_SCORE: u_dat.currentScore,
@@ -146,8 +149,14 @@ app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
 	});
 });
 
-app.get("/toggle-leaderboard", loggedIn, (req, res, next) => {
-	
+app.get("/toggle-leaderboard/:onoff", loggedIn, (req, res, next) => {
+	let toggleStatus = req.params["onoff"];
+
+	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.session.user_id], (err) => {
+		if (err) return next(err);
+
+		res.send("");
+	});
 });
 
 app.post("/save-game", loggedIn, (req, res, next) => {
@@ -268,18 +277,7 @@ function signup_valid(body) {
 	if (!body.password || !body.password.length)
 		invalid_response += "2,";
 
-	if (!body.gender || !body.gender.length)
-		invalid_response += "3,";
-
-	if (!body.birthday || !body.birthday.length) {
-		invalid_response += "4";
-
-		return invalid_response;
-	}
-
-	if (!date_validator(body.birthday, responseType="boolean"))
-		invalid_response += "4";
-
+	console.log("inval res", invalid_response, invalid_response.length);
 	return invalid_response;
 }
 
@@ -288,7 +286,7 @@ function signup_valid(body) {
 // 1 - errors
 app.post("/signup", async (req, res, next) => {
 	let signup_validator;
-	if (!(signup_validator = signup_valid(req.body)).length) {
+	if ((signup_validator = signup_valid(req.body)).length) {
 		res.send("1-" + signup_validator);
 		return;
 	}
@@ -301,11 +299,8 @@ app.post("/signup", async (req, res, next) => {
 		});
 	});
 
-	let split_birthdate = req.body.birthdate.split("/");
-	let adjust_birthdate = split_birthdate[2] + "-" + split_birthdate[1] + "-" + split_birthdate[0];
-	connection.query("INSERT INTO user (username, email, password, birthdate, gender, joindate) VALUES(?, ?, ?, ?, ?, NOW());",
-		[req.body.username, req.body.email, encryptPass, adjust_birthdate,
-		req.body.gender], (err) => {
+	connection.query("INSERT INTO user (username, email, password, joindate) VALUES(?, ?, ?, NOW());",
+		[req.body.username, req.body.email, encryptPass], (err) => {
 			if (err) return next(err);
 
 			connection.query("SELECT id FROM user WHERE username=? AND email=?", [req.body.username, req.body.email], async (err, newUserID) => {

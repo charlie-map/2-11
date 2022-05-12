@@ -45,9 +45,28 @@ a {
 
 #leaderboard {
 	position: fixed;
-	top: 10%;
 
-	height: 80%;
+	height: 100%;
+}
+
+.leaderboard-top-buffer {
+	position: relative;
+
+	height: calc(10% - 46px);
+	top: 0px;
+	margin-bottom: 46px;
+
+	z-index: 15;
+}
+
+.leaderboard-bottom-buffer {
+	position: relative;
+
+	height: calc(10% - 46px);
+	bottom: 0px;
+	margin-top: 46px;
+
+	z-index: 15;
 }
 
 .leaderboard-entry {
@@ -56,6 +75,37 @@ a {
 	align-items: center;
 	
 	margin-right: 8px;
+	margin-bottom: 6px;
+
+	opacity: 0;
+}
+
+.leaderboard-entry.fade-in {
+	animation: 0.8s fade-in ease-in-out;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+.leaderboard-entry.fade-out {
+	animation: 0.8s fade-out ease-in-out;
+	animation-fill-mode: forwards;
+}
+
+@keyframes fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
 }
 
 .leaderboard-entry.swapping {
@@ -69,7 +119,7 @@ a {
 	justify-content: center;
 	align-items: center;
 
-	margin-bottom: 4px;
+	/*margin-bottom: 4px;*/
 }
 
 .leaderboard-entry-rank {
@@ -85,7 +135,7 @@ a {
 
 	font-size: 28px;
 
-	padding: 16px;
+	padding: 14px;
 	border-radius: 10px;
 
 	margin-right: 8px;
@@ -102,7 +152,7 @@ a {
 
 	font-size: 14px;
 
-	padding: 16px;
+	padding: 14px;
 	padding-left: 20px;
 	border-radius: 2px;
 
@@ -126,7 +176,7 @@ a {
 
 	font-size: 14px;
 
-	padding: 16px;
+	padding: 14px;
 	border-radius: 2px;
 
 	margin-right: 8px;

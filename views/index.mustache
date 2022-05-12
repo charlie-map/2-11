@@ -123,6 +123,7 @@
 		</div>
 		{{#LOGGED_IN}}
 		<div id="leaderboard" class="leaderboard">
+			<div class="leaderboard-top-buffer"></div>
 			{{#LEADERBOARD}}
 			<div class="leaderboard-entry">
 				<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
@@ -132,6 +133,7 @@
 				</div>
 			</div>
 			{{/LEADERBOARD}}
+			<div class="leaderboard-bottom-buffer"></div>
 		</div>
 		{{/LOGGED_IN}}
 
@@ -139,8 +141,8 @@
 		<script>
 			let board;
 			let moveBuildup;
-			let highestPiece = {{BEST_BLOCK}};
-			let loggedIn = {{LOGGED_IN}};
+			let highestPiece = {{{BEST_BLOCK}}};
+			let loggedIn = {{{LOGGED_IN}}};
 
 			let endGame = 0;
 			let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
@@ -151,6 +153,7 @@
 			bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
 			let points = 0, metaPoints = 0;
 
+			let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
 			let activelyMovingLeaderboardRank = 0, needLeaderboardCheck = 0;
 
 			let currentScoreAnimationTimeout;

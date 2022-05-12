@@ -12,9 +12,6 @@ CREATE TABLE user (
 
 	password VARCHAR(60) NOT NULL,
 
-	birthdate DATE NOT NULL,
-	gender VARCHAR(255),
-
 	joindate DATE NOT NULL,
 
 	PRIMARY KEY(id)
