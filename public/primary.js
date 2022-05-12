@@ -94,6 +94,7 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
 	while (upper_sibling_check) {
+		console.log("LOOKING");
 		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints)
 			break;
 
@@ -101,40 +102,51 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		upper_sibling_check = $(upper_sibling_check).is(":first-child") ? null : $(upper_sibling_check).prev();
 	}
 
-	console.log("switch sibs?", sib_to_switch);
+	console.log("switch?", sib_to_switch);
 	if (sib_to_switch) {
-		let pre_sib_to_switch = $(sib_to_switch).is(":first-child") ? $("#leaderboard") : $(sib_to_switch).prev();
-		let pre_personal_user = $(personal_user).prev().is(sib_to_switch) ? $(personal_user) : $(personal_user).prev();
-
 		$(sib_to_switch).css("z-index", 1);
+		$(sib_to_switch).addClass("swapping");
 		$(personal_user).css("z-index", 2);
+		$(personal_user).addClass("swapping");
 
 		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
 
 		console.log("animating", sib_to_switch, personal_user, space_diff);
 
-		activelyMovingLeaderboardRank = 1;
-		$(personal_user).animate({
-			"margin-top": -1 * space_diff
-		}, 800, function(animation_data) {
-			console.log(animation_data);
-			let personal_user_dat = $(animation_data[0]).outerHTML;
-			$(animation_data[0]).remove();
+		$(personal_user).css({
+			"margin-top": -2 * space_diff
+		});
+		$(sib_to_switch).css({
+			"margin-top": space_diff
+		});
 
-			$(animation_data[1]).after(personal_user_dat);
+		setTimeout(function(animation_data) {
+			$(animation_data[0]).removeClass("swapping");
+			$(animation_data[1]).removeClass("swapping");
 
+			$(animation_data[0]).css({
+				"margin-top": 0
+			});
+			$(animation_data[1]).css({
+				"margin-top": 0
+			});
 
-			let sib_to_switch_dat = $(animation_data[2]).outerHTML;
-			$(animation_data[2]).remove();
+			let personal_username = $(animation_data[0]).find(".leaderboard-entry-username").html();
+			let other_username = $(animation_data[1]).find(".leaderboard-entry-username").html();
+			$(animation_data[0]).find(".leaderboard-entry-username").html(other_username);
+			$(animation_data[1]).find(".leaderboard-entry-username").html(personal_username);
 
-			$(animation_data[3]).after(personal_user_dat);
+			$(animation_data[0]).find(".leaderboard-entry-score").removeClass("personal-user-points");
+			$(animation_data[1]).find(".leaderboard-entry-score").addClass("personal-user-points");
+
+			let personal_score = $(animation_data[0]).find(".leaderboard-entry-score").text();
+			let other_score = $(animation_data[1]).find(".leaderboard-entry-score").text();
+
+			$(animation_data[0]).find(".leaderboard-entry-score").text(other_score);
+			$(animation_data[1]).find(".leaderboard-entry-score").text(personal_score);
 
 			activelyMovingLeaderboardRank = 0;
-		}, [personal_user, pre_sib_to_switch, sib_to_switch, pre_sib_to_switch]);
-
-		$(sib_to_switch).animate({
-			"margin-top": space_diff
-		}, 800);
+		}, 800, [personal_user, sib_to_switch]);
 	}
 }
 

@@ -58,6 +58,10 @@ a {
 	margin-right: 8px;
 }
 
+.leaderboard-entry.swapping {
+  transition: margin 0.8s ease-in-out;
+}
+
 .leaderboard-entry-meta {
 	width: calc(100% - 60px);
 
