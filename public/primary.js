@@ -94,12 +94,16 @@ function checkUserRankLeaderboard(newMetaPoints) {
 
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
+	let number_of_spaces = 0;
 	while (!$(upper_sibling_check).is(personal_user) && upper_sibling_check && upper_sibling_check.length) {
-		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints)
+		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints) {
+			number_of_spaces++;
 			break;
+		}
 
 		sib_to_switch = upper_sibling_check;
 		upper_sibling_check = $(upper_sibling_check).is(":first-child") ? null : $(upper_sibling_check).prev();
+		number_of_spaces++;
 	}
 
 	if (sib_to_switch) {
@@ -110,12 +114,13 @@ function checkUserRankLeaderboard(newMetaPoints) {
 
 		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
 
+		console.log(space_diff, number_of_spaces, $(sib_to_switch).outerWidth());
 		$(personal_user).css({
-			"margin-top": -2 * space_diff,
+			"margin-top": -1 * (space_diff + (space_diff / number_of_spaces)),
 			"margin-bottom": space_diff
 		});
 		$(sib_to_switch).css({
-			"margin-top": space_diff
+			"margin-top": space_diff / number_of_spaces
 		});
 
 		setTimeout(function(animation_data) {
