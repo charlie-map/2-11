@@ -865,71 +865,50 @@ a {
 	margin-bottom: -10px;
 }
 
-.card {
-  background: white;
-  padding: 38px 36px;
-  margin-top: 40px;
-  margin-bottom: 40px;
-  border-radius: 4px;
-  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.1);
-  max-width: 30em;
-  width: 100%;
-}
-.card details {
-  display: flex;
-  border-radius: 5px;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.05);
-  border-left: 15px solid gray;
-  padding: 15px;
-}
-.card details {
-  margin-top: 15px;
-}
-.card details.info {
-  --highlight: var(--color-summary-2-highlight) ;
-  background: var(--color-summary-2);
-  border-left-color: var(--color-summary-2-highlight);
-}
-.card details.info p {
-  list-style-type: corona-info;
-}
-.card details summary, .card details p {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
-  justify-content: flex-start;
-  font-family: var(--font-ibm-plex-sans);
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  color: var(--color-title);
-  padding: 20px;
-  cursor: pointer;
-}
-.card details summary::-webkit-details-marker, .card details p::-webkit-details-marker {
-  display: none;
-}
-.card details summary:focus, .card details p:focus {
-  outline: solid 3px var(--highlight);
-}
-.card details summary::-moz-selection, .card details p::-moz-selection {
-  background-color: var(--highlight);
-}
-.card details summary::selection, .card details p::selection {
-  background-color: var(--highlight);
-}
-.card details p {
-  display: list-item;
-  cursor: default;
-  margin-left: 3rem;
-  list-style-type: corona;
-}
-.card details[open] summary {
-  font-weight: 700;
+.leaderboard-property-choices {
+  position: absolute;
+
+  height: 0;
+  opacity: 0;
+
+  transition: all 0.4s ease-in;
 }
 
+.leaderboard-property-choices.select {
+  background: #ddcee2;
+  border-radius: 5px;
+
+  z-index: 15;
+
+  height: auto;
+  opacity: 1;
+
+  box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
+}
+
+.board-options-show {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.leaderboard-pick {
+  width: calc(100% - 16px);
+
+  background: white;
+  border-radius: 5px;
+
+  padding: 2px;
+  margin: 0;
+  margin-bottom: 5px;
+
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+}
+
+.leaderboard-pick:hover {
+  cursor: pointer;
+}
 
 #username-taken, #email-taken, #leaderboard-personal {
 	color: #ce5c24;

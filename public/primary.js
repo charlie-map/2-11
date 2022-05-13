@@ -486,3 +486,7 @@ $(".leaderboard-tab").click(function() {
 		});
 	}
 });
+
+$(".leaderboard-current-property").click(function() {
+	$(".leaderboard-property-choices").toggleClass("select");
+});
