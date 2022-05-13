@@ -116,6 +116,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 				LAST_LOGIN: u_dat.lastLogin,
 
 				CURRENT_STREAK: u_dat.currentStreak,
+				STREAK_FIRE: u_dat.currentStreak >= 3 ? true : false,
 				BEST_STREAK: u_dat.bestStreak,
 			});
 		});
@@ -309,7 +310,7 @@ app.post("/signup", async (req, res, next) => {
 				let u_id = parseInt(newUserID[0].id);
 
 				await new Promise((resolve, reject) => {
-					connection.query("INSERT INTO streak (user_id, lastLogin) VALUES (?, NOW())", u_id, (err) => {
+					connection.query("INSERT INTO streak (user_id, lastLogin, currentStreak, bestStreak) VALUES (?, ?, 1, 1)", [u_id, new Date()], (err) => {
 						if (err) return next(err);
 
 						resolve();
@@ -362,6 +363,12 @@ app.get("/login", (req, res) => {
 	});
 });
 
+// https://www.codegrepper.com/code-examples/javascript/javascript+check+if+dates+are+a+day+apart
+function getDifferenceInDays(date1, date2) {
+	const diffInMs = Math.abs(date2 - date1);
+	return diffInMs / (1000 * 60 * 60 * 24);
+}
+
 // status codes:
 // 0: success
 // 1: error with inputs (no email / no password)
@@ -374,8 +381,8 @@ app.post("/login", (req, res, next) => {
 	}
 
 	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
-	connection.query(`SELECT id, username, password, bestScore, currentScore, wholeBoard FROM user INNER JOIN
-		game ON user.id=game.user_id INNER JOIN current_board ON user.id=current_board.user_id WHERE ${email_or_username}=?`, req.body.username_email, (err, user_password) => {
+	connection.query(`SELECT id, username, password, lastLogin, currentStreak, bestStreak, bestScore, currentScore, wholeBoard FROM user INNER JOIN
+		streak ON user.id=streak.user_id INNER JOIN game ON user.id=game.user_id INNER JOIN current_board ON user.id=current_board.user_id WHERE ${email_or_username}=?`, req.body.username_email, (err, user_password) => {
 		if (err || !user_password) return next(err);
 
 		if (!user_password.length) {
@@ -390,9 +397,44 @@ app.post("/login", (req, res, next) => {
 				let newUUID = uuidv4();
 
 				connection.query("UPDATE auth SET authToken=? WHERE user_id=?;",
-					[newUUID, user_password[0].id], (err) => {
+					[newUUID, user_password[0].id], async (err) => {
 					if (err)
 						return next(err);
+
+					// update streak
+					try {
+						await new Promise((resolve, reject) => {
+							let lastLoginDate = new Date(user_password[0].lastLogin);
+							let currentDate = new Date();
+
+							// under 24 hour mark
+							let lastLoginDateMonth = lastLoginDate.getMonth();
+							let lastLoginDateDay = lastLoginDate.getDate();
+
+							let currentDateMonth = currentDate.getMonth();
+							let currentDateDay = currentDate.getDate();
+
+							let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
+							if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && dateDiff == 1)  {
+								connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
+									[currentDate, user_password[0].currentStreak + 1, user_password[0].currentStreak + 1 > user_password[0].bestStreak ?
+									user_password[0].currentStreak + 1 : user_password[0].bestStreak, user_password[0].id], (err) => {
+										if (err) return reject(err);
+
+										resolve();
+									})
+							} else {
+								connection.query("UPDATE streak SET lastLogin=?, currentStreak=? WHERE user_id=?",
+									[currentDate, dateDiff != 0, user_password[0].id], (err) => {
+										if (err) return reject(err);
+
+										resolve();
+									});
+							}
+						});
+					} catch (error) {
+						return next(error);
+					}
 
 					req.session.cookie.expires = false;
 					req.session.user_id = user_password[0].id;

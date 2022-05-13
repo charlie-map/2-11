@@ -27,8 +27,59 @@
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 			</div>
 			<div class="column-tab current-streak">
-				<div class="barlow current-streak-descript">Streak</div>
-				<div class="curr-streak">{{CURRENT_STREAK}}</div>
+				<div class="barlow current-streak-descript">Streak (days)</div>
+				<div class="curr-streak">{{#STREAK_FIRE}}<div class="fire">
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+					<div class="particle"></div>
+				</div>{{/STREAK_FIRE}}{{CURRENT_STREAK}}</div>
 			</div>
 			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
 				<div class="barlow best-sq-descript">Best tile</div>
@@ -123,17 +174,17 @@
 		</div>
 		{{#LOGGED_IN}}
 		<div id="leaderboard" class="leaderboard">
-			<div class="leaderboard-top-buffer"></div>
-			{{#LEADERBOARD}}
-			<div class="leaderboard-entry">
-				<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
-				<div class="leaderboard-entry-meta">	
-					<div class="leaderboard-entry-username">{{{username}}}</div>
-					<div class="leaderboard-entry-score {{personal_user}}">{{bestScore}}</div>
+			<div class="full-leaderboard-enclose">
+				{{#LEADERBOARD}}
+				<div class="leaderboard-entry">
+					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+					<div class="leaderboard-entry-meta">	
+						<div class="leaderboard-entry-username">{{{username}}}</div>
+						<div class="leaderboard-entry-score {{personal_user}}">{{bestScore}}</div>
+					</div>
 				</div>
+				{{/LEADERBOARD}}
 			</div>
-			{{/LEADERBOARD}}
-			<div class="leaderboard-bottom-buffer"></div>
 		</div>
 		{{/LOGGED_IN}}
 

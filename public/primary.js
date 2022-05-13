@@ -435,9 +435,11 @@ $(".leaderboard-tab").click(function() {
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.users;
 
+			if (!$(".full-leaderboard-enclose").length)
+				$("#leaderboard").append(`<div class="full-leaderboard-enclose"></div>`);
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
 				setTimeout(function(e) {
-					$("#leaderboard").append(`
+					$(".full-leaderboard-enclose").append(`
 					<div class="leaderboard-entry fade-in">
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
 						<div class="leaderboard-entry-meta">
@@ -456,7 +458,7 @@ $(".leaderboard-tab").click(function() {
 	} else {
 		$(this).find("rect").attr("fill", "none");
 
-		let delete_child = $("#leaderboard").children("div");
+		let delete_child = $("#leaderboard .full-leaderboard-enclose").children("div");
 
 		for (let i = delete_child.length - 1; i >= 0; i--) {
 			setTimeout(function(e) {
