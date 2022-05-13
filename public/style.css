@@ -865,111 +865,69 @@ a {
 	margin-bottom: -10px;
 }
 
-.gender-noti, .leaderboard-property-choices {
-	opacity: 0;
-
-	z-index: 2;
-	background: #b69de6;
-
-	border-radius: 5px;
-	padding: 4px;
-
-  z-index: 10;
-
-	transition: all 1s ease-in-out;
+.card {
+  background: white;
+  padding: 38px 36px;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border-radius: 4px;
+  box-shadow: 0 8px 10px rgba(0, 0, 0, 0.1);
+  max-width: 30em;
+  width: 100%;
 }
-
-.leaderboard-property-choices {
-  position: absolute;
+.card details {
+  display: flex;
+  border-radius: 5px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.05);
+  border-left: 15px solid gray;
+  padding: 15px;
 }
-
-.gender-noti.select, .leaderboard-property-choices.select {
-	margin-top: 0px;
-	opacity: 1;
+.card details {
+  margin-top: 15px;
 }
-
-.gender-noti div, .leaderboard-property-choices div {
-	margin-top: 4px;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+.card details.info {
+  --highlight: var(--color-summary-2-highlight) ;
+  background: var(--color-summary-2);
+  border-left-color: var(--color-summary-2-highlight);
 }
-
-.gender-pick, .leaderboard-pick {
-	background: white;
-
-	width: calc(100% - 8px);
-
-	padding-left: 5px;
-	margin: 0;
-	margin-bottom: 2px;
-
-	border-radius: 2px;
+.card details.info p {
+  list-style-type: corona-info;
 }
-
-.gender-noti.select .gender-pick:hover, .leaderboard-property-choices.select .leaderboard-pick:hover {
-	cursor: pointer;
-}
-
-.gender-pick::before, .leaderboard-pick::before {  
-  transform: scaleX(0);
-  transform-origin: bottom right;
-}
-
-.gender-pick:hover::before, .leaderboard-pick:hover::before {
-  transform: scaleX(1);
-  transform-origin: bottom left;
-}
-
-.gender-pick::before, .leaderboard-pick::before {
-  content: " ";
-  display: block;
-  position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  inset: 0 0 0 0;
-  z-index: -1;
-  transition: transform .3s ease;
-}
-
-.gender-pick.male::before, .leaderboard-pick.bestScore::before {
-  background: hsl(200 100% 80%);
-}
-
-.gender-pick.female::before, .leaderboard-pick.bestBlock::before {
-	background: hsl(175 100% 80%);
-}
-
-.gender-pick.non-binary::before, .leaderboard-pick.wins::before {
-	background: hsl(148 100% 80%);
-}
-
-.gender-pick.transgender::before, .leaderboard-pick.averageScore::before {
-	background: hsl(270 100% 80%);
-}
-
-.gender-pick.intersex::before, .leaderboard-pick.percentWins::before {
-	background: hsl(354 100% 80%);
-}
-
-.gender-pick.other::before {
-	background: hsl(290 100% 80%);
-}
-
-.gender-pick.prefer-not-to-say::before {
-	background: hsl(86 100% 80%);
-}
-
-.gender-pick {
+.card details summary, .card details p {
   position: relative;
-  font-size: 16px;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: flex-start;
+  font-family: var(--font-ibm-plex-sans);
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  color: var(--color-title);
+  padding: 20px;
+  cursor: pointer;
 }
-
-@media (orientation: landscape) {
-  body {
-    grid-auto-flow: column;
-  }
+.card details summary::-webkit-details-marker, .card details p::-webkit-details-marker {
+  display: none;
+}
+.card details summary:focus, .card details p:focus {
+  outline: solid 3px var(--highlight);
+}
+.card details summary::-moz-selection, .card details p::-moz-selection {
+  background-color: var(--highlight);
+}
+.card details summary::selection, .card details p::selection {
+  background-color: var(--highlight);
+}
+.card details p {
+  display: list-item;
+  cursor: default;
+  margin-left: 3rem;
+  list-style-type: corona;
+}
+.card details[open] summary {
+  font-weight: 700;
 }
 
 

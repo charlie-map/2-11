@@ -41,9 +41,9 @@ $(document).ready(function() {
 				"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
 			});
 
-			$(".leaderboard-property-choices").outerWidth(200);
+			$(".leaderboard-property-choices").outerWidth(400);
 			$(".leaderboard-property-choices").offset({
-				left: $(".leaderboard-current-property").offset().left + 110,
+				left: $(".leaderboard-current-property").offset().left + 113,
 				top: $(".leaderboard-current-property").offset().top
 			});
 		}
