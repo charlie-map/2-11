@@ -444,7 +444,7 @@ $(".leaderboard-tab").click(function() {
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
 						<div class="leaderboard-entry-meta">
 							<div class="leaderboard-entry-username">${e.username}</div>
-							<div class="leaderboard-entry-score ${e.personal_user}">${e.bestScore}</div>
+							<div class="leaderboard-entry-score ${e.personal_user}">${e.score}</div>
 						</div>
 					</div>
 					`);

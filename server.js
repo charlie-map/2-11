@@ -73,24 +73,54 @@ app.get("/", (req, res, next) => {
 	});
 });
 
+let properties = {
+	0: "bestScore",
+	1: "bestBlock",
+	2: "wins",
+	3: "averageScore"
+};
+
+function getPropertyValue(currentProperty, obj) {
+	if (currentProperty <= 3)
+		return obj[properties[currentProperty]];
+
+	if (currentProperty == 4) {
+		return (Math.round((object.wins / object.totalGames) * 100) / 100) + "%";
+	}
+}
+
+// for leaderboard
+let propertiesSQL = {
+	0: "bestScore DESC",
+	1: "bestBlock DESC",
+	2: "wins DESC", // (getting 2048)
+	3: "averageScore DESC",
+	4: "wins DESC, totalGames ASC" // % wins
+}
+
 app.get("/l", loggedIn, (req, res, next) => {
 	connection.query(`SELECT username, game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM user INNER JOIN game
 		ON user.id=game.user_id INNER JOIN streak ON
 		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
 
-		connection.query(`SELECT bestScore, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]} LIMIT 20`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
 
 			let userBoardOpen;
 			let u_dat = user_data[0];
-			users.forEach((u, i) => {
-				u.rank = i + 1;
+			let leaderboardIndex = users.map((u, i) => {
+				let newU = {};
 
-				if (u.username == u_dat.username) {
-					u.personal_user = "personal-user-points";
-					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
-				}
+				newU.rank = i + 1;
+				newU.score = getPropertyValue(u_dat.leaderboardProperty, u);
+
+				newU.username = u.username + (u.username == u_dat.username ? " <span id='leaderboard-personal' class='is-taken'>(you)</span>" : "");
+
+				if (u.username == u_dat.username)
+					newU.personal_user = "personal-user-points";
+
+				return newU;
 			});
 
 			res.render("index", {
@@ -98,7 +128,8 @@ app.get("/l", loggedIn, (req, res, next) => {
 				USERNAME: u_dat.username,
 
 				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
-				LEADERBOARD: users,
+				LEADERBOARD_PROPERTY: u_dat.leaderboardProperty,
+				LEADERBOARD: leaderboardIndex,
 
 				CURRENT_SCORE: u_dat.currentScore,
 				BEST_BLOCK: u_dat.bestBlock,
@@ -124,27 +155,31 @@ app.get("/l", loggedIn, (req, res, next) => {
 });
 
 app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
-	connection.query("SELECT username FROM user WHERE id=?", req.session.user_id, (err, user_data) => {
+	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.session.user_id, (err, user_data) => {
 		if (err) return next(err);
 
-		connection.query(`SELECT bestScore, leaderboardOpen, username FROM game INNER JOIN user ON user.id=game.user_id ORDER BY bestScore DESC LIMIT 20`, (err, users) => {
+		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]} LIMIT 20`, (err, users) => {
 			if (err || !users) return next(err);
 
+			let userBoardOpen;
 			let u_dat = user_data[0];
-			let wantsLeaderboardOpen = 0;
-			users.forEach((u, i) => {
-				u.rank = i + 1;
+			let leaderboardIndex = users.map((u, i) => {
+				let newU = {};
 
-				if (u.username == u_dat.username) {
-					wantsLeaderboardOpen = u.leaderboardOpen;
-					u.personal_user = "personal-user-points";
-					u.username += " <span id='leaderboard-personal' class='is-taken'>(you)</span>";
-				}
+				newU.rank = i + 1;
+				newU.score = getPropertyValue(u_dat.leaderboardProperty, u);
+
+				newU.username = u.username + (u.username == u_dat.username ? " <span id='leaderboard-personal' class='is-taken'>(you)</span>" : "");
+
+				if (u.username == u_dat.username)
+					newU.personal_user = "personal-user-points";
+
+				return newU;
 			});
 
 			res.json({
-				leaderboardOpen: wantsLeaderboardOpen,
-				users
+				leaderboardOpen: u_dat.leaderboardOpen ? true : false,
+				leaderboardIndex
 			});
 		});
 	});
@@ -425,7 +460,7 @@ app.post("/login", (req, res, next) => {
 									})
 							} else {
 								connection.query("UPDATE streak SET lastLogin=?, currentStreak=? WHERE user_id=?",
-									[currentDate, dateDiff != 0, user_password[0].id], (err) => {
+									[currentDate, dateDiff == 0 ? user_password[0].currentStreak : 1, user_password[0].id], (err) => {
 										if (err) return reject(err);
 
 										resolve();

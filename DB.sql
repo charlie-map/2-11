@@ -41,6 +41,16 @@ CREATE TABLE game (
 	user_id INT,
 
 	leaderboardOpen INT NOT NULL DEFAULT 0,
+	leaderboardProperty INT NOT NULL DEFAULT 0,
+	/*
+		leaderboarProperty is used for defining what the leaderboard is currently sorted on
+
+		0: bestScore
+		1: bestBlock
+		2: wins (getting 2048)
+		3: % win
+		4: averageScore
+	*/
 
 	currentScore INT NOT NULL DEFAULT 0,
 	bestBlock INT NOT NULL DEFAULT 2,
