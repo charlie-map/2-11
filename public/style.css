@@ -350,7 +350,7 @@ a {
 
 .user-column {
   width: 100px;
-  height: 380px;
+  height: 420px;
 
   position: fixed;
   top: 10%;
@@ -377,6 +377,36 @@ a {
   align-items: center;
 
   border-radius: 10px;
+}
+
+.leaderboard-current-property {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding-left: 2px;
+
+  transition: all 0.4s ease-in-out;
+}
+
+.leaderboard-current-property:hover {
+  cursor: pointer;
+
+  transform: scale(1.1);
+}
+
+.leaderboard-current-property.open {
+  transform: scale(1.1);
+}
+
+.dropdown-property-choice {
+  display: flex;
+
+  transition: all 0.4s ease-in-out;
+}
+
+.leaderboard-current-property.open .dropdown-property-choice {
+  transform: rotate(90deg);
 }
 
 .column-tab.profile:hover, .column-tab.leaderboard-tab:hover {
@@ -835,8 +865,7 @@ a {
 	margin-bottom: -10px;
 }
 
-.gender-noti {
-	margin-top: -38px;
+.gender-noti, .leaderboard-property-choices {
 	opacity: 0;
 
 	z-index: 2;
@@ -845,15 +874,21 @@ a {
 	border-radius: 5px;
 	padding: 4px;
 
+  z-index: 10;
+
 	transition: all 1s ease-in-out;
 }
 
-.gender-noti.select {
-	margin-top: 0px;
-	opacity: 0.9;
+.leaderboard-property-choices {
+  position: absolute;
 }
 
-.gender-noti div {
+.gender-noti.select, .leaderboard-property-choices.select {
+	margin-top: 0px;
+	opacity: 1;
+}
+
+.gender-noti div, .leaderboard-property-choices div {
 	margin-top: 4px;
 
 	display: flex;
@@ -862,7 +897,7 @@ a {
 	align-items: center;
 }
 
-.gender-pick {
+.gender-pick, .leaderboard-pick {
 	background: white;
 
 	width: calc(100% - 8px);
@@ -874,21 +909,21 @@ a {
 	border-radius: 2px;
 }
 
-.gender-noti.select .gender-pick:hover {
+.gender-noti.select .gender-pick:hover, .leaderboard-property-choices.select .leaderboard-pick:hover {
 	cursor: pointer;
 }
 
-.gender-pick::before {  
+.gender-pick::before, .leaderboard-pick::before {  
   transform: scaleX(0);
   transform-origin: bottom right;
 }
 
-.gender-pick:hover::before {
+.gender-pick:hover::before, .leaderboard-pick:hover::before {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
 
-.gender-pick::before {
+.gender-pick::before, .leaderboard-pick::before {
   content: " ";
   display: block;
   position: absolute;
@@ -898,23 +933,23 @@ a {
   transition: transform .3s ease;
 }
 
-.gender-pick.male::before {
+.gender-pick.male::before, .leaderboard-pick.bestScore::before {
   background: hsl(200 100% 80%);
 }
 
-.gender-pick.female::before {
+.gender-pick.female::before, .leaderboard-pick.bestBlock::before {
 	background: hsl(175 100% 80%);
 }
 
-.gender-pick.non-binary::before {
+.gender-pick.non-binary::before, .leaderboard-pick.wins::before {
 	background: hsl(148 100% 80%);
 }
 
-.gender-pick.transgender::before {
+.gender-pick.transgender::before, .leaderboard-pick.averageScore::before {
 	background: hsl(270 100% 80%);
 }
 
-.gender-pick.intersex::before {
+.gender-pick.intersex::before, .leaderboard-pick.percentWins::before {
 	background: hsl(354 100% 80%);
 }
 

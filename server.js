@@ -77,8 +77,22 @@ let properties = {
 	0: "bestScore",
 	1: "bestBlock",
 	2: "wins",
-	3: "averageScore"
+	3: "averageScore",
+
+	"bestScore": 1,
+	"bestBlock": 2,
+	"wins": 3,
+	"averageScore": 4,
+	"wins%": 5
 };
+
+let propertiesUI = {
+	0: "Best score",
+	1: "Best block",
+	2: "Wins",
+	3: "Average score",
+	4: "% wins"
+}
 
 function getPropertyValue(currentProperty, obj) {
 	if (currentProperty <= 3)
@@ -128,7 +142,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 				USERNAME: u_dat.username,
 
 				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
-				LEADERBOARD_PROPERTY: u_dat.leaderboardProperty,
+				LEADERBOARD_PROPERTY: propertiesUI[u_dat.leaderboardProperty],
 				LEADERBOARD: leaderboardIndex,
 
 				CURRENT_SCORE: u_dat.currentScore,
@@ -151,6 +165,19 @@ app.get("/l", loggedIn, (req, res, next) => {
 				BEST_STREAK: u_dat.bestStreak,
 			});
 		});
+	});
+});
+
+app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
+	let propNum = properties[req.params.lbprop];
+
+	if (!propNum)
+		return next("Invalid property request");
+
+	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.session.user_id], (err) => {
+		if (err) return next(err);
+
+		return res.send("");
 	});
 });
 

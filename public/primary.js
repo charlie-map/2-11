@@ -32,9 +32,19 @@ $(document).ready(function() {
 				LEADERBOARD_USERS = res.users;
 			});
 
-			let user_column_left = $(document).outerWidth() * 0.5 - 230;
+			let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 			$(".user-column").css({
-				left: user_column_left - $(".user-column").outerWidth()
+				left: user_column_left - $(".user-column").outerWidth(false)
+			});
+
+			$(".leaderboard-property-choices").css({
+				"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
+			});
+
+			$(".leaderboard-property-choices").outerWidth(200);
+			$(".leaderboard-property-choices").offset({
+				left: $(".leaderboard-current-property").offset().left + 110,
+				top: $(".leaderboard-current-property").offset().top
 			});
 		}
 
@@ -433,7 +443,7 @@ $(".leaderboard-tab").click(function() {
 		$(this).find("rect").attr("fill", "#ddcee2");
 
 		$.get("/updated-leaderboard", (res) => {
-			LEADERBOARD_USERS = res.users;
+			LEADERBOARD_USERS = res.leaderboardIndex;
 
 			if (!$(".full-leaderboard-enclose").length)
 				$("#leaderboard").append(`<div class="full-leaderboard-enclose"></div>`);

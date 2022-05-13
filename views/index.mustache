@@ -25,7 +25,19 @@
 			</div>
 			<div class="column-tab leaderboard-tab">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
-				<div class="leaderboard-current-property"></div>
+			</div>
+			<div class="leaderboard-current-property">
+				<div class="barlow">
+					{{LEADERBOARD_PROPERTY}}
+				</div>
+				<div class="dropdown-property-choice">
+					<ion-icon name="chevron-forward-outline"></ion-icon>
+				</div>
+			</div>
+			<hr style="width: calc(100% - 10px); margin-top: 0">
+			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
+				<div class="barlow best-sq-descript">Best tile</div>
+				<div class="best-num">{{BEST_BLOCK}}</div>
 			</div>
 			<div class="column-tab current-streak">
 				<div class="barlow current-streak-descript">Streak (days)</div>
@@ -81,10 +93,6 @@
 					<div class="particle"></div>
 					<div class="particle"></div>
 				</div>{{/STREAK_FIRE}}{{CURRENT_STREAK}}</div>
-			</div>
-			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
-				<div class="barlow best-sq-descript">Best tile</div>
-				<div class="best-num">{{BEST_BLOCK}}</div>
 			</div>
 		</div>
 		{{/LOGGED_IN}}
@@ -174,6 +182,16 @@
 			</div>
 		</div>
 		{{#LOGGED_IN}}
+		<div class="leaderboard-property-choices select barlow">
+			Change leaderboard property:
+			<div>
+				<p value="Best score" class="leaderboard-pick barlow bestScore">Best score</p>
+				<p value="Best block" class="leaderboard-pick barlow bestBlock">Best block</p>
+				<p value="Wins" class="leaderboard-pick barlow wins">Wins</p>
+				<p value="Average score" class="leaderboard-pick barlow averageScore">Average score</p>
+				<p value="% Wins" class="leaderboard-pick barlow percentWins">% Wins</p>
+			</div>
+		</div>
 		<div id="leaderboard" class="leaderboard">
 			<div class="full-leaderboard-enclose">
 				{{#LEADERBOARD}}
@@ -189,6 +207,8 @@
 		</div>
 		{{/LOGGED_IN}}
 
+		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+		<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
 		<!-- META DATA -->
 		<script>
 			let board;
