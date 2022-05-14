@@ -392,7 +392,7 @@ app.post("/signup", async (req, res, next) => {
 				});
 
 				await new Promise((resolve, reject) => {
-					connection.query("INSERT INTO game (user_id) VALUES (?)", u_id, (err) => {
+					connection.query("INSERT INTO game (user_id) VALUES (?)", [u_id], (err) => {
 						if (err) return next(err);
 
 						resolve();
@@ -400,7 +400,7 @@ app.post("/signup", async (req, res, next) => {
 				});
 
 				await new Promise((resolve, reject) => {
-					connection.query("INSERT INTO current_board (user_id, startTime) VALUES (?, ?)", [u_id, new Date()], (err) => {
+					connection.query("INSERT INTO current_board (user_id, wholeBoard, startTime) VALUES (?, ?, ?)", [u_id, req.body.board ? req.body.board : "", new Date()], (err) => {
 						if (err) console.log(err);
 
 						resolve();

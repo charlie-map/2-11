@@ -320,19 +320,30 @@ function stringBoardToVisual(mainDiv, fullBoard) {
 }
 
 function differentNumbers(board1, board2) {
+	let isDifferent = 0;
+	let tilesBoard1 = 0, tilesBoard2 = 0;
+
 	for (let x = 0; x < 4; x++) {
 		for (let y = 0; y < 4; y++) {
 			if (board1[x][y] && board2[x][y]) {
 				if (board1[x][y].num != board2[x][y].num)
-					return 1;
-			} else if (board1[x][y])
-				return 1;
-			else if (board2[x][y])
-				return 1
+					isDifferent = 1;
+			} else if (board1[x][y]) {
+				tilesBoard2++;
+				isDifferent = 1;
+			} else if (board2[x][y]) {
+				tilesBoard1++;
+				isDifferent = 1;
+			}
 		}
 	}
 
-	return 0;
+	if (!tilesBoard1)
+		return 0;
+	else if (!tilesBoard2)
+		return 0;
+
+	return isDifferent;
 }
 
 let res_buffer;
@@ -597,7 +608,7 @@ $(".leaderboard-pick").click(function() {
 			setTimeout(function() {
 				$(lTab).addClass("open");
 				leaderboardCreate(lTab, 0);
-			}, 50);
+			}, 800);
 		} else
 			leaderboardCreate(lTab);
 
