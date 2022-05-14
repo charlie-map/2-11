@@ -43,6 +43,26 @@ a {
   width: 410px;
 }
 
+.top-leaderboard-gradient {
+  position: fixed;
+
+  height: 10%;
+  top: 0;
+
+  background: rgb(255,255,255);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8841737378545168) 72%, rgba(255,0,0,0) 100%);
+}
+
+.base-leaderboard-gradient {
+  position: fixed;
+
+  height: 10%;
+  bottom: 0;
+
+  background: rgb(255,255,255);
+  background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8841737378545168) 72%, rgba(255,255,255,0) 100%);
+}
+
 #leaderboard {
 	position: fixed;
 

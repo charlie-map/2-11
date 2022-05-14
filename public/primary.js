@@ -21,6 +21,14 @@ $(document).ready(function() {
 					width: set_width,
 					left: "calc(50% + " + (430 * 0.5) + "px)"
 				});
+				$(".base-leaderboard-gradient").css({
+					width: set_width + 10,
+					left: "calc(50% + " + (410 * 0.5) + "px)"
+				});
+				$(".top-leaderboard-gradient").css({
+					width: set_width + 10,
+					left: "calc(50% + " + (410 * 0.5) + "px)"
+				})
 
 				if (!wantsLeaderboardOpen) {
 					$("#leaderboard").html("");
@@ -367,7 +375,6 @@ $("#register").click(function(e) {
 			username_email: username_or_email,
 			password
 		}, (res) => {
-			console.log(res);
 
 			if (!res.success) {
 				if (res == "1") { // invalid inputs
@@ -617,4 +624,21 @@ $(".leaderboard-pick").click(function() {
 
 		$("body").off("click", leaderboardCloser);
 	});
+});
+
+/* LEADERBOARD SCROLL */
+let prevScrollDir = 0;
+$(document).scroll(function(e) {
+	console.log(e);
+	let newScroll = $(this).scrollTop();
+
+	if (newScroll > prevScrollDir){
+		// downscroll code
+		console.log("down");
+	} else {
+		// upscroll code
+		console.log("up");
+	}
+
+	prevScrollDir = newScroll;
 });

@@ -192,19 +192,19 @@
 				<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
 			</div>
 		</div>
+		<div class="top-leaderboard-gradient"></div>
 		<div id="leaderboard" class="leaderboard">
-			<div class="full-leaderboard-enclose">
-				{{#LEADERBOARD}}
-				<div class="leaderboard-entry">
-					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
-					<div class="leaderboard-entry-meta">	
-						<div class="leaderboard-entry-username">{{{username}}}</div>
-						<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
-					</div>
+			{{#LEADERBOARD}}
+			<div class="leaderboard-entry">
+				<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+				<div class="leaderboard-entry-meta">	
+					<div class="leaderboard-entry-username">{{{username}}}</div>
+					<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
 				</div>
-				{{/LEADERBOARD}}
 			</div>
+			{{/LEADERBOARD}}
 		</div>
+		<div class="base-leaderboard-gradient"></div>
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
