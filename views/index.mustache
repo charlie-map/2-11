@@ -19,7 +19,7 @@
 	</head>
 	<body>
 		{{#LOGGED_IN}}
-		<div class="user-column">
+		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 395px;{{/LEADERBOARD_OPEN}}">
 			<div class="column-tab profile">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
 			</div>
@@ -27,14 +27,14 @@
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 			</div>
 			<div class="leaderboard-current-property">
-				<div class="barlow">
+				<div id="leaderboard-shown-property" class="barlow">
 					{{LEADERBOARD_PROPERTY}}
 				</div>
 				<div class="dropdown-property-choice">
 					<ion-icon name="chevron-forward-outline"></ion-icon>
 				</div>
 			</div>
-			<hr style="width: calc(100% - 10px); margin-top: 0">
+			<div class="leaderboard-property-choice-hider {{#LEADERBOARD_OPEN}}open{{/LEADERBOARD_OPEN}}"></div>
 			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
 				<div class="barlow best-sq-descript">Best tile</div>
 				<div class="best-num">{{BEST_BLOCK}}</div>
@@ -185,11 +185,11 @@
 		<div class="leaderboard-property-choices barlow">
 			<h3 class="barlow" style="padding: 0px 16px; margin: 8px 0px;">Change leaderboard property:</h3>
 			<div class="board-options-show">
-				<p value="Best score" class="leaderboard-pick barlow bestScore">Best score</p>
-				<p value="Best block" class="leaderboard-pick barlow bestBlock">Best block</p>
-				<p value="Wins" class="leaderboard-pick barlow wins">Wins</p>
-				<p value="Average score" class="leaderboard-pick barlow averageScore">Average score</p>
-				<p value="% Wins" class="leaderboard-pick barlow percentWins">% Wins</p>
+				<p value="Best score" class="leaderboard-pick barlow" lead-prop="bestScore">Best score</p>
+				<p value="Best block" class="leaderboard-pick barlow" lead-prop="bestBlock">Best block</p>
+				<p value="Wins" class="leaderboard-pick barlow" lead-prop="wins">Wins</p>
+				<p value="Average score" class="leaderboard-pick barlow" lead-prop="averageScore">Average score</p>
+				<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
 			</div>
 		</div>
 		<div id="leaderboard" class="leaderboard">

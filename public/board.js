@@ -29,6 +29,8 @@ class Board {
       }
     }
 
+    this.saveGame();
+
     // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
     // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
 
@@ -259,6 +261,7 @@ class Board {
       highestPiece = newHighestPiece;
 
       $.get("/update-best-block/" + highestPiece);
+      this.saveGame();
     }
     return canMove;
   }

@@ -399,18 +399,40 @@ a {
   transform: scale(1.1);
 }
 
+.leaderboard-property-choice-hider {
+	width: calc(100% - 10px);
+	height: 18px;
+	margin: 0;
+
+	background: #d6f1f1;
+
+	margin-top: -24px;
+	margin-bottom: -24px;
+
+	z-index: 2;
+	transition: all 0.4s ease-in-out;
+}
+
+.leaderboard-property-choice-hider.open {
+	margin-top: 0;
+}
+
 .dropdown-property-choice {
   display: flex;
 
   transition: all 0.4s ease-in-out;
 }
 
-.leaderboard-current-property.open .dropdown-property-choice {
-  transform: rotate(90deg);
+.dropdown-property-choice.open {
+  transform: rotate(180deg);
 }
 
 .column-tab.profile:hover, .column-tab.leaderboard-tab:hover {
 	cursor: pointer;
+}
+
+#column-best-square {
+	z-index: 2;
 }
 
 .current-streak {
@@ -865,10 +887,14 @@ a {
 	margin-bottom: -10px;
 }
 
+#leaderboard-shown-property {
+	text-align: center;
+}
+
 .leaderboard-property-choices {
   position: absolute;
 
-  height: 0;
+  z-index: -1;
   opacity: 0;
 
   transition: all 0.4s ease-in;
@@ -880,7 +906,6 @@ a {
 
   z-index: 15;
 
-  height: auto;
   opacity: 1;
 
   box-shadow: rgba(0, 0, 0, 0.56) 0px 22px 70px 4px;
@@ -910,14 +935,15 @@ a {
   cursor: pointer;
 }
 
-#username-taken, #email-taken, #leaderboard-personal {
+#username-taken, #email-taken, #leaderboard-personal, #username-email-unknown, #login-password-invalid {
 	color: #ce5c24;
 	opacity: 0;
 
 	transition: opacity 1s ease-in-out;
 }
 
-#username-taken.is-taken, #email-taken.is-taken, #leaderboard-personal.is-taken {
+#username-taken.is-taken, #email-taken.is-taken, #leaderboard-personal.is-taken,
+	#username-email-unknown.is-taken, #login-password-invalid.is-taken {
 	opacity: 1;
 }
 /* Login / Signup page (from Pablo Eugenio Lujambio Martinez) */

@@ -32,8 +32,8 @@
 				</p>
 				{{#LOGGING_IN}}
 					<div class="floating-label">
-						<input class="barlow" placeholder="Username or Email" type="username" name="username" id="username" autocomplete="off">
-						<label class="barlow" for="username">Username or Email: </label>
+						<input class="barlow" placeholder="Username or email" type="username" name="username" id="username" autocomplete="off">
+						<label class="barlow" for="username">Username or email: <span id="username-email-unknown" class="barlow">unknown</span></label>
 						
 						<div class="icon">
 							<?xml version="1.0" encoding="UTF-8"?>
@@ -64,7 +64,7 @@
 				
 				<div id="password-container" class="floating-label {{LOG_OR_SIGN}}">
 					<input class="barlow" placeholder="Password" type="password" name="password" id="password" autocomplete="off">
-					<label class="barlow" for="password">Password:</label>
+					<label class="barlow" for="password">Password: <span id="login-password-invalid" class="barlow">invalid</span></label>
 					
 					<div class="icon">
 						<?xml version="1.0" encoding="UTF-8"?>

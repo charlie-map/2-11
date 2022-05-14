@@ -79,11 +79,11 @@ let properties = {
 	2: "wins",
 	3: "averageScore",
 
-	"bestScore": 1,
-	"bestBlock": 2,
-	"wins": 3,
-	"averageScore": 4,
-	"wins%": 5
+	"bestScore": 0,
+	"bestBlock": 1,
+	"wins": 2,
+	"averageScore": 3,
+	"percentWins": 4
 };
 
 let propertiesUI = {
@@ -99,7 +99,12 @@ function getPropertyValue(currentProperty, obj) {
 		return obj[properties[currentProperty]];
 
 	if (currentProperty == 4) {
-		return (Math.round((object.wins / object.totalGames) * 100) / 100) + "%";
+		if (obj.wins == 0 && obj.totalGames > 0)
+			return "0%";
+		else if (obj.totalGames == 0)
+			return "No games";
+
+		return (Math.round((obj.wins / obj.totalGames) * 100) / 100) + "%";
 	}
 }
 
@@ -113,10 +118,17 @@ let propertiesSQL = {
 }
 
 app.get("/l", loggedIn, (req, res, next) => {
-	connection.query(`SELECT username, game.*, streak.currentStreak, streak.bestStreak, streak.lastLogin FROM user INNER JOIN game
+	connection.query(`SELECT id, username, game.*, streak.* FROM user INNER JOIN game
 		ON user.id=game.user_id INNER JOIN streak ON
-		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, (err, user_data) => {
+		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, async (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
+
+		// update streak
+		try {
+			await streakUpdate(user_data[0]);
+		} catch (error) {
+			return next(error);
+		}
 
 		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]} LIMIT 20`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
@@ -171,13 +183,13 @@ app.get("/l", loggedIn, (req, res, next) => {
 app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 	let propNum = properties[req.params.lbprop];
 
-	if (!propNum)
-		return next("Invalid property request");
+	if (propNum == undefined)
+		return res.send("1");
 
 	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.session.user_id], (err) => {
 		if (err) return next(err);
 
-		return res.send("");
+		return res.send("0");
 	});
 });
 
@@ -431,6 +443,38 @@ function getDifferenceInDays(date1, date2) {
 	return diffInMs / (1000 * 60 * 60 * 24);
 }
 
+function streakUpdate(user) {
+	return new Promise((resolve, reject) => {
+		let lastLoginDate = new Date(user.lastLogin);
+		let currentDate = new Date();
+
+		// under 24 hour mark
+		let lastLoginDateMonth = lastLoginDate.getMonth();
+		let lastLoginDateDay = lastLoginDate.getDate();
+
+		let currentDateMonth = currentDate.getMonth();
+		let currentDateDay = currentDate.getDate();
+
+		let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
+		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && (dateDiff >= 1 && dateDiff < 2))  {
+			connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
+				[currentDate, user.currentStreak + 1, user.currentStreak + 1 > user.bestStreak ?
+				user.currentStreak + 1 : user.bestStreak, user.id], (err) => {
+					if (err) return reject(err);
+
+					resolve();
+				})
+		} else {
+			connection.query("UPDATE streak SET lastLogin=?, currentStreak=? WHERE user_id=?",
+				[currentDate, dateDiff <= 1 ? user.currentStreak : 1, user.id], (err) => {
+					if (err) return reject(err);
+
+					resolve();
+				});
+		}
+	});
+}
+
 // status codes:
 // 0: success
 // 1: error with inputs (no email / no password)
@@ -465,35 +509,7 @@ app.post("/login", (req, res, next) => {
 
 					// update streak
 					try {
-						await new Promise((resolve, reject) => {
-							let lastLoginDate = new Date(user_password[0].lastLogin);
-							let currentDate = new Date();
-
-							// under 24 hour mark
-							let lastLoginDateMonth = lastLoginDate.getMonth();
-							let lastLoginDateDay = lastLoginDate.getDate();
-
-							let currentDateMonth = currentDate.getMonth();
-							let currentDateDay = currentDate.getDate();
-
-							let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
-							if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && dateDiff == 1)  {
-								connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
-									[currentDate, user_password[0].currentStreak + 1, user_password[0].currentStreak + 1 > user_password[0].bestStreak ?
-									user_password[0].currentStreak + 1 : user_password[0].bestStreak, user_password[0].id], (err) => {
-										if (err) return reject(err);
-
-										resolve();
-									})
-							} else {
-								connection.query("UPDATE streak SET lastLogin=?, currentStreak=? WHERE user_id=?",
-									[currentDate, dateDiff == 0 ? user_password[0].currentStreak : 1, user_password[0].id], (err) => {
-										if (err) return reject(err);
-
-										resolve();
-									});
-							}
-						});
+						await streakUpdate(user_password[0]);
 					} catch (error) {
 						return next(error);
 					}

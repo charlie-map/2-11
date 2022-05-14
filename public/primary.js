@@ -49,23 +49,32 @@ $(document).ready(function() {
 		}
 
 		return;
-	}
-
-	$("#email").focus();
+	} else
+		$("#email").focus();
 });
 
 window.onresize = function() {
 	if (loggedIn) {
-		let set_width = $(document).outerWidth() - 460;
+		let set_width = $(document).outerWidth(false) - 460;
 		set_width = set_width > 400 ? 400 : set_width;
 		$("#leaderboard").css({
 			width: set_width,
 			left: "calc(50% + " + (430 * 0.5) + "px)"
 		});
 
-		let user_column_left = $(document).outerWidth() * 0.5 - 230;
+		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 		$(".user-column").css({
-			left: user_column_left - $(".user-column").outerWidth()
+			left: user_column_left - $(".user-column").outerWidth(false)
+		});
+
+		$(".leaderboard-property-choices").css({
+			"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
+		});
+
+		$(".leaderboard-property-choices").outerWidth(400);
+		$(".leaderboard-property-choices").offset({
+			left: $(".leaderboard-current-property").offset().left + 113,
+			top: $(".leaderboard-current-property").offset().top
 		});
 	}
 
@@ -202,16 +211,39 @@ $(".gender-pick").click(function() {
 	$("#birthday").focus();
 });
 
+let logging_in_prev_username = "";
+let logging_in_prev_password = "";
+
 $("#username").focus(function() {
+	if ($("#username").parent().hasClass("invalid") && logging_in) {
+		logging_in_prev_username = $("#username").val();
+	}
+
 	$("#username").removeClass("taken");
 	$("#username-taken").removeClass("is-taken");
+	$("#username-email-unknown").removeClass("is-taken");
+});
+
+$("#password").focus(function() {
+	if ($("#password").parent().hasClass("invalid") && logging_in) {
+		logging_in_prev_password = $("#password").val();
+	}
 });
 
 $("#username").focusout(function() {
-	if (logging_in)
-		return;
-
 	let username = $("#username").val();
+
+	if (logging_in) {
+		if (logging_in_prev_username.length && logging_in_prev_username == username) {
+			invalidate($("#username"));
+			$("#username-email-unknown").addClass("is-taken");
+		} else if (logging_in_prev_password.length && logging_in_prev_password == $("#password").val()) {
+			invalidate($("#password"));
+			$("#login-password-invalid").addClass("is-taken");
+		}
+
+		return;
+	}
 
 	if (!username.length)
 		return;
@@ -327,6 +359,25 @@ $("#register").click(function(e) {
 			console.log(res);
 
 			if (!res.success) {
+				if (res == "1") { // invalid inputs
+					let errorNumbers = res.split("-")[1];
+
+					let errorNumberSplit = errorNumbers.split(",");
+					let formInputs = {
+						"0": $("#username"),
+						"1": $("#password")
+					}
+
+					for (let i = 0; i < errorNumberSplit.length; i++) {
+						invalidate(formInputs[errorNumberSplit[i]]);
+					}
+				} else if (res == "2") { // no user
+					$("#username-email-unknown").addClass("is-taken");
+					invalidate($("#username"));
+				} else if (res == "3") { // incorrect password
+					$("#login-password-invalid").addClass("is-taken");
+					invalidate($("#password"));
+				}
 				// error
 				return;
 			}
@@ -434,17 +485,20 @@ $("#choose-remote-board").click(function() {
 	window.location.href = window.location.href.split("/")[0] + "/l";
 });
 
-
-
-$(".leaderboard-tab").click(function() {
-	$(this).toggleClass("open");
-
-	if ($(this).hasClass("open")) {
-		$(this).find("rect").attr("fill", "#ddcee2");
+// boardClose: decide if leaderboard-property-choice-hider should close
+function leaderboardCreate(Lboard, boardClose) {
+	if ($(Lboard).hasClass("open")) {
+		$(Lboard).find("rect").attr("fill", "#ddcee2");
 
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.leaderboardIndex;
 
+			if (boardClose) {
+				$(".leaderboard-property-choice-hider").addClass("open");
+				$(".user-column").animate({
+					height: "420px"
+				}, 400);
+			}
 			if (!$(".full-leaderboard-enclose").length)
 				$("#leaderboard").append(`<div class="full-leaderboard-enclose"></div>`);
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
@@ -466,7 +520,13 @@ $(".leaderboard-tab").click(function() {
 			return;
 		});
 	} else {
-		$(this).find("rect").attr("fill", "none");
+		if (boardClose) {
+			$(Lboard).find("rect").attr("fill", "none");
+			$(".leaderboard-property-choice-hider").removeClass("open");
+			$(".user-column").animate({
+				height: "395px"
+			}, 400);
+		}
 
 		let delete_child = $("#leaderboard .full-leaderboard-enclose").children("div");
 
@@ -485,8 +545,65 @@ $(".leaderboard-tab").click(function() {
 			return;
 		});
 	}
+}
+
+$(".leaderboard-tab").click(function() {
+	$(this).toggleClass("open");
+	leaderboardCreate($(this), 1);
 });
+
+function leaderboardCloser() {
+	if ($(".leaderboard-property-choices").hasClass("select")) {
+		$(".leaderboard-property-choices").removeClass("select");
+		$(".dropdown-property-choice").removeClass("open");
+
+		$("body").off("click", leaderboardCloser);
+	}
+}
+
+$(".leaderboard-property-choices").mouseenter(function() {
+	$("body").off("click", leaderboardCloser);
+}).mouseleave(function() {
+	if ($(".leaderboard-property-choices").hasClass("select"))
+		$("body").on("click", leaderboardCloser);
+})
 
 $(".leaderboard-current-property").click(function() {
 	$(".leaderboard-property-choices").toggleClass("select");
+	if ($(".leaderboard-property-choices").hasClass("select")) {
+		$(".dropdown-property-choice").addClass("open");
+
+		setTimeout(function() {
+			$("body").on("click", leaderboardCloser);
+		}, 100);
+	} else {
+		$(".dropdown-property-choice").removeClass("open");
+
+		$("body").off("click", leaderboardCloser);
+	}
+});
+
+$(".leaderboard-pick").click(function() {
+	let leaderboardProperty = $(this).attr("lead-prop");
+
+	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
+		$("#leaderboard-shown-property").text($(this).text());
+
+		let lTab = $(".leaderboard-tab");
+		if ($(lTab).hasClass("open")) {
+			$(lTab).removeClass("open")
+			leaderboardCreate(lTab, 0);
+
+			setTimeout(function() {
+				$(lTab).addClass("open");
+				leaderboardCreate(lTab, 0);
+			}, 50);
+		} else
+			leaderboardCreate(lTab);
+
+		$(".leaderboard-property-choices").removeClass("select");
+		$(".dropdown-property-choice").removeClass("open");
+
+		$("body").off("click", leaderboardCloser);
+	});
 });
