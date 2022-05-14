@@ -65,7 +65,7 @@ a {
  
 .meta-leaderboard-holder {
   position: fixed;
-  height: 90%;
+  height: calc(90% - 50px);
 
   background: transparent;
   top: 0;
@@ -94,7 +94,7 @@ a {
 	opacity: 0;
 }
 
-.leaderboard-entry.fade-in {
+.leaderboard-entry.fade-in.in-frame {
 	animation: 0.8s fade-in ease-in-out;
 	animation-fill-mode: forwards;
 }

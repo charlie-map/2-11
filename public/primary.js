@@ -21,7 +21,7 @@ $(document).ready(function() {
 					width: set_width
 				});
 				$(".meta-leaderboard-holder").css({
-					width: $(window).outerWidth(false),
+					width: $(document).outerWidth(false),
 					left: "calc(50% + " + (300 * 0.5) + "px)"
 				});
 
@@ -33,6 +33,7 @@ $(document).ready(function() {
 					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
 				}
 
+				isInLeaderboardFrame();
 				LEADERBOARD_USERS = res.users;
 			});
 
@@ -123,8 +124,10 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	if (sib_to_switch) {
 		$(sib_to_switch).css("z-index", 1);
 		$(sib_to_switch).addClass("swapping");
+		$(sib_to_switch).addClass("in-frame");
 		$(personal_user).css("z-index", 2);
 		$(personal_user).addClass("swapping");
+		$(personal_user).addClass("in-frame");
 
 		let space_diff = $(personal_user).offset().top - $(sib_to_switch).offset().top;
 
@@ -163,6 +166,8 @@ function checkUserRankLeaderboard(newMetaPoints) {
 			$(animation_data[1]).find(".leaderboard-entry-score").text(personal_score);
 
 			activelyMovingLeaderboardRank = 0;
+
+			isInLeaderboardFrame();
 		}, 800, [personal_user, sib_to_switch]);
 	} else
 		activelyMovingLeaderboardRank = 0;
@@ -516,9 +521,11 @@ function leaderboardCreate(Lboard, boardClose) {
 			}
 
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
-				setTimeout(function(e) {
+				setTimeout(function(in_dat) {
+					let e = in_dat[0];
+
 					$("#leaderboard").append(`
-					<div class="leaderboard-entry fade-in">
+					<div class="leaderboard-entry fade-in in-frame">
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
 						<div class="leaderboard-entry-meta">
 							<div class="leaderboard-entry-username">${e.username}</div>
@@ -526,7 +533,13 @@ function leaderboardCreate(Lboard, boardClose) {
 						</div>
 					</div>
 					`);
-				}, i * 40, LEADERBOARD_USERS[i]);
+
+					if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
+						setTimeout(function() {
+							isInLeaderboardFrame();
+						}, 800);
+					}
+				}, i * 40, [LEADERBOARD_USERS[i], i]);
 			}
 		});
 
@@ -632,7 +645,7 @@ $(".leaderboard-pick").click(function() {
 
 /* LEADERBOARD SCROLL */
 function isScrolledIntoView(elem) {
-	var docViewTop = $(".meta-leaderboard-holder").scrollTop();
+	var docViewTop = $(window).scrollTop();
 	var docViewBottom = docViewTop + $(".meta-leaderboard-holder").height();
 
 	var elemTop = $(elem).offset().top;
@@ -641,6 +654,19 @@ function isScrolledIntoView(elem) {
 	return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
 }
 
+function isInLeaderboardFrame() {
+	let leaderboardGroup = $("#leaderboard").children();
+
+	for (let i = 0; i < leaderboardGroup.length; i++) {
+		if (isScrolledIntoView($(leaderboardGroup[i])))
+			$(leaderboardGroup[i]).addClass("in-frame");
+		else {
+			$(leaderboardGroup[i]).removeClass("in-frame");
+			$(leaderboardGroup[i]).addClass("fade-out");
+		}
+	}
+}
+
 $(".meta-leaderboard-holder").scroll(function() {
-	
+	isInLeaderboardFrame();
 });
