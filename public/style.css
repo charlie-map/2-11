@@ -62,12 +62,25 @@ a {
   background: rgb(255,255,255);
   background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8841737378545168) 72%, rgba(255,255,255,0) 100%);
 }
+ 
+.meta-leaderboard-holder {
+  position: fixed;
+  height: 90%;
+
+  background: transparent;
+  top: 0;
+
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
 #leaderboard {
-	position: fixed;
+  position: relative;
 
   top: 10%;
 	height: 80%;
+
+  padding-left: 68px;
 }
 
 .leaderboard-entry {

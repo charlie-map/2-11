@@ -27,9 +27,7 @@
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 			</div>
 			<div class="leaderboard-current-property">
-				<div id="leaderboard-shown-property" class="barlow">
-					{{LEADERBOARD_PROPERTY}}
-				</div>
+				<div id="leaderboard-shown-property" class="barlow">{{LEADERBOARD_PROPERTY}}</div>
 				<div class="dropdown-property-choice">
 					<ion-icon name="chevron-forward-outline"></ion-icon>
 				</div>
@@ -192,19 +190,21 @@
 				<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
 			</div>
 		</div>
-		<div class="top-leaderboard-gradient"></div>
-		<div id="leaderboard" class="leaderboard">
-			{{#LEADERBOARD}}
-			<div class="leaderboard-entry">
-				<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
-				<div class="leaderboard-entry-meta">	
-					<div class="leaderboard-entry-username">{{{username}}}</div>
-					<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+<!-- 		<div class="top-leaderboard-gradient"></div>
+ -->		<div class="meta-leaderboard-holder">
+			<div id="leaderboard" class="leaderboard">
+				{{#LEADERBOARD}}
+				<div class="leaderboard-entry">
+					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+					<div class="leaderboard-entry-meta">	
+						<div class="leaderboard-entry-username">{{{username}}}</div>
+						<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+					</div>
 				</div>
+				{{/LEADERBOARD}}
 			</div>
-			{{/LEADERBOARD}}
 		</div>
-		<div class="base-leaderboard-gradient"></div>
+		<!-- <div class="base-leaderboard-gradient"></div> -->
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

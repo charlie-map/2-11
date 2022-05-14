@@ -1,7 +1,7 @@
 class Board {
   constructor(size, tileSize, oldBoard) {
     this.board = [];
-    this.nxn = size * size;
+    this.size = size;
     this.tileS = tileSize;
     // all current tiles from smallest to largest
     //---used for drawing to make large glow effects

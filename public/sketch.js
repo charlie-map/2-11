@@ -38,7 +38,22 @@ function setup(isRestart) {
     localStorage.setItem("savedCurr2-11Score", 0);
   }
 
-  board = new Board(4, 90, oldBoard);
+  let hasNumbers = 0;
+  if (oldBoard) {
+    for (let x = 0; x < oldBoard.size; x++) {
+      for (let y = 0; y < oldBoard.size; y++) {
+        if (oldBoard[x][y]) {
+          hasNumbers = 1;
+          break;
+        }
+      }
+
+      if (hasNumbers)
+        break;
+    }
+  }
+
+  board = new Board(4, 90, hasNumbers ? oldBoard : null);
   moveBuildup = [];
 
   let options = {

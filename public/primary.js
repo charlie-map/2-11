@@ -15,20 +15,15 @@ $(document).ready(function() {
 
 		if (loggedIn) {
 			$.get("/updated-leaderboard", (res) => {
-				let set_width = $(document).outerWidth() - 460;
+				let set_width = $(document).outerWidth(false) - 460;
 				set_width = set_width > 400 ? 400 : set_width;
 				$("#leaderboard").css({
-					width: set_width,
-					left: "calc(50% + " + (430 * 0.5) + "px)"
+					width: set_width
 				});
-				$(".base-leaderboard-gradient").css({
-					width: set_width + 10,
-					left: "calc(50% + " + (410 * 0.5) + "px)"
+				$(".meta-leaderboard-holder").css({
+					width: $(window).outerWidth(false),
+					left: "calc(50% + " + (300 * 0.5) + "px)"
 				});
-				$(".top-leaderboard-gradient").css({
-					width: set_width + 10,
-					left: "calc(50% + " + (410 * 0.5) + "px)"
-				})
 
 				if (!wantsLeaderboardOpen) {
 					$("#leaderboard").html("");
@@ -37,6 +32,7 @@ $(document).ready(function() {
 					$(".leaderboard-tab").addClass("open");
 					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
 				}
+
 				LEADERBOARD_USERS = res.users;
 			});
 
@@ -66,8 +62,11 @@ window.onresize = function() {
 		let set_width = $(document).outerWidth(false) - 460;
 		set_width = set_width > 400 ? 400 : set_width;
 		$("#leaderboard").css({
-			width: set_width,
-			left: "calc(50% + " + (430 * 0.5) + "px)"
+			width: set_width
+		});
+		$(".meta-leaderboard-holder").css({
+			width: $(window).outerWidth(false),
+			left: "calc(50% + " + (300 * 0.5) + "px)"
 		});
 
 		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
@@ -110,7 +109,6 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
 	let number_of_spaces = 0;
-	console.log(metaPoints);
 	while (!$(upper_sibling_check).is(personal_user) && upper_sibling_check && upper_sibling_check.length) {
 		if (parseInt($(upper_sibling_check).find(".leaderboard-entry-score").text(), 10) >= newMetaPoints) {
 			number_of_spaces++;
@@ -122,7 +120,6 @@ function checkUserRankLeaderboard(newMetaPoints) {
 		number_of_spaces++;
 	}
 
-	console.log(sib_to_switch, personal_user);
 	if (sib_to_switch) {
 		$(sib_to_switch).css("z-index", 1);
 		$(sib_to_switch).addClass("swapping");
@@ -517,11 +514,10 @@ function leaderboardCreate(Lboard, boardClose) {
 					height: "420px"
 				}, 400);
 			}
-			if (!$(".full-leaderboard-enclose").length)
-				$("#leaderboard").append(`<div class="full-leaderboard-enclose"></div>`);
+
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
 				setTimeout(function(e) {
-					$(".full-leaderboard-enclose").append(`
+					$("#leaderboard").append(`
 					<div class="leaderboard-entry fade-in">
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
 						<div class="leaderboard-entry-meta">
@@ -546,7 +542,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			}, 400);
 		}
 
-		let delete_child = $("#leaderboard .full-leaderboard-enclose").children("div");
+		let delete_child = $("#leaderboard").children("div");
 
 		for (let i = delete_child.length - 1; i >= 0; i--) {
 			setTimeout(function(e) {
@@ -602,6 +598,14 @@ $(".leaderboard-current-property").click(function() {
 });
 
 $(".leaderboard-pick").click(function() {
+	if ($(this).text() == $("#leaderboard-shown-property").text()) {
+		$(".leaderboard-property-choices").removeClass("select");
+		$(".dropdown-property-choice").removeClass("open");
+
+		$("body").off("click", leaderboardCloser);
+
+		return;
+	}
 	let leaderboardProperty = $(this).attr("lead-prop");
 
 	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
@@ -627,18 +631,16 @@ $(".leaderboard-pick").click(function() {
 });
 
 /* LEADERBOARD SCROLL */
-let prevScrollDir = 0;
-$(document).scroll(function(e) {
-	console.log(e);
-	let newScroll = $(this).scrollTop();
+function isScrolledIntoView(elem) {
+	var docViewTop = $(".meta-leaderboard-holder").scrollTop();
+	var docViewBottom = docViewTop + $(".meta-leaderboard-holder").height();
 
-	if (newScroll > prevScrollDir){
-		// downscroll code
-		console.log("down");
-	} else {
-		// upscroll code
-		console.log("up");
-	}
+	var elemTop = $(elem).offset().top;
+	var elemBottom = elemTop + $(elem).height();
 
-	prevScrollDir = newScroll;
+	return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+}
+
+$(".meta-leaderboard-holder").scroll(function() {
+	
 });
