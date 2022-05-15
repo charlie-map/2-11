@@ -202,11 +202,16 @@
 				</div>
 				{{/LEADERBOARD}}
 			</div>
-			<!-- <div class="leaderboard-scrollbar">
-				<div class="leaderboard-scrollbar-position"></div>
-			</div> -->
 		</div>
-		<!-- <div class="base-leaderboard-gradient"></div> -->
+		<div class="user-modal">
+			<div class="user-modal-header">
+				<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
+					<div class="barlow best-sq-descript">Best tile</div>
+					<div class="best-num">{{BEST_BLOCK}}</div>
+				</div>
+				<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
+			</div>
+		</div>
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

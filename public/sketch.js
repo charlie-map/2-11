@@ -40,8 +40,8 @@ function setup(isRestart) {
 
   let hasNumbers = 0;
   if (oldBoard) {
-    for (let x = 0; x < oldBoard.size; x++) {
-      for (let y = 0; y < oldBoard.size; y++) {
+    for (let x = 0; x < oldBoard.length; x++) {
+      for (let y = 0; y < oldBoard[x].length; y++) {
         if (oldBoard[x][y]) {
           hasNumbers = 1;
           break;

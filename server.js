@@ -96,7 +96,7 @@ let propertiesUI = {
 
 function getPropertyValue(currentProperty, obj) {
 	if (currentProperty <= 3)
-		return obj[properties[currentProperty]];
+		return currentProperty == 3 ? Math.round(obj[properties[currentProperty]]) : obj[properties[currentProperty]];
 
 	if (currentProperty == 4) {
 		if (obj.wins == 0 && obj.totalGames > 0)
@@ -125,6 +125,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 
 		// update streak
 		try {
+			console.log("streak update");
 			await streakUpdate(user_data[0]);
 		} catch (error) {
 			return next(error);
@@ -335,7 +336,6 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 
 	let killerPiece = parseInt(req.body.killerPiece, 10);
 	killerPiece = killerPiece != 2 && killerPiece != 4 && killerPiece != 8 ? 2 : killerPiece;
-	console.log(killerPiece);
 
 	connection.query(`UPDATE game SET wins=(SELECT wins FROM game WHERE user_id=?)+?,
 		giveUps=(SELECT giveUps FROM game WHERE user_id=?)+?,
@@ -445,7 +445,6 @@ function signup_valid(body) {
 	if (!body.password || !body.password.length)
 		invalid_response += "2,";
 
-	console.log("inval res", invalid_response, invalid_response.length);
 	return invalid_response;
 }
 
@@ -541,15 +540,8 @@ function streakUpdate(user) {
 		let lastLoginDate = new Date(user.lastLogin);
 		let currentDate = new Date();
 
-		// under 24 hour mark
-		let lastLoginDateMonth = lastLoginDate.getMonth();
-		let lastLoginDateDay = lastLoginDate.getDate();
-
-		let currentDateMonth = currentDate.getMonth();
-		let currentDateDay = currentDate.getDate();
-
 		let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
-		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && (dateDiff >= 1 && dateDiff < 2))  {
+		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && (dateDiff > 1 && dateDiff < 2))  {
 			connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
 				[currentDate, user.currentStreak + 1, user.currentStreak + 1 > user.bestStreak ?
 				user.currentStreak + 1 : user.bestStreak, user.id], (err) => {

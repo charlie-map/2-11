@@ -58,8 +58,6 @@ class Board {
     $.post("/save-game", {
       board: stringedBoard,
       currentScore: "83e0a301" + metaPoints
-    }, (res) => {
-
     });
   }
 

@@ -468,6 +468,10 @@ a {
 	transition: all 0.4s ease-in-out;
 }
 
+.leaderboard-property-choice-hider.large {
+  margin-top: -48px;
+}
+
 .leaderboard-property-choice-hider.open {
 	margin-top: 0;
 }
@@ -1369,6 +1373,40 @@ input:focus {
 }
 .board-picker:hover {
   cursor: pointer;
+}
+
+.user-modal {
+  position: absolute;
+  opacity: 0;
+
+  max-width: 410px;
+  width: 80%;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: -1;
+
+  transition: opacity 0.5s ease-in-out, z-index 0.6s ease-in-out;
+}
+
+.user-modal.open {
+  z-index: 5;
+
+  opacity: 1;
+}
+
+.user-modal-header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.user-modal-username {
+  width: calc(100% - 160px);
+
+  margin-left: 10px;
 }
 
 /* FIRE ANIMATION FROM: Jon Kantner */

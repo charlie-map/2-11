@@ -35,6 +35,13 @@ $(document).ready(function() {
 					$(".leaderboard-entry").addClass("fade-in");
 					$(".leaderboard-tab").addClass("open");
 					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
+
+					let normalHeight = 19;
+					let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+
+					if (checkHeight > normalHeight) {
+						$(".leaderboard-property-choice-hider").addClass("large");
+					}
 				}
 
 				isInLeaderboardFrame();
@@ -416,17 +423,16 @@ $("#register").click(function(e) {
 			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
 			let JSONres_board = JSON.parse(res.board);
 
-			if ((!currentLocalBoard || !JSONcurrentLocalBoard) && (!res.board || !JSONres_board)) {
-				localStorage.setItem("saved2-11Board", null);
-				localStorage.setItem("savedBest2-11Score", 0);
+			if ((!currentLocalBoard || !JSONcurrentLocalBoard) && (res.board && JSONres_board)) {
+				localStorage.setItem("saved2-11Board", res.board);
+				localStorage.setItem("savedBest2-11Score", res.currentScore);
 
 				window.location.href = window.location.href.split("/")[0] + "/l";
 				return;
 			}
 
-			if (((!currentLocalBoard || !JSONcurrentLocalBoard) || (!res.board || !JSONres_board))
-				|| !differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
-				localStorage.setItem("savedBest2-11Score", res.bestScore);
+			if (!differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
+
 				window.location.href = window.location.href.split("/")[0] + "/l";
 				return;
 			}
@@ -506,6 +512,7 @@ $("#choose-local-board").click(function() {
 });
 
 $("#choose-remote-board").click(function() {
+	console.log(res_buffer);
 	localStorage.setItem("saved2-11Board", res_buffer.board);
 	localStorage.setItem("savedCurr2-11Score", res_buffer.currentScore);
 	localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
@@ -566,8 +573,6 @@ function leaderboardCreate(Lboard, boardClose) {
 			$(".user-column").animate({
 				height: "395px"
 			}, 400);
-
-			$(".leaderboard-scrollbar").hide();
 		}
 
 		let delete_child = $("#leaderboard").children("div");
@@ -592,6 +597,18 @@ function leaderboardCreate(Lboard, boardClose) {
 $(".leaderboard-tab").click(function() {
 	$(this).toggleClass("open");
 	leaderboardCreate($(this), 1);
+});
+
+$(".profile").click(function() {
+	$(this).toggleClass("open");
+
+	if ($(this).hasClass("open")) {
+		$(this).find("path").attr("fill", "#ddcee2");
+		$(".user-modal").addClass("open");
+	} else {
+		$(this).find("path").attr("fill", "none");
+		$(".user-modal").removeClass("open");
+	}
 });
 
 function leaderboardCloser() {
@@ -638,6 +655,13 @@ $(".leaderboard-pick").click(function() {
 
 	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
 		$("#leaderboard-shown-property").text($(this).text());
+		let normalHeight = 19;
+		let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+
+		if (checkHeight > normalHeight) {
+			$(".leaderboard-property-choice-hider").addClass("large");
+		} else
+			$(".leaderboard-property-choice-hider").removeClass("large");
 
 		let lTab = $(".leaderboard-tab");
 		if ($(lTab).hasClass("open")) {
