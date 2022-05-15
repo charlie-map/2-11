@@ -286,6 +286,99 @@ app.get("/update-best-block/:newblock", loggedIn, (req, res, next) => {
 	});
 });
 
+function computeNumFrom(num, end) {
+	let endNum = 0, scale = 1;
+
+	for (let getToNum = num; getToNum > end; getToNum -= (getToNum * 0.5)) {
+		endNum += getToNum * scale;
+		scale *= 2;
+	}
+
+	return endNum;
+}
+
+// guess minimum and maximum score asssuming that only
+// 8's or 2's are spawned respectively:
+function calculateScore(board) {
+	let minScore = 0, maxScore = 0;
+	let bestBlock = 2;
+
+	for (let x = 0; x < board.length; x++) {
+		for (let y = 0; y < board[x].length; y++) {
+			bestBlock = bestBlock < board[x][y].num ? board[x][y].num : bestBlock;
+			minScore += computeNumFrom(parseInt(board[x][y].num, 10), 8);
+			maxScore += computeNumFrom(parseInt(board[x][y].num, 10), 2);
+		}
+	}
+
+	return {
+		min: minScore,
+		max: maxScore,
+		bestBlock
+	};
+}
+
+app.post("/game-over", loggedIn, (req, res, next) => {
+	if (!req.body.board || !req.body.score || !req.body.killerPiece) {
+		return res.send("1");
+	}
+
+	let endBoard = JSON.parse(req.body.board);
+	let scores = calculateScore(endBoard);
+
+	let score = parseInt(req.body.score, 10);
+
+	// score was tampered with
+	if (score < scores.min || score > scores.max) {
+		return res.send("2");
+	}
+
+	let killerPiece = parseInt(req.body.killerPiece, 10);
+	killerPiece = killerPiece != 2 && killerPiece != 4 && killerPiece != 8 ? 2 : killerPiece;
+	console.log(killerPiece);
+
+	connection.query(`UPDATE game SET wins=(SELECT wins FROM game WHERE user_id=?)+?,
+		giveUps=(SELECT giveUps FROM game WHERE user_id=?)+?,
+		${killerPiece == 4 ? "killedBy4=(SELECT killedBy4 FROM game WHERE user_id=?)+1" :
+		killerPiece == 8 ? "killedBy8=(SELECT killedBy8 FROM game WHERE user_id=?)+1" :
+		"killedBy2=(SELECT killedBy2 FROM game WHERE user_id=?)+1"},
+		totalGames=(SELECT totalGames FROM game WHERE user_id=?)+1 WHERE user_id=?`,
+		[req.session.user_id, scores.bestBlock >= 2048 ? 1 : 0, req.session.user_id,
+		scores.bestBlock < 2048 ? 1 : 0, req.session.user_id, req.session.user_id, req.session.user_id, req.session.user_id, req.session.user_id], (err) => {
+			if (err) return next(err);
+
+			connection.query(`INSERT INTO board_history (user_id, wholeBoard, score, startTime, endTime) VALUES
+				(?, ?, ?, (SELECT startTime FROM current_board WHERE user_id=?), ?)`,
+				[req.session.user_id, req.body.board, score, req.session.user_id, new Date()], async (err) => {
+					if (err) return next(err);
+
+					let prevAvgScore_totalGames;
+					try {
+						prevAvgScore_totalGames = await new Promise((resolve, reject) => {
+							connection.query("SELECT averageScore, totalGames FROM game WHERE user_id=?", req.session.user_id, (err, avgScore) => {
+								if (err || !avgScore || !avgScore.length) return reject(err);
+
+								resolve({
+									avS: avgScore[0].averageScore,
+									tG: avgScore[0].totalGames
+								});
+							});
+						});
+					} catch (error) {
+						return next(error);
+					}
+				
+					connection.query("UPDATE game SET averageScore=? WHERE user_id=?",
+						[((prevAvgScore_totalGames.avS * (prevAvgScore_totalGames.tG - 1)) / (prevAvgScore_totalGames.tG)) +
+						(score / prevAvgScore_totalGames.tG), req.session.user_id], (err) => {
+							if (err) return next(err);
+
+							return res.send("0");
+						});
+				});
+		});
+});
+
 app.get("/username-available/:username", (req, res, next) => {
 	let username = req.params.username;
 

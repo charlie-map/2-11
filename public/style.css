@@ -77,7 +77,7 @@ a {
 }
 
 .leaderboard-scrollbar {
-  position: relative;
+  position: absolute;
 
   top: 10%;
 

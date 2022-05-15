@@ -30,6 +30,7 @@ $(document).ready(function() {
 
 				if (!wantsLeaderboardOpen) {
 					$("#leaderboard").html("");
+					$(".leaderboard-scrollbar").hide();
 				} else {
 					$(".leaderboard-entry").addClass("fade-in");
 					$(".leaderboard-tab").addClass("open");
@@ -68,10 +69,14 @@ window.onresize = function() {
 		$("#leaderboard").css({
 			width: set_width
 		});
+		$(".leaderboard-scrollbar-position").css({
+			height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
+		});
 		$(".meta-leaderboard-holder").css({
 			width: $(window).outerWidth(false),
 			left: "calc(50% + " + (300 * 0.5) + "px)"
 		});
+		isInLeaderboardFrame();
 
 		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 		$(".user-column").css({
@@ -521,6 +526,8 @@ function leaderboardCreate(Lboard, boardClose) {
 				$(".user-column").animate({
 					height: "420px"
 				}, 400);
+
+				$(".leaderboard-scrollbar").show();
 			}
 
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
@@ -540,6 +547,9 @@ function leaderboardCreate(Lboard, boardClose) {
 					if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
 						setTimeout(function() {
 							isInLeaderboardFrame();
+							$(".leaderboard-scrollbar-position").css({
+								height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
+							});
 						}, 800);
 					}
 				}, i * 40, [LEADERBOARD_USERS[i], i]);
@@ -556,6 +566,8 @@ function leaderboardCreate(Lboard, boardClose) {
 			$(".user-column").animate({
 				height: "395px"
 			}, 400);
+
+			$(".leaderboard-scrollbar").hide();
 		}
 
 		let delete_child = $("#leaderboard").children("div");
@@ -670,21 +682,6 @@ function isInLeaderboardFrame() {
 	}
 }
 
-let prevScrollPos = 0;
 $(".meta-leaderboard-holder").scroll(function() {
-	let currScrollPos = $(this).scrollTop();
-
-	if (prevScrollPos <= currScrollPos && $(".leaderboard-scrollbar-position").offset().top + $(".leaderboard-scrollbar-position").outerHeight(false)
-		>= $(".leaderboard-scrollbar").offset().top + $(".leaderboard-scrollbar").outerHeight(false))
-		return;
-
-	$(".leaderboard-scrollbar-position").css({
-		top: $(this).scrollTop()
-	});
-	$(".leaderboard-scrollbar").css({
-		top: "calc(10% + " + $(this).scrollTop() + "px)"
-	});
-
 	isInLeaderboardFrame();
-	prevScrollPos = currScrollPos;
 });

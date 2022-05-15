@@ -43,6 +43,8 @@ class Board {
 
     this.boardMove = 0;
     this.canMove();
+
+    this.endGameRequest = 0;
   }
 
   saveGame() {
@@ -92,6 +94,7 @@ class Board {
 
     let choose_start = floor(random(100));
     let start_number = choose_start < 89 ? 2 : choose_start < 99 ? 4 : 8;
+    mostRecentPiece = start_number;
     this.board[findOpenX][findOpenY] = new Piece(100 * findOpenX, 100 * findOpenY, tileSize, tileSize, start_number);
 
     return 1;
@@ -196,13 +199,21 @@ class Board {
 
     this.boardMove = movingPieces ? 1 : 0;
 
-    if (!this.boardMove && !this.canMove()) {
-      endGame = 1;
+    if (!this.boardMove && !this.canMove() && !this.endGameRequest) {
+      this.endGameRequest = 1;
 
-      localStorage.setItem("saved2-11Board", null);
-      localStorage.setItem("savedCurr2-11Score", 0);
+      $.post("/game-over", {
+        board: JSON.stringify(this.board),
+        score: metaPoints,
+        killerPiece: mostRecentPiece
+      }, (res) => {
+        endGame = 1;
 
-      $("#new-game").text("Try again");
+        localStorage.setItem("saved2-11Board", null);
+        localStorage.setItem("savedCurr2-11Score", 0);
+
+        $("#new-game").text("Try again");
+      });
     }
   }
 

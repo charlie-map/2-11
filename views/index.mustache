@@ -202,9 +202,9 @@
 				</div>
 				{{/LEADERBOARD}}
 			</div>
-			<div class="leaderboard-scrollbar">
+			<!-- <div class="leaderboard-scrollbar">
 				<div class="leaderboard-scrollbar-position"></div>
-			</div>
+			</div> -->
 		</div>
 		<!-- <div class="base-leaderboard-gradient"></div> -->
 		{{/LOGGED_IN}}
@@ -215,7 +215,7 @@
 		<script>
 			let board;
 			let moveBuildup;
-			let highestPiece = {{{BEST_BLOCK}}};
+			let highestPiece = {{{BEST_BLOCK}}}, mostRecentPiece = 2;
 			let loggedIn = {{{LOGGED_IN}}};
 
 			let endGame = 0;
