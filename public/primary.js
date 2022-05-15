@@ -20,6 +20,9 @@ $(document).ready(function() {
 				$("#leaderboard").css({
 					width: set_width
 				});
+				$(".leaderboard-scrollbar-position").css({
+					height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
+				});
 				$(".meta-leaderboard-holder").css({
 					width: $(document).outerWidth(false),
 					left: "calc(50% + " + (300 * 0.5) + "px)"
@@ -667,6 +670,21 @@ function isInLeaderboardFrame() {
 	}
 }
 
+let prevScrollPos = 0;
 $(".meta-leaderboard-holder").scroll(function() {
+	let currScrollPos = $(this).scrollTop();
+
+	if (prevScrollPos <= currScrollPos && $(".leaderboard-scrollbar-position").offset().top + $(".leaderboard-scrollbar-position").outerHeight(false)
+		>= $(".leaderboard-scrollbar").offset().top + $(".leaderboard-scrollbar").outerHeight(false))
+		return;
+
+	$(".leaderboard-scrollbar-position").css({
+		top: $(this).scrollTop()
+	});
+	$(".leaderboard-scrollbar").css({
+		top: "calc(10% + " + $(this).scrollTop() + "px)"
+	});
+
 	isInLeaderboardFrame();
+	prevScrollPos = currScrollPos;
 });
