@@ -718,7 +718,7 @@ function isScrolledIntoView(elem) {
 	var elemTop = $(elem).offset().top;
 	var elemBottom = elemTop + $(elem).height();
 
-	return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+	return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop + $(".user-column").offset().top));
 }
 
 function isInLeaderboardFrame() {
