@@ -14,6 +14,12 @@ $(document).ready(function() {
 			$("#username").focus();
 
 		if (loggedIn) {
+			// $(".user-modal").css({ width: 420 });
+			// $(".user-modal").css({
+			// 	"margin-left": $(".user-column").outerWidth(false) + 420,
+			// 	"margin-bottom": -1 * $(".user-modal").outerHeight(false)
+			// });
+
 			$.get("/updated-leaderboard", (res) => {
 				let set_width = $(document).outerWidth(false) - 460;
 				set_width = set_width > 400 ? 400 : set_width;
@@ -526,7 +532,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			if (boardClose) {
 				$(".leaderboard-property-choice-hider").addClass("open");
 				$(".user-column").animate({
-					height: "420px"
+					height: "330px"
 				}, 400);
 
 				$(".leaderboard-scrollbar").show();
@@ -566,7 +572,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			$(Lboard).find("rect").attr("fill", "none");
 			$(".leaderboard-property-choice-hider").removeClass("open");
 			$(".user-column").animate({
-				height: "395px"
+				height: "305px"
 			}, 400);
 		}
 
@@ -594,15 +600,37 @@ $(".leaderboard-tab").click(function() {
 	leaderboardCreate($(this), 1);
 });
 
+function profileCloser() {
+	if ($(".user-modal").hasClass("open")) {
+		$(".user-modal").removeClass("open");
+		$(".profile").find("path").attr("fill", "none");
+
+		$("body").off("click", profileCloser);
+	}
+}
+
+$(".user-modal").mouseenter(function() {
+	$("body").off("click", profileCloser);
+}).mouseleave(function() {
+	if ($(".user-modal").hasClass("open"))
+		$("body").on("click", profileCloser);
+});
+
 $(".profile").click(function() {
 	$(this).toggleClass("open");
 
 	if ($(this).hasClass("open")) {
 		$(this).find("path").attr("fill", "#ddcee2");
 		$(".user-modal").addClass("open");
+
+		setTimeout(function() {
+			$("body").on("click", profileCloser);
+		}, 100);
 	} else {
 		$(this).find("path").attr("fill", "none");
 		$(".user-modal").removeClass("open");
+
+		$("body").off("click", profileCloser);
 	}
 });
 
@@ -620,7 +648,7 @@ $(".leaderboard-property-choices").mouseenter(function() {
 }).mouseleave(function() {
 	if ($(".leaderboard-property-choices").hasClass("select"))
 		$("body").on("click", leaderboardCloser);
-})
+});
 
 $(".leaderboard-current-property").click(function() {
 	$(".leaderboard-property-choices").toggleClass("select");
@@ -649,6 +677,11 @@ $(".leaderboard-pick").click(function() {
 	let leaderboardProperty = $(this).attr("lead-prop");
 
 	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
+		if (res == "1")
+			return;
+
+		activeLeaderboardProperty = res.split("-")[1];
+
 		$("#leaderboard-shown-property").text($(this).text());
 		let normalHeight = 19;
 		let checkHeight = $("#leaderboard-shown-property").outerHeight(false);

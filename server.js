@@ -69,7 +69,8 @@ app.get("/", (req, res, next) => {
 	res.render("index", {
 		LOGGED_IN: false,
 		LEADERBOARD_OPEN: 0,
-		BEST_BLOCK: 2
+		BEST_BLOCK: 2,
+		LEADERBOARD_PROPERTY: "Best score"
 	});
 });
 
@@ -190,7 +191,7 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.session.user_id], (err) => {
 		if (err) return next(err);
 
-		return res.send("0");
+		return res.send("0-" + propertiesUI[propNum]);
 	});
 });
 

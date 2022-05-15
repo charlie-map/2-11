@@ -147,7 +147,8 @@ class Board {
 
       if (newMetaPoints > bestPoints && newMetaPoints > metaPoints) {
         $("#best-score").text(newMetaPoints);
-        $(".personal-user-points").text(newMetaPoints);
+        if (activeLeaderboardProperty == "Best score")
+          $(".personal-user-points").text(newMetaPoints);
 
         if (!activelyMovingLeaderboardRank)
           checkUserRankLeaderboard(newMetaPoints);
@@ -269,6 +270,8 @@ class Board {
       $("#column-best-square").children(".best-num").text(newHighestPiece);
 
       highestPiece = newHighestPiece;
+      if (activeLeaderboardProperty == "Best block")
+        $(".personal-user-points").text(highestPiece);
 
       $.get("/update-best-block/" + highestPiece);
       this.saveGame();

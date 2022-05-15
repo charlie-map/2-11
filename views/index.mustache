@@ -20,9 +20,9 @@
 	<body>
 		{{#LOGGED_IN}}
 		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 395px;{{/LEADERBOARD_OPEN}}">
-			<div class="column-tab profile">
+			<!-- <div class="column-tab profile">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
-			</div>
+			</div> -->
 			<div class="column-tab leaderboard-tab">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 			</div>
@@ -33,6 +33,9 @@
 				</div>
 			</div>
 			<div class="leaderboard-property-choice-hider {{#LEADERBOARD_OPEN}}open{{/LEADERBOARD_OPEN}}"></div>
+			<!-- <div class="user-modal open">
+				<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
+			</div> -->
 			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
 				<div class="barlow best-sq-descript">Best tile</div>
 				<div class="best-num">{{BEST_BLOCK}}</div>
@@ -203,15 +206,6 @@
 				{{/LEADERBOARD}}
 			</div>
 		</div>
-		<div class="user-modal">
-			<div class="user-modal-header">
-				<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
-					<div class="barlow best-sq-descript">Best tile</div>
-					<div class="best-num">{{BEST_BLOCK}}</div>
-				</div>
-				<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
-			</div>
-		</div>
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
@@ -235,12 +229,14 @@
 			let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
 			let activelyMovingLeaderboardRank = 0, needLeaderboardCheck = 0;
 
+			let activeLeaderboardProperty = "{{{LEADERBOARD_PROPERTY}}}";
+
 			let currentScoreAnimationTimeout;
 			let logging_in = undefined;
 		</script>
 		<script src="piece.js"></script>
 		<script src="board.js"></script>
-		<script src="sketch.js"></script>
+		<script src="sketch.js" defer></script>
 
 		<script src="primary.js" defer></script>
 	</body>
