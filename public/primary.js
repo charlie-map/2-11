@@ -423,6 +423,7 @@ $("#register").click(function(e) {
 			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
 			let JSONres_board = JSON.parse(res.board);
 
+			localStorage.setItem("savedBest2-11Score", res.bestScore);
 			if ((!currentLocalBoard || !JSONcurrentLocalBoard) && (res.board && JSONres_board)) {
 				localStorage.setItem("saved2-11Board", res.board);
 				localStorage.setItem("savedBest2-11Score", res.currentScore);
@@ -432,7 +433,6 @@ $("#register").click(function(e) {
 			}
 
 			if (!differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
-
 				window.location.href = window.location.href.split("/")[0] + "/l";
 				return;
 			}
@@ -474,12 +474,7 @@ $("#register").click(function(e) {
 			username,
 			password
 		}, (res) => {
-			console.log(res);
-
 			if (res.success) {
-				localStorage.setItem("savedBest2-11Score", 0);
-				localStorage.setItem("savedCurr2-11Score", 0);
-				localStorage.setItem("saved2-11Board", null);
 				window.location.href = window.location.href.split("/")[0] + "/l";
 
 				return;
