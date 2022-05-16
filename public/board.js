@@ -147,8 +147,11 @@ class Board {
 
       if (newMetaPoints > bestPoints && newMetaPoints > metaPoints) {
         $("#best-score").text(newMetaPoints);
-        if (activeLeaderboardProperty == "Best score")
+        if (activeLeaderboardProperty == "Best score") {
+          let lowestLeaderboardBlock = parseInt($("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-score").text(), 10);
+
           $(".personal-user-points").text(newMetaPoints);
+        }
 
         if (!activelyMovingLeaderboardRank)
           checkUserRankLeaderboard(newMetaPoints);
