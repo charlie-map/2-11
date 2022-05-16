@@ -63,11 +63,19 @@ a {
   background: linear-gradient(0deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.8841737378545168) 72%, rgba(255,255,255,0) 100%);
 }
  
-.meta-leaderboard-holder {
+.ultra-meta-leaderboard-holder {
   position: fixed;
-  height: calc(90% - 50px);
 
+  height: calc(90%);
+
+  top: 0;
+}
+
+.meta-leaderboard-holder {
   background: transparent;
+
+  height: calc(100% - 50px);
+
   top: 0;
 
   overflow-y: auto;
@@ -116,9 +124,17 @@ a {
 	opacity: 0.4;
 }
 
+#leaderboard .leaderboard-entry:last-child {
+  margin-bottom: 2px !important;
+}
+
 .leaderboard-entry.fade-in.in-frame {
 	animation: 0.8s fade-in ease-in-out;
 	animation-fill-mode: forwards;
+}
+
+.user-personal-low.fade-in.in-frame {
+  transition: opacity 0.4s ease-in-out;
 }
 
 @keyframes fade-in {
@@ -221,6 +237,20 @@ a {
 	vertical-align: middle;
 
 	z-index: 3;
+}
+
+.user-personal-low {
+  padding-left: 68px;
+  opacity: 0;
+
+  margin-top: 4px;
+
+  transition: opacity 0.4s ease-in-out;
+}
+
+.rank-color-1 { /* Not ranked */
+  background: #03b6db !important;
+  color: #8f2510;
 }
 
 .rank-color1 {

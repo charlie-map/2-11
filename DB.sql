@@ -71,7 +71,7 @@ CREATE TABLE game (
 CREATE TABLE current_board (
 	user_id INT NOT NULL,
 
-	game_id VARCHAR(36) NOT NULL,
+	game_id VARCHAR(36) NOT NULL DEFAULT 0,
 
 	wholeBoard TEXT,
 	startTime DATETIME,

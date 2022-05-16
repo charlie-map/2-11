@@ -193,28 +193,30 @@
 				<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
 			</div>
 		</div>
-		<div class="meta-leaderboard-holder">
-			<div id="leaderboard" class="leaderboard">
-				{{#LEADERBOARD}}
-				<div class="leaderboard-entry">
-					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
-					<div class="leaderboard-entry-meta">	
-						<div class="leaderboard-entry-username">{{{username}}}</div>
-						<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+		<div class="ultra-meta-leaderboard-holder">
+			<div class="meta-leaderboard-holder">
+				<div id="leaderboard" class="leaderboard">
+					{{#LEADERBOARD}}
+					<div class="leaderboard-entry">
+						<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+						<div class="leaderboard-entry-meta">	
+							<div class="leaderboard-entry-username">{{{username}}}</div>
+							<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+						</div>
 					</div>
+					{{/LEADERBOARD}}
 				</div>
-				{{/LEADERBOARD}}
 			</div>
-		</div>
-		{{#USER_SPECIAL}}
-		<div class="user-personal-low leaderboard-entry">
-			<div class="leaderboard-entry-rank rank-color0">{{USER_RANK}}</div>
-			<div class="leaderboard-entry-meta">
-				<div class="leaderboard-entry-username">{{USERNAME}}</div>
-				<div class="leaderboard-entry-score">{{USER_SPECIAL_SCORE}}</div>
+			{{#USER_SPECIAL}}
+			<div class="user-personal-low leaderboard-entry in-frame">
+				<div class="leaderboard-entry-rank rank-color-1">{{USER_RANK}}</div>
+				<div class="leaderboard-entry-meta">
+					<div class="leaderboard-entry-username">{{USERNAME}} <span id='leaderboard-personal' class='is-taken'>(you)</span></div>
+					<div class="leaderboard-entry-score">{{USER_SPECIAL_SCORE}}</div>
+				</div>
 			</div>
+			{{/USER_SPECIAL}}
 		</div>
-		{{/USER_SPECIAL}}
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

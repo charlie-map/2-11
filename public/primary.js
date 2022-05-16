@@ -26,11 +26,13 @@ $(document).ready(function() {
 				$("#leaderboard").css({
 					width: set_width
 				});
-				$(".leaderboard-scrollbar-position").css({
-					height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
+				$(".user-personal-low").css({
+					width: set_width - 8
 				});
 				$(".meta-leaderboard-holder").css({
-					width: $(document).outerWidth(false),
+					width: $(document).outerWidth(false)
+				});
+				$(".ultra-meta-leaderboard-holder").css({
 					left: "calc(50% + " + (300 * 0.5) + "px)"
 				});
 
@@ -41,6 +43,7 @@ $(document).ready(function() {
 					$(".leaderboard-entry").addClass("fade-in");
 					$(".leaderboard-tab").addClass("open");
 					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
+					$(".user-personal-low").addClass("fade-in");
 
 					let normalHeight = 19;
 					let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
@@ -481,6 +484,7 @@ $("#register").click(function(e) {
 			password
 		}, (res) => {
 			if (res.success) {
+
 				window.location.href = window.location.href.split("/")[0] + "/l";
 
 				return;
@@ -507,7 +511,6 @@ $("#choose-local-board").click(function() {
 		board: localStorage.getItem("saved2-11Board"),
 		currentScore: "83e0a301" + localStorage.getItem("savedCurr2-11Score")
 	}, (res) => {
-		localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
 		window.location.href = window.location.href.split("/")[0] + "/l";
 	});
 });
@@ -525,6 +528,7 @@ $("#choose-remote-board").click(function() {
 function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
 		$(Lboard).find("rect").attr("fill", "#ddcee2");
+		$(".user-personal-low").addClass("fade-in");
 
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.leaderboardIndex;
@@ -537,6 +541,12 @@ function leaderboardCreate(Lboard, boardClose) {
 
 				$(".leaderboard-scrollbar").show();
 			}
+
+			if (res.lowUser) {
+				$(".user-personal-low").find(".leaderboard-entry-rank").text(res.lowUser.rank);
+				$(".user-personal-low").find(".leaderboard-entry-score").text(res.lowUser.score);
+			} else
+				$(".user-personal-low").removeClass("fade-in");
 
 			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
 				setTimeout(function(in_dat) {
@@ -568,6 +578,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			return;
 		});
 	} else {
+		$(".user-personal-low").removeClass("fade-in");
 		if (boardClose) {
 			$(Lboard).find("rect").attr("fill", "none");
 			$(".leaderboard-property-choice-hider").removeClass("open");
@@ -718,7 +729,7 @@ function isScrolledIntoView(elem) {
 	var elemTop = $(elem).offset().top;
 	var elemBottom = elemTop + $(elem).height();
 
-	return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop + $(".user-column").offset().top));
+	return (elemBottom <= docViewBottom) && (elemTop >= docViewTop + ($(window).outerHeight(false) * 0.1));
 }
 
 function isInLeaderboardFrame() {

@@ -126,7 +126,6 @@ app.get("/l", loggedIn, (req, res, next) => {
 
 		// update streak
 		try {
-			console.log("streak update");
 			await streakUpdate(user_data[0]);
 		} catch (error) {
 			return next(error);
@@ -138,15 +137,19 @@ app.get("/l", loggedIn, (req, res, next) => {
 			let userBoardOpen;
 			let onLeaderboard = 0, user_special_rank = 0;
 			let u_dat = user_data[0];
-			let leaderboardIndex = users.map((u, i) => {
+			let leaderboardIndex = [];
 
-				if (i > 20) {
-					if (!onLeaderboard && u.username == u_dat.username) {
-						user_special_rank = i;
+			for (let i = 0; i < users.length; i++) {
+				if (i >= 20) {
+					if (!onLeaderboard && users[i].username == u_dat.username) {
+						user_special_rank = i + 1;
+
+						break;
 					}
 
-					return;
+					continue;
 				}
+				let u = users[i];
 				let newU = {};
 
 				newU.rank = i + 1;
@@ -160,8 +163,8 @@ app.get("/l", loggedIn, (req, res, next) => {
 					newU.personal_user = "personal-user-points";
 				}
 
-				return newU;
-			});
+				leaderboardIndex.push(newU);
+			}
 
 			res.render("index", {
 				LOGGED_IN: true,
@@ -216,12 +219,30 @@ app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
 	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.session.user_id, (err, user_data) => {
 		if (err) return next(err);
 
-		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]} LIMIT 20`, (err, users) => {
+		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
 			if (err || !users) return next(err);
 
 			let userBoardOpen;
 			let u_dat = user_data[0];
-			let leaderboardIndex = users.map((u, i) => {
+			let leaderboardIndex = [];
+
+			let onLeaderboard = 0
+			let lowUser = null;
+
+			for (let i = 0; i < users.length; i++) {
+				if (i >= 20) {
+					if (!onLeaderboard && users[i].username == u_dat.username) {
+						lowUser = {};
+						lowUser.rank = i + 1;
+						lowUser.username = u_dat.username;
+						lowUser.score = getPropertyValue(u_dat.leaderboardProperty, users[i]);
+
+						break;
+					}
+
+					continue;
+				}
+				let u = users[i];
 				let newU = {};
 
 				newU.rank = i + 1;
@@ -229,15 +250,19 @@ app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
 
 				newU.username = u.username + (u.username == u_dat.username ? " <span id='leaderboard-personal' class='is-taken'>(you)</span>" : "");
 
-				if (u.username == u_dat.username)
+				if (u.username == u_dat.username) {
+					onLeaderboard = 1;
+					user_special_rank = i;
 					newU.personal_user = "personal-user-points";
+				}
 
-				return newU;
-			});
+				leaderboardIndex.push(newU);
+			}
 
 			res.json({
 				leaderboardOpen: u_dat.leaderboardOpen ? true : false,
-				leaderboardIndex
+				leaderboardIndex,
+				lowUser
 			});
 		});
 	});
