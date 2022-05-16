@@ -132,12 +132,21 @@ app.get("/l", loggedIn, (req, res, next) => {
 			return next(error);
 		}
 
-		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]} LIMIT 20`, (err, users) => {
+		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
 			if (err || !users) return res.render("error", { error: err });
 
 			let userBoardOpen;
+			let onLeaderboard = 0, user_special_rank = 0;
 			let u_dat = user_data[0];
 			let leaderboardIndex = users.map((u, i) => {
+
+				if (i > 20) {
+					if (!onLeaderboard && u.username == u_dat.username) {
+						user_special_rank = i;
+					}
+
+					return;
+				}
 				let newU = {};
 
 				newU.rank = i + 1;
@@ -145,8 +154,11 @@ app.get("/l", loggedIn, (req, res, next) => {
 
 				newU.username = u.username + (u.username == u_dat.username ? " <span id='leaderboard-personal' class='is-taken'>(you)</span>" : "");
 
-				if (u.username == u_dat.username)
+				if (u.username == u_dat.username) {
+					onLeaderboard = 1;
+					user_special_rank = i;
 					newU.personal_user = "personal-user-points";
+				}
 
 				return newU;
 			});
@@ -157,7 +169,12 @@ app.get("/l", loggedIn, (req, res, next) => {
 
 				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
 				LEADERBOARD_PROPERTY: propertiesUI[u_dat.leaderboardProperty],
+				LARGE_LEADERBOARD_PROPERTY: u_dat.leaderboardProperty == 3 ? true : false,
 				LEADERBOARD: leaderboardIndex,
+
+				USER_SPECIAL: onLeaderboard ? false : true,
+				USER_RANK: user_special_rank,
+				USER_SPECIAL_SCORE: getPropertyValue(u_dat.leaderboardProperty, u_dat),
 
 				CURRENT_SCORE: u_dat.currentScore,
 				BEST_BLOCK: u_dat.bestBlock,
@@ -492,8 +509,9 @@ app.post("/signup", async (req, res, next) => {
 					});
 				});
 
+				let game_id = uuidv4();
 				await new Promise((resolve, reject) => {
-					connection.query("INSERT INTO current_board (user_id, startTime) VALUES (?, ?)", [u_id, new Date()], (err) => {
+					connection.query("INSERT INTO current_board (user_id, startTime, game_id) VALUES (?, ?, ?)", [u_id, new Date(), game_id], (err) => {
 						if (err) console.log(err);
 
 						resolve();

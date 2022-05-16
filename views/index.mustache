@@ -19,7 +19,7 @@
 	</head>
 	<body>
 		{{#LOGGED_IN}}
-		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 395px;{{/LEADERBOARD_OPEN}}">
+		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 305px;{{/LEADERBOARD_OPEN}}">
 			<!-- <div class="column-tab profile">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
 			</div> -->
@@ -32,7 +32,7 @@
 					<ion-icon name="chevron-forward-outline"></ion-icon>
 				</div>
 			</div>
-			<div class="leaderboard-property-choice-hider {{#LEADERBOARD_OPEN}}open{{/LEADERBOARD_OPEN}}"></div>
+			<div class="leaderboard-property-choice-hider {{#LEADERBOARD_OPEN}}open{{/LEADERBOARD_OPEN}} {{#LARGE_LEADERBOARD_PROPERTY}}large{{/LARGE_LEADERBOARD_PROPERTY}}"></div>
 			<!-- <div class="user-modal open">
 				<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
 			</div> -->
@@ -206,6 +206,15 @@
 				{{/LEADERBOARD}}
 			</div>
 		</div>
+		{{#USER_SPECIAL}}
+		<div class="user-personal-low leaderboard-entry">
+			<div class="leaderboard-entry-rank rank-color0">{{USER_RANK}}</div>
+			<div class="leaderboard-entry-meta">
+				<div class="leaderboard-entry-username">{{USERNAME}}</div>
+				<div class="leaderboard-entry-score">{{USER_SPECIAL_SCORE}}</div>
+			</div>
+		</div>
+		{{/USER_SPECIAL}}
 		{{/LOGGED_IN}}
 
 		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
