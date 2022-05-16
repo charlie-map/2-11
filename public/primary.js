@@ -130,6 +130,19 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	needLeaderboardCheck = 0;
 	activelyMovingLeaderboardRank = 1;
 	let personal_user = $(".personal-user-points").parent().parent();
+	let personal_user_rank = parseInt($(personal_user).children(".leaderboard-entry-rank") ?
+		$(personal_user).children(".leaderboard-entry-rank").text() : 0, 10)
+
+	console.log("reaplce", personal_user_rank);
+	if (personal_user_rank > 20) { // extended position, replace bottom of leaderboard
+		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-score").text(newMetaPoints);
+		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-username").html($(personal_user).find(".leaderboard-entry-username").html());
+	
+		$(personal_user).remove();
+		personal_user = $("#leaderboard .leaderboard-entry:last-child");
+
+		console.log(personal_user);
+	}
 
 	let upper_sibling_check = $(personal_user).prev();
 	let sib_to_switch = null;
