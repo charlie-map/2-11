@@ -21,7 +21,7 @@ CREATE TABLE auth (
 	user_id INT,
 
 	authToken VARCHAR(36) NOT NULL,
-	tokenDeath DATETIME NOT NULL,
+	tokenDeath BIGINT NOT NULL DEFAULT 86400000,
 
 	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );

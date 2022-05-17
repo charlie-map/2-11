@@ -124,6 +124,10 @@ $("#new-game").click(function() {
 	$("#current-score").text("0");
 
 	setup(1);
+
+	$.post("/game-over", {
+
+	});
 });
 
 function checkUserRankLeaderboard(newMetaPoints) {
@@ -133,15 +137,13 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	let personal_user_rank = parseInt($(personal_user).children(".leaderboard-entry-rank") ?
 		$(personal_user).children(".leaderboard-entry-rank").text() : 0, 10)
 
-	console.log("reaplce", personal_user_rank);
 	if (personal_user_rank > 20) { // extended position, replace bottom of leaderboard
 		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-score").text(newMetaPoints);
 		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-username").html($(personal_user).find(".leaderboard-entry-username").html());
 	
 		$(personal_user).remove();
 		personal_user = $("#leaderboard .leaderboard-entry:last-child");
-
-		console.log(personal_user);
+		$(personal_user).find(".leaderboard-entry-score").addClass("personal-user-points");
 	}
 
 	let upper_sibling_check = $(personal_user).prev();

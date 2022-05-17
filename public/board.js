@@ -45,9 +45,11 @@ class Board {
     this.canMove();
 
     this.endGameRequest = 0;
+    this.sendingRequest = 0;
   }
 
   saveGame() {
+    this.sendingRequest = 1;
     let stringedBoard = JSON.stringify(this.board)
 
     localStorage.setItem("saved2-11Board", stringedBoard);
@@ -58,7 +60,7 @@ class Board {
     $.post("/save-game", {
       board: stringedBoard,
       currentScore: "83e0a301" + metaPoints
-    });
+    }, () => { this.sendingRequest = 0; });
   }
 
   addPiece(tileSize) {
@@ -141,6 +143,9 @@ class Board {
     if (!activelyMovingLeaderboardRank && needLeaderboardCheck)
       checkUserRankLeaderboard(metaPoints);
 
+    if (movingPieces == 0 && !this.sendingRequest)
+      this.saveGame();
+
     if (isMoving < (45 * movingPieces) && points) {
       let prevScore = metaPoints;
       let newMetaPoints = prevScore + points;
@@ -198,7 +203,6 @@ class Board {
 
       metaPoints = newMetaPoints;
       points = 0;
-      this.saveGame();
     }
 
     this.boardMove = movingPieces ? 1 : 0;
@@ -279,7 +283,6 @@ class Board {
         $(".personal-user-points").text(highestPiece);
 
       $.get("/update-best-block/" + highestPiece);
-      this.saveGame();
     }
     return canMove;
   }

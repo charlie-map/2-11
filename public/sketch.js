@@ -55,18 +55,6 @@ function setup(isRestart) {
 
   board = new Board(4, 90, hasNumbers ? oldBoard : null);
   moveBuildup = [];
-
-  let options = {
-    preventDefault: true
-  };
-
-  // document.body registers gestures anywhere on the page
-  let hammer = new Hammer(document.body, options);
-  hammer.get('swipe').set({
-    direction: Hammer.DIRECTION_ALL
-  });
-
-  hammer.on("swipe", swiped);
 }
 
 function draw() {
@@ -85,7 +73,6 @@ function draw() {
       }
       
       moveBuildup = moveBuildup.slice(1);
-      board.saveGame();
     }
     
     board.drawBoard();
@@ -148,43 +135,52 @@ function keyPressed() {
     
     board.moveDown();
   }
-
-  board.saveGame();
 }
 
-function swiped(event) {
+$("#defaultCanvas0").on("swipeleft", () => {
   if (endGame)
     return;
 
-  if (event.angle > 135 || event.angle < -135) {
-    if (board.boardMove) {
-      moveBuildup.push(1);
-      return;
-    }
-    
-    board.moveLeft();
-  } else if (event.angle < -45 && event.angle >= -135) {
-    if (board.boardMove) {
-      moveBuildup.push(2);
-      return;
-    }
-    
-    board.moveUp();
-  } else if (event.angle < 45 && event.angle >= -45) {
+  if (board.boardMove) {
+    moveBuildup.push(1);
+    return;
+  }
+  
+  board.moveLeft();
+});
+
+$("#defaultCanvas0").on("swipeup", () => {
+  if (endGame)
+    return;
+
+  if (board.boardMove) {
+    moveBuildup.push(2);
+    return;
+  }
+  
+  board.moveUp();
+});
+
+$("#defaultCanvas0").on("swiperight", () => {
+  if (endGame)
+    return;
+
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
     board.moveRight();
-  } else if (event.angle > 45 && event.angle <= 135) {
-    if (board.boardMove) {
-      moveBuildup.push(4);
-      return;
-    }
-    
-    board.moveDown();
-  }
+});
 
-  board.saveGame();
-}
+$("#defaultCanvas0").on("swipedown", () => {
+  if (endGame)
+    return;
+
+  if (board.boardMove) {
+    moveBuildup.push(4);
+    return;
+  }
+  
+  board.moveDown();
+});
