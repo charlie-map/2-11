@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 /* PASSWORD SAFETY & AUTH */
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
-const session = require('express-session');
+const cookieParser = require('cookie-parser');
 const { v4: uuidv4 } = require('uuid');
 
 const email_validator = require("email-validator");
@@ -25,18 +25,25 @@ const connection = mysql.createConnection({
 });
 
 function loggedIn(req, res, next) {
-	if (!req.session.user_id || !req.session.auth_token)
+	if (!req.cookies.user_id || !req.cookies.auth_token)
 		return res.redirect("/");
 
-	connection.query("SELECT authToken FROM auth WHERE user_id=?", req.session.user_id, (err, authToken) => {
-		if (err) 
+	connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
+		if (err)
 			return res.render("error", {
 				error
 			});
 
-		if (authToken.length && authToken[0].authToken == req.session.auth_token)
-			return next();
-		else
+		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && getDifferenceInDays(new Date(), new Date(authToken[0].deathDate) <= 1)) {
+			connection.query("UPDATE auth SET tokenDeath=86400000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+				if (err) {
+					console.error(err);
+					return res.redirect("/");
+				}
+
+				return next();
+			});
+		} else
 			res.redirect("/");
 	});
 }
@@ -45,15 +52,7 @@ app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({
 	extended: false
 }));
-
-app.use(session({
-	secret: process.env.SESSION_SECRET,
-	resave: false,
-	saveUninitialized: true,
-	cookie: { 
-		maxAge: 600000
-	}
-}))
+app.use(cookieParser());
 
 app.use((err, req, res, next) => {
 	console.log("ERROR OCCURRED: ", err);
@@ -68,6 +67,7 @@ app.engine('mustache', mustache());
 app.get("/", (req, res, next) => {
 	res.render("index", {
 		LOGGED_IN: false,
+		WINS: 0,
 		LEADERBOARD_OPEN: 0,
 		BEST_BLOCK: 2,
 		LEADERBOARD_PROPERTY: "Best score"
@@ -121,7 +121,7 @@ let propertiesSQL = {
 app.get("/l", loggedIn, (req, res, next) => {
 	connection.query(`SELECT id, username, game.*, streak.* FROM user INNER JOIN game
 		ON user.id=game.user_id INNER JOIN streak ON
-		user.id=streak.user_id WHERE user.id=?`, req.session.user_id, async (err, user_data) => {
+		user.id=streak.user_id WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
 
 		// update streak
@@ -208,7 +208,7 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 	if (propNum == undefined)
 		return res.send("1");
 
-	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.session.user_id], (err) => {
+	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.cookies.user_id], (err) => {
 		if (err) return next(err);
 
 		return res.send("0-" + propertiesUI[propNum]);
@@ -216,7 +216,7 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 });
 
 app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
-	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.session.user_id, (err, user_data) => {
+	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.cookies.user_id, (err, user_data) => {
 		if (err) return next(err);
 
 		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
@@ -271,7 +271,7 @@ app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
 app.get("/toggle-leaderboard/:onoff", loggedIn, (req, res, next) => {
 	let toggleStatus = req.params["onoff"];
 
-	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.session.user_id], (err) => {
+	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.cookies.user_id], (err) => {
 		if (err) return next(err);
 
 		res.send("");
@@ -283,15 +283,15 @@ app.post("/save-game", loggedIn, (req, res, next) => {
 		return res.send("1");
 
 	let realCurrentScore = req.body.currentScore.substr(8);
-	connection.query("SELECT bestScore FROM game WHERE user_id=?", req.session.user_id, (err, bestscore) => {
+	connection.query("SELECT bestScore FROM game WHERE user_id=?", req.cookies.user_id, (err, bestscore) => {
 		if (err || !bestscore || !bestscore.length) return next(err);
 
 		let newBestScore = bestscore[0].bestScore < realCurrentScore ? realCurrentScore : bestscore[0].bestScore;
 
-		connection.query("UPDATE game SET bestScore=?, currentScore=? WHERE user_id=?", [newBestScore, realCurrentScore, req.session.user_id], (err) => {
+		connection.query("UPDATE game SET bestScore=?, currentScore=? WHERE user_id=?", [newBestScore, realCurrentScore, req.cookies.user_id], (err) => {
 			if (err) return next(err);
 
-			connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [req.body.board, req.session.user_id], (err) => {
+			connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [req.body.board, req.cookies.user_id], (err) => {
 				if (err) return next(err);
 
 				res.send("0");
@@ -323,7 +323,7 @@ app.get("/update-best-block/:newblock", loggedIn, (req, res, next) => {
 	if (!allowed_blocks[req.params["newblock"]])
 		return res.send("1");
 
-	connection.query("UPDATE game SET bestBlock=? WHERE user_id=?", [req.params["newblock"], req.session.user_id], (err) => {
+	connection.query("UPDATE game SET bestBlock=? WHERE user_id=?", [req.params["newblock"], req.cookies.user_id], (err) => {
 		if (err) return next(err);
 
 		return res.send("0");
@@ -386,19 +386,19 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 		killerPiece == 8 ? "killedBy8=(SELECT killedBy8 FROM game WHERE user_id=?)+1" :
 		"killedBy2=(SELECT killedBy2 FROM game WHERE user_id=?)+1"},
 		totalGames=(SELECT totalGames FROM game WHERE user_id=?)+1 WHERE user_id=?`,
-		[req.session.user_id, scores.bestBlock >= 2048 ? 1 : 0, req.session.user_id,
-		scores.bestBlock < 2048 ? 1 : 0, req.session.user_id, req.session.user_id, req.session.user_id, req.session.user_id, req.session.user_id], (err) => {
+		[req.cookies.user_id, scores.bestBlock >= 2048 ? 1 : 0, req.cookies.user_id,
+		scores.bestBlock < 2048 ? 1 : 0, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id], (err) => {
 			if (err) return next(err);
 
 			connection.query(`INSERT INTO board_history (user_id, wholeBoard, score, startTime, endTime) VALUES
 				(?, ?, ?, (SELECT startTime FROM current_board WHERE user_id=?), ?)`,
-				[req.session.user_id, req.body.board, score, req.session.user_id, new Date()], async (err) => {
+				[req.cookies.user_id, req.body.board, score, req.cookies.user_id, new Date()], async (err) => {
 					if (err) return next(err);
 
 					let prevAvgScore_totalGames;
 					try {
 						prevAvgScore_totalGames = await new Promise((resolve, reject) => {
-							connection.query("SELECT averageScore, totalGames FROM game WHERE user_id=?", req.session.user_id, (err, avgScore) => {
+							connection.query("SELECT averageScore, totalGames FROM game WHERE user_id=?", req.cookies.user_id, (err, avgScore) => {
 								if (err || !avgScore || !avgScore.length) return reject(err);
 
 								resolve({
@@ -413,7 +413,7 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 				
 					connection.query("UPDATE game SET averageScore=? WHERE user_id=?",
 						[((prevAvgScore_totalGames.avS * (prevAvgScore_totalGames.tG - 1)) / (prevAvgScore_totalGames.tG)) +
-						(score / prevAvgScore_totalGames.tG), req.session.user_id], (err) => {
+						(score / prevAvgScore_totalGames.tG), req.cookies.user_id], (err) => {
 							if (err) return next(err);
 
 							return res.send("0");
@@ -550,9 +550,9 @@ app.post("/signup", async (req, res, next) => {
 					if (err)
 						return next(err);
 
-					req.session.cookie.expires = false;
-					req.session.user_id = u_id;
-					req.session.auth_token = newUUID;
+					req.cookies.cookie.expires = false;
+					req.cookies.user_id = u_id;
+					req.cookies.auth_token = newUUID;
 
 					res.json({
 						success: 1,
@@ -631,7 +631,7 @@ app.post("/login", (req, res, next) => {
 			if (result) {
 				let newUUID = uuidv4();
 
-				connection.query("UPDATE auth SET authToken=? WHERE user_id=?;",
+				connection.query("UPDATE auth SET authToken=?, tokenDeath=86400000 WHERE user_id=?;",
 					[newUUID, user_password[0].id], async (err) => {
 					if (err)
 						return next(err);
@@ -643,9 +643,8 @@ app.post("/login", (req, res, next) => {
 						return next(error);
 					}
 
-					req.session.cookie.expires = false;
-					req.session.user_id = user_password[0].id;
-					req.session.auth_token = newUUID;
+					res.cookie("user_id", user_password[0].id, { maxAge: 86400000, httpOnly: true });
+					res.cookie("auth_token", newUUID, { maxAge: 86400000, httpOnly: true });
 
 					res.json({
 						success: 1,

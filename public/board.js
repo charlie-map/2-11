@@ -208,6 +208,19 @@ class Board {
     this.boardMove = movingPieces ? 1 : 0;
 
     if (!this.boardMove && !this.canMove() && !this.endGameRequest) {
+      if (activeLeaderboardProperty == "Average score" ||
+          activeLeaderboardProperty == "Wins" ||
+          activeLeaderboardProperty == "% Wins") {
+        let lTab = $(".leaderboard-tab");
+        $(lTab).removeClass("open")
+        leaderboardCreate(lTab, 0);
+
+        setTimeout(function() {
+          $(lTab).addClass("open");
+          leaderboardCreate(lTab, 0);
+        }, 800);
+      }
+
       this.endGameRequest = 1;
 
       $.post("/game-over", {

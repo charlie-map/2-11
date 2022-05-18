@@ -115,6 +115,12 @@ window.onresize = function() {
 }
 
 $("#new-game").click(function() {
+	$.post("/game-over", {
+		board: JSON.stringify(board.board),
+		score: metaPoints,
+		killerPiece: 0
+	});
+
 	metaPoints = 0, points = 0;
 	endGame = 0;
 	opacityEndRoller = 60
@@ -124,10 +130,6 @@ $("#new-game").click(function() {
 	$("#current-score").text("0");
 
 	setup(1);
-
-	$.post("/game-over", {
-
-	});
 });
 
 function checkUserRankLeaderboard(newMetaPoints) {
