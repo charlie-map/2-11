@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta charset="utf-8" />
+		
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet">
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
+		
+		<link rel="icon" href="2-11TileIcon.png">
+		<title>2^11 ● {{LOG_OR_SIGN}}</title>
+	</head>
+	<body class="column">
+		<div id="page-title">2<p class="shooter">^</p>11 {{LOG_OR_SIGN}}</div>
+		<div class="session">
+			<div id="nice-image" class="left">
+				<img src="2-11TileIcon.png" alt="2-11 Favicon">
+			</div>
+			<form action="" id="big-ol-form" class="log-in" autocomplete="off">
+				<h4 class="barlow">{{LOG_OR_SIGN}} <span>2^11</span></h4>
+				<p class="barlow">
+					{{#LOGGING_IN}}
+						Welcome back! Log in to get back to the game:
+					{{/LOGGING_IN}}
+					{{^LOGGING_IN}}
+						Welcome! Sign up to start your <span>2^11</span> journey:
+					{{/LOGGING_IN}}
+				</p>
+				{{#LOGGING_IN}}
+					<div class="floating-label">
+						<input class="barlow" placeholder="Username or email" type="username" name="username" id="username" autocomplete="off">
+						<label class="barlow" for="username">Username or email: <span id="username-email-unknown" class="barlow">unknown</span></label>
+						
+						<div class="icon">
+							<?xml version="1.0" encoding="UTF-8"?>
+							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
+						</div>
+					</div>
+				{{/LOGGING_IN}}
+				{{^LOGGING_IN}}
+					<div class="floating-label">
+						<input class="barlow" placeholder="Email" type="email" name="email" id="email" autocomplete="off">
+						<label class="barlow" for="email">Email: <span id="email-taken" class="barlow">taken</span></label>
+						
+						<div class="icon">
+							<?xml version="1.0" encoding="UTF-8"?>
+							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Mail</title><rect x="48" y="96" width="416" height="320" rx="40" ry="40" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M112 160l144 112 144-112"/></svg>
+						</div>
+					</div>
+					<div class="floating-label">
+						<input class="barlow" placeholder="Username" type="text" name="username" id="username" autocomplete="off">
+						<label id="username-label" class="barlow" for="username">Username: <span id="username-taken" class="barlow">taken</span></label>
+						
+						<div class="icon">
+							<?xml version="1.0" encoding="UTF-8"?>
+							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
+						</div>
+					</div>
+				{{/LOGGING_IN}}
+				
+				<div id="password-container" class="floating-label {{LOG_OR_SIGN}}">
+					<input class="barlow" placeholder="Password" type="password" name="password" id="password" autocomplete="off">
+					<label class="barlow" for="password">Password: <span id="login-password-invalid" class="barlow">invalid</span></label>
+					
+					<div class="icon">
+						<?xml version="1.0" encoding="UTF-8"?>
+						<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Lock Closed</title><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+					</div>
+				</div>
+
+				<div class="registration-button-group">
+					{{#LOGGING_IN}}
+						<span class="barlow">No account? <a href="/signup">Signup</a></span>
+					{{/LOGGING_IN}}
+					{{^LOGGING_IN}}
+						<span class="barlow">Already have an account? <a href="/login">Login</a></span>
+					{{/LOGGING_IN}}
+					<button id="register" class="yellow-button" type="submit">{{LOG_OR_SIGN}}</button>
+				</div>
+			</form>
+		</div>
+
+		<div id="choose-board">
+			<p style="margin-top: 0px; margin-bottom: 7px;" class="barlow">You have an active game running with a different game loaded on the account <span style="font-size: 24px; line-height: 8px" id="choose-board-username"></span>. Which one would you like to continue with?</p>
+			<div class="display-choice-boards">
+				<div class="display-board" id="local-board">
+
+					<div id="choose-local-board" class="board-picker">Local board</div>
+				</div>
+				<div class="display-board" id="remote-board">
+
+					<div id="choose-remote-board" class="board-picker">Remote board</div>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			let loggedIn = {{LOGGED_IN}};
+			let logging_in = {{LOGGING_IN}};
+		</script>
+		<script src="primary.js"></script>
+	</body>
+</html>

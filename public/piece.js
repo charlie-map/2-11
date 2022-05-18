@@ -9,7 +9,7 @@ class Piece {
     this.num = num;
     this.c = c;
     
-    this.og_growth = 10;
+    this.og_growth = 4;
     this.animation_time = 0;
     
     this.moveDirection = 0;
@@ -29,7 +29,7 @@ class Piece {
     if (this.moveAmount <= 0)
       return;
     
-    let mover = this.moveAmount > 30 ? 30 : this.moveAmount;
+    let mover = this.moveAmount > 35 ? 35 : this.moveAmount;
     if (this.moveDirection == 1) { // left
       this.x -= mover;
     } else if (this.moveDirection == 2) { // up
@@ -40,7 +40,7 @@ class Piece {
       this.y += mover;
     }
     
-    this.moveAmount -= 30;
+    this.moveAmount -= 35;
   }
   
   upgrade() {
@@ -121,7 +121,7 @@ class Piece {
     
     pop();
     
-    this.animation_time -= this.animation_time >= 0 ? 1 : 0;
+    this.animation_time -= this.animation_time > 0 ? 1 : 0;
     this.og_growth -= this.og_growth > 0 ? 1 : 0;
   }
 }
