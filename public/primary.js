@@ -375,20 +375,27 @@ function differentNumbers(board1, board2) {
 	let tilesBoard1 = 0, tilesBoard2 = 0;
 
 	for (let x = 0; x < 4; x++) {
+		if (!board1[x] && !board2[x])
+			continue
+		else if (board1[x]) {
+			isDifferent = 1;
+		} else if (board2[x]) {
+			isDifferent = 1;
+		}
+
 		for (let y = 0; y < 4; y++) {
-			if (board1[x][y] && board2[x][y]) {
+			if (board1[x] && board1[x][y] && board2[x] && board2[x][y]) {
 				if (board1[x][y].num != board2[x][y].num)
 					isDifferent = 1;
-			} else if (board1[x][y]) {
+			} else if (board1[x] && board1[x][y]) {
 				tilesBoard2++;
 				isDifferent = 1;
-			} else if (board2[x][y]) {
+			} else if (board2[x] && board2[x][y]) {
 				tilesBoard1++;
 				isDifferent = 1;
 			}
 		}
 	}
-
 	if (!tilesBoard1)
 		return 0;
 	else if (!tilesBoard2)
@@ -450,7 +457,7 @@ $("#register").click(function(e) {
 			let JSONres_board = JSON.parse(res.board);
 
 			localStorage.setItem("savedBest2-11Score", res.bestScore);
-			if ((!currentLocalBoard || !JSONcurrentLocalBoard) && (res.board && JSONres_board)) {
+			if ((!currentLocalBoard || !JSONcurrentLocalBoard) || (!res.board || !JSONres_board)) {
 				localStorage.setItem("saved2-11Board", res.board);
 				localStorage.setItem("savedBest2-11Score", res.currentScore);
 

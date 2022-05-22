@@ -18,7 +18,7 @@ CREATE TABLE user (
 );
 
 CREATE TABLE auth (
-	user_id INT,
+	user_id INT UNIQUE,
 
 	authToken VARCHAR(36) NOT NULL,
 	tokenDeath BIGINT NOT NULL DEFAULT 86400000,

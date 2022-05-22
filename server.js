@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({path: __dirname + "/.env"});
 
 const express = require("express");
 const mustache = require("mustache-express");
@@ -34,10 +34,10 @@ function loggedIn(req, res, next) {
 				error
 			});
 
-		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && getDifferenceInDays(new Date(), new Date(authToken[0].deathDate) <= 1)) {
+		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
 			connection.query("UPDATE auth SET tokenDeath=86400000 WHERE user_id=?", [req.cookies.user_id], (err) => {
 				if (err) {
-					console.error(err);
+					console.log(err);
 					return res.redirect("/");
 				}
 
@@ -64,7 +64,31 @@ app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustache());
 
-app.get("/", (req, res, next) => {
+function default_login_check(req, res, next) {
+	if (!req.cookies.user_id || !req.cookies.auth_token)
+                return next();
+
+        connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
+                if (err)
+                        return res.render("error", {
+                                error
+                        });
+
+                if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
+                        connection.query("UPDATE auth SET tokenDeath=86400000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+                                if (err) {
+                                        console.error(err);
+                                        return next();
+                                }
+
+                                return res.redirect("/l");
+                        });
+                } else
+                        next();
+        });
+}
+
+app.get("/", default_login_check, (req, res, next) => {
 	res.render("index", {
 		LOGGED_IN: false,
 		WINS: 0,
@@ -105,7 +129,7 @@ function getPropertyValue(currentProperty, obj) {
 		else if (obj.totalGames == 0)
 			return "No games";
 
-		return (Math.round((obj.wins / obj.totalGames) * 100) / 100) + "%";
+		return (Math.round(obj.wins / obj.totalGames) * 100) + "%";
 	}
 }
 
@@ -546,13 +570,12 @@ app.post("/signup", async (req, res, next) => {
 				let newUUID = uuidv4();
 
 				connection.query("INSERT INTO auth (user_id, authToken, tokenDeath) VALUES (?, ?, ?);",
-					[u_id, newUUID, new Date(new Date().getTime() + 86400000)], (err) => {
+					[u_id, newUUID, 86400000], (err) => {
 					if (err)
 						return next(err);
 
-					req.cookies.cookie.expires = false;
-					req.cookies.user_id = u_id;
-					req.cookies.auth_token = newUUID;
+					res.cookie("user_id", u_id, { maxAge: 86400000, httpOnly: true });
+					res.cookie("auth_token", newUUID, { maxAge: 86400000, httpOnly: true });
 
 					res.json({
 						success: 1,
@@ -631,8 +654,8 @@ app.post("/login", (req, res, next) => {
 			if (result) {
 				let newUUID = uuidv4();
 
-				connection.query("UPDATE auth SET authToken=?, tokenDeath=86400000 WHERE user_id=?;",
-					[newUUID, user_password[0].id], async (err) => {
+				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=86400000;",
+					[user_password[0].id, newUUID, newUUID], async (err) => {
 					if (err)
 						return next(err);
 
