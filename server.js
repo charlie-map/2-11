@@ -94,9 +94,40 @@ app.get("/", default_login_check, (req, res, next) => {
 		WINS: 0,
 		LEADERBOARD_OPEN: 0,
 		BEST_BLOCK: 2,
+		BEST_SCORE: 0,
 		LEADERBOARD_PROPERTY: "Best score"
 	});
 });
+
+function leaderboardSort(lb, low, high) {
+	if (low >= high) return;
+
+	let findpivot = low - 1;
+	for (let j = low; j < high; j++) {
+		if (lb[j].wins == 0 || lb[j].totalGames == 0)
+			return leaderboardSort(lb, low, j - 1);
+
+		if (lb[high].wins == 0 || lb[high].totalGames == 0)
+			return leaderboardSort(lb, low, high - 1);
+
+		if ((lb[j].wins / lb[j].totalGames) > (lb[high].wins / lb[high].totalGames)) {
+			findpivot++;
+
+			let swapbuffer = lb[j];
+			lb[j] = lb[findpivot];
+			lb[findpivot] = swapbuffer;
+		}
+	}
+
+	findpivot++;
+
+	let swapbuffer = lb[high];
+	lb[high] = lb[findpivot];
+	lb[findpivot] = swapbuffer;
+
+	leaderboardSort(lb, low, findpivot - 1);
+	leaderboardSort(lb, findpivot + 1, high);
+}
 
 let properties = {
 	0: "bestScore",
@@ -129,7 +160,7 @@ function getPropertyValue(currentProperty, obj) {
 		else if (obj.totalGames == 0)
 			return "No games";
 
-		return (Math.round(obj.wins / obj.totalGames) * 100) + "%";
+		return (Math.round((obj.wins / obj.totalGames) * 100)) + "%";
 	}
 }
 
@@ -162,6 +193,9 @@ app.get("/l", loggedIn, (req, res, next) => {
 			let onLeaderboard = 0, user_special_rank = 0;
 			let u_dat = user_data[0];
 			let leaderboardIndex = [];
+
+                        if (u_dat.leaderboardProperty == 4)
+                                leaderboardSort(users, 0, users.length - 1);
 
 			for (let i = 0; i < users.length; i++) {
 				if (i >= 20) {
@@ -252,6 +286,9 @@ app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
 
 			let onLeaderboard = 0
 			let lowUser = null;
+
+                        if (u_dat.leaderboardProperty == 4)
+                                leaderboardSort(users, 0, users.length - 1);
 
 			for (let i = 0; i < users.length; i++) {
 				if (i >= 20) {

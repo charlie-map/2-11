@@ -140,7 +140,7 @@
 								Best
 							 	<div class="sub-scorer">
 									<p id="best-score">
-										0
+										{{#LOGGED_IN}}{{BEST_SCORE}}{{/LOGGED_IN}}{{^LOGGED_IN}}0{{/LOGGED_IN}}
 									</p>
 								</div>
 							</div>
@@ -236,6 +236,11 @@
 			let levelConverter;
 			let bestPoints = localStorage.getItem("savedBest2-11Score");
 			bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
+
+			if ({{{BEST_SCORE}}} > bestPoints) {
+				bestPoints = {{{BEST_SCORE}}};
+				localStorage.setItem("savedBest2-11Score", {{{BEST_SCORE}}});
+			}
 			let points = 0, metaPoints = 0;
 
 			let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
