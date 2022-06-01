@@ -7,14 +7,15 @@ function LeaderboardPositionCheck() {
 			position: "relative",
 			left: "0px"
 		});
-		let leaderboardEntries = $(".leaderboard-entry").length;
+		let leaderboardEntries = $("#leaderboard").children().length;
 		$(".meta-leaderboard-holder").css({
 			width: "calc(100% + 34px)",
 			"margin-left": "-34px",
-			height: 46 * leaderboardEntries + 68 + "px"
+			height: 52 * leaderboardEntries + 102 + "px",
+			"max-height": "246px"
 		});
 		$("#leaderboard").css({
-			height: 46 * leaderboardEntries + "px",
+			height: 52 * leaderboardEntries + "px",
 			top: "34px",
 			"padding-left": "68px",
 			"padding-bottom": leaderboardEntries > 1 ? "34px" : "0px"
@@ -23,6 +24,9 @@ function LeaderboardPositionCheck() {
 		$("#page-body").after($(".ultra-meta-leaderboard-holder"));
 
 		$(".leaderboard-entry").addClass("in-frame");
+		$("#how-to-play").css({
+			"margin-top": (leaderboardEntries < 4 ? "-68px" : "0px")
+		});
 	}
 }
 
@@ -623,6 +627,10 @@ function leaderboardCreate(Lboard, boardClose) {
 					}
 				}, i * 40, [LEADERBOARD_USERS[i], i]);
 			}
+
+			setTimeout(function() {
+				LeaderboardPositionCheck();
+			}, LEADERBOARD_USERS.length * 40);
 		});
 
 		$.get("/toggle-leaderboard/1", (res) => {
