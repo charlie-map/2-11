@@ -866,7 +866,9 @@ a {
 	border: 5px solid rgba(10, 87, 90, 1);
 	border-radius: 5px;
 
-	margin: 5px;
+  margin-top: 5px;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .final-tag {
@@ -1681,4 +1683,8 @@ input:focus {
     opacity: 0;
     transform: translateY(-10em) scale(0);
   }
+}
+
+@media only screen and (max-width: 1220) {
+
 }

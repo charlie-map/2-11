@@ -1,4 +1,30 @@
 let LEADERBOARD_USERS;
+function LeaderboardPositionCheck() {
+	let bodyWidth = $("body").outerWidth(false);
+
+	if (bodyWidth < 1225) {
+		$(".ultra-meta-leaderboard-holder").css({
+			position: "relative",
+			left: "0px"
+		});
+		let leaderboardEntries = $(".leaderboard-entry").length;
+		$(".meta-leaderboard-holder").css({
+			width: "calc(100% + 34px)",
+			"margin-left": "-34px",
+			height: 46 * leaderboardEntries + 68 + "px"
+		});
+		$("#leaderboard").css({
+			height: 46 * leaderboardEntries + "px",
+			top: "34px",
+			"padding-left": "68px",
+			"padding-bottom": leaderboardEntries > 1 ? "34px" : "0px"
+		});
+
+		$("#page-body").after($(".ultra-meta-leaderboard-holder"));
+
+		$(".leaderboard-entry").addClass("in-frame");
+	}
+}
 
 $(document).ready(function() {
 	if ($(".dropdown-noti").hasClass("logged-in-box"))
@@ -54,6 +80,7 @@ $(document).ready(function() {
 				}
 
 				isInLeaderboardFrame();
+				LeaderboardPositionCheck();
 				LEADERBOARD_USERS = res.users;
 			});
 
@@ -757,6 +784,9 @@ function isScrolledIntoView(elem) {
 }
 
 function isInLeaderboardFrame() {
+	if ($("body").outerWidth(false) < 1225)
+		return;
+
 	let leaderboardGroup = $("#leaderboard").children();
 
 	for (let i = 0; i < leaderboardGroup.length; i++) {
