@@ -1,13 +1,19 @@
 let LEADERBOARD_USERS;
-function LeaderboardPositionCheck() {
+// isOpening: decides whether "in-frame" should be added
+// 1 for adding "in-frame" class
+// 0 for not adding "in-frame" class
+function LeaderboardPositionCheck(isOpening) {
 	let bodyWidth = $("body").outerWidth(false);
 
 	if (bodyWidth < 1225) {
+		let leaderboardEntries = $("#leaderboard").children().length;
+
 		$(".ultra-meta-leaderboard-holder").css({
 			position: "relative",
-			left: "0px"
+			left: "0px",
+			"border-bottom": leaderboardEntries > 4 ? "solid 1px grey" : "none"
 		});
-		let leaderboardEntries = $("#leaderboard").children().length;
+
 		$(".meta-leaderboard-holder").css({
 			width: "calc(100% + 34px)",
 			"margin-left": "-34px",
@@ -18,14 +24,84 @@ function LeaderboardPositionCheck() {
 			height: 52 * leaderboardEntries + "px",
 			top: "34px",
 			"padding-left": "68px",
-			"padding-bottom": leaderboardEntries > 1 ? "34px" : "0px"
+			width: "400px"
+			// "padding-bottom": leaderboardEntries > 1 ? "34px" : "0px"
 		});
+
+		if (!isOpening) {
+			$("#how-to-play").css({
+				"margin-top": (leaderboardEntries < 4 ? "-68px" : "0px")
+			});
+
+			return;
+		}
 
 		$("#page-body").after($(".ultra-meta-leaderboard-holder"));
 
 		$(".leaderboard-entry").addClass("in-frame");
 		$("#how-to-play").css({
 			"margin-top": (leaderboardEntries < 4 ? "-68px" : "0px")
+		});
+
+		$($("#how-to-play").children("p")[0]).css({
+			"margin-top": "0px"
+		});
+		$("#leaderboard").last().css({ "margin-bottom": "0 !important" })
+		$(".user-personal-low").css({
+			"margin-top": "6px",
+			"padding-left": "34px",
+			width: $($(".leaderboard-entry")[0]).outerWidth(false)
+		});
+	} else {
+		$(".ultra-meta-leaderboard-holder").removeAttr("style");
+		$(".meta-leaderboard-holder").removeAttr("style");
+		$("#leaderboard").removeAttr("style");
+
+		$("#how-to-play").css({
+			"margin-top": "0px"
+		});
+
+		$(".user-personal-low").removeAttr("style");
+
+		$(".leaderboard-property-choices").after($(".ultra-meta-leaderboard-holder"));
+
+		let set_width = $(document).outerWidth(false) - 460;
+		set_width = set_width > 400 ? 400 : set_width;
+		$("#leaderboard").css({
+			width: set_width
+		});
+		$(".user-personal-low").css({
+			width: set_width - 8
+		});
+		$(".meta-leaderboard-holder").css({
+			width: $(document).outerWidth(false)
+		});
+		$(".ultra-meta-leaderboard-holder").css({
+			left: "calc(50% + " + (300 * 0.5) + "px)"
+		});
+
+		if (!wantsLeaderboardOpen) {
+			$("#leaderboard").html("");
+			$(".leaderboard-scrollbar").hide();
+		} else {
+			$(".leaderboard-entry").addClass("fade-in");
+			$(".leaderboard-tab").addClass("open");
+			$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
+			$(".user-personal-low").addClass("fade-in");
+
+			let normalHeight = 19;
+			let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+
+			if (checkHeight > normalHeight) {
+				$(".leaderboard-property-choice-hider").addClass("large");
+			}
+		}
+
+		isInLeaderboardFrame();
+
+		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
+		$(".user-column").css({
+			left: user_column_left - $(".user-column").outerWidth(false)
 		});
 	}
 }
@@ -84,7 +160,7 @@ $(document).ready(function() {
 				}
 
 				isInLeaderboardFrame();
-				LeaderboardPositionCheck();
+				LeaderboardPositionCheck(1);
 				LEADERBOARD_USERS = res.users;
 			});
 
@@ -124,6 +200,7 @@ window.onresize = function() {
 			left: "calc(50% + " + (300 * 0.5) + "px)"
 		});
 		isInLeaderboardFrame();
+		LeaderboardPositionCheck(1);
 
 		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 		$(".user-column").css({
@@ -584,6 +661,7 @@ function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
 		$(Lboard).find("rect").attr("fill", "#ddcee2");
 		$(".user-personal-low").addClass("fade-in");
+		LeaderboardPositionCheck(1);
 
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.leaderboardIndex;
@@ -620,17 +698,16 @@ function leaderboardCreate(Lboard, boardClose) {
 					if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
 						setTimeout(function() {
 							isInLeaderboardFrame();
+							
 							$(".leaderboard-scrollbar-position").css({
 								height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
 							});
 						}, 800);
 					}
+
+					LeaderboardPositionCheck(1);
 				}, i * 40, [LEADERBOARD_USERS[i], i]);
 			}
-
-			setTimeout(function() {
-				LeaderboardPositionCheck();
-			}, LEADERBOARD_USERS.length * 40);
 		});
 
 		$.get("/toggle-leaderboard/1", (res) => {
@@ -655,6 +732,7 @@ function leaderboardCreate(Lboard, boardClose) {
 
 				setTimeout(function(e) {
 					$(e).remove();
+					LeaderboardPositionCheck(0);
 				}, 800, e);
 			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 60, $(delete_child[i]));
 		}

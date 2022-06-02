@@ -991,7 +991,7 @@ a {
 }
 
 .leaderboard-property-choices {
-  position: absolute;
+  position: fixed;
 
   z-index: -1;
   opacity: 0;
