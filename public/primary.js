@@ -80,25 +80,6 @@ function LeaderboardPositionCheck(isOpening) {
 			left: "calc(50% + " + (300 * 0.5) + "px)"
 		});
 
-		if (!wantsLeaderboardOpen) {
-			$("#leaderboard").html("");
-			$(".leaderboard-scrollbar").hide();
-		} else {
-			$(".leaderboard-entry").addClass("fade-in");
-			$(".leaderboard-tab").addClass("open");
-			$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
-			$(".user-personal-low").addClass("fade-in");
-
-			let normalHeight = 19;
-			let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
-
-			if (checkHeight > normalHeight) {
-				$(".leaderboard-property-choice-hider").addClass("large");
-			}
-		}
-
-		isInLeaderboardFrame();
-
 		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 		$(".user-column").css({
 			left: user_column_left - $(".user-column").outerWidth(false)
@@ -199,8 +180,8 @@ window.onresize = function() {
 			width: $(window).outerWidth(false),
 			left: "calc(50% + " + (300 * 0.5) + "px)"
 		});
-		isInLeaderboardFrame();
 		LeaderboardPositionCheck(1);
+		isInLeaderboardFrame();
 
 		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 		$(".user-column").css({
@@ -661,7 +642,8 @@ function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
 		$(Lboard).find("rect").attr("fill", "#ddcee2");
 		$(".user-personal-low").addClass("fade-in");
-		LeaderboardPositionCheck(1);
+		if ($("body").outerWidth(false) < 1225)
+			LeaderboardPositionCheck(1);
 
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.leaderboardIndex;
@@ -705,7 +687,8 @@ function leaderboardCreate(Lboard, boardClose) {
 						}, 800);
 					}
 
-					LeaderboardPositionCheck(1);
+					if ($("body").outerWidth(false) < 1225)
+						LeaderboardPositionCheck(1);
 				}, i * 40, [LEADERBOARD_USERS[i], i]);
 			}
 		});
@@ -732,7 +715,9 @@ function leaderboardCreate(Lboard, boardClose) {
 
 				setTimeout(function(e) {
 					$(e).remove();
-					LeaderboardPositionCheck(0);
+
+					if ($("body").outerWidth(false) < 1225)
+						LeaderboardPositionCheck(0);
 				}, 800, e);
 			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 60, $(delete_child[i]));
 		}

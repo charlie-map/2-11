@@ -1686,5 +1686,8 @@ input:focus {
 }
 
 @media only screen and (max-width: 1220) {
-
+	#all-content {
+		background: red;
+		transform: scale(1.2);
+	}
 }
