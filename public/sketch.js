@@ -61,7 +61,7 @@ function setup(isRestart) {
   };
 
   // document.body registers gestures anywhere on the page
-  let hammer = new Hammer(document.body, options);
+  hammer = new Hammer(document.body, options);
   hammer.get('swipe').set({
     direction: Hammer.DIRECTION_ALL
   });
@@ -118,28 +118,29 @@ function keyPressed() {
   if (endGame)
     return;
 
-  if (keyCode == LEFT_ARROW) {
+  key = key.toLowerCase();
+  if (keyCode == LEFT_ARROW || key == 'a' || key == 'h') {
     if (board.boardMove) {
       moveBuildup.push(1);
       return;
     }
     
     board.moveLeft();
-  } else if (keyCode == UP_ARROW) {
+  } else if (keyCode == UP_ARROW || key == 'w' || key == 'k') {
     if (board.boardMove) {
       moveBuildup.push(2);
       return;
     }
     
     board.moveUp();
-  } else if (keyCode == RIGHT_ARROW) {
+  } else if (keyCode == RIGHT_ARROW || key == 'd' || key == 'l') {
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
     board.moveRight();
-  } else if (keyCode == DOWN_ARROW) {
+  } else if (keyCode == DOWN_ARROW || key == 's' || key == 'j') {
     if (board.boardMove) {
       moveBuildup.push(4);
       return;

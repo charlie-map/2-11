@@ -136,7 +136,7 @@ class Board {
         this.orderedPieces[i].itemToMerge = null;
 
         this.orderedPieces[i].upgrade();
-        this.orderedPieces[i].animation_time = 6;
+        this.orderedPieces[i].animation_time = 2;
       }
     }
 
