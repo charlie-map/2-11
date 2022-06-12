@@ -61,12 +61,14 @@ function setup(isRestart) {
   };
 
   // document.body registers gestures anywhere on the page
-  hammer = new Hammer(document.body, options);
-  hammer.get('swipe').set({
-    direction: Hammer.DIRECTION_ALL
-  });
+  if (!hammer) {
+    hammer = new Hammer(document.body, options);
+    hammer.get('swipe').set({
+      direction: Hammer.DIRECTION_ALL
+    });
 
-  hammer.on("swipe", swiped);
+    hammer.on("swipe", swiped);
+  }
 }
 
 function draw() {
