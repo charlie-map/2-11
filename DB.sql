@@ -14,6 +14,8 @@ CREATE TABLE user (
 
 	joindate DATE NOT NULL,
 
+	darkmode INT NOT NULL DEFAULT 0,
+
 	PRIMARY KEY(id)
 );
 
@@ -21,7 +23,7 @@ CREATE TABLE auth (
 	user_id INT UNIQUE,
 
 	authToken VARCHAR(36) NOT NULL,
-	tokenDeath BIGINT NOT NULL DEFAULT 86400000,
+	tokenDeath BIGINT NOT NULL DEFAULT 2629800000,
 
 	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
 );
