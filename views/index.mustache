@@ -12,12 +12,12 @@
 		<script src="p5.sound.min.js"></script>
 		<script src="swipe.min.js"></script>
 
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+		<script src="jquery-3.6.0.min.js"></script>
 
 		<link rel="icon" href="2-11TileIcon.png">
 		<title>2^11</title>
 	</head>
-	<body>
+	<body class="{{DARKMODE}}">
 		{{#LOGGED_IN}}
 		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 305px;{{/LEADERBOARD_OPEN}}">
 			<!-- <div class="column-tab profile">
@@ -95,6 +95,13 @@
 					<div class="particle"></div>
 				</div>{{/STREAK_FIRE}}{{CURRENT_STREAK}}</div>
 			</div>
+
+			<div class="darkmode-status barlow">
+				Darkmode: <div class="active-darkmode barlow">{{#DARKMODE_ACTIVE}}on{{/DARKMODE_ACTIVE}}{{^DARKMODE_ACTIVE}}off{{/DARKMODE_ACTIVE}}</div>
+			</div>
+			<div class="darkmode-wrapper">
+				<input type="checkbox" name="checkbox" class="switch">
+			</div>
 		</div>
 		{{/LOGGED_IN}}
 	  	<div id="all-content">
@@ -149,9 +156,9 @@
 					<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
 						<div style="display: flex; flex-direction: column; justify-content: center;">
 							<p class="barlow">Join the tiles to get to 2^11 (2048)!</p>
-							<a id="go-to-how-to" href="#how-to-play">How to play ➞</a>
+							<a id="go-to-how-to" class="{{DARKMODE}}" href="#how-to-play">How to play ➞</a>
 						</div>
-						<div id="new-game">
+						<div id="new-game" class="{{DARKMODE}}">
 							New game
 						</div>
 					</div>
@@ -163,7 +170,7 @@
 				<p class="barlow" style="line-height: 26px">
 					Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
 				</p>
-				<a id="go-to-title" href="#page-title">Start playing ➞</a>
+				<a id="go-to-title" class="{{DARKMODE}}" href="#page-title">Start playing ➞</a>
 
 				<hr>
 
@@ -228,6 +235,8 @@
 			let currentWins = {{{WINS}}};
 			let highestPiece = {{{BEST_BLOCK}}}, mostRecentPiece = 2;
 			let loggedIn = {{{LOGGED_IN}}};
+
+			let darkmode = {{{DARKMODE_ACTIVE}}};
 
 			let hammer = undefined;
 			let endGame = 0;

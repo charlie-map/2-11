@@ -35,7 +35,7 @@ function loggedIn(req, res, next) {
 			});
 
 		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
-			connection.query("UPDATE auth SET tokenDeath=86400000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
 				if (err) {
 					console.log(err);
 					return res.redirect("/");
@@ -75,7 +75,7 @@ function default_login_check(req, res, next) {
                         });
 
                 if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
-                        connection.query("UPDATE auth SET tokenDeath=86400000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+                        connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
                                 if (err) {
                                         console.error(err);
                                         return next();
@@ -93,6 +93,7 @@ app.get("/", default_login_check, (req, res, next) => {
 		LOGGED_IN: false,
 		WINS: 0,
 		LEADERBOARD_OPEN: 0,
+		DARKMODE: "\"\"",
 		BEST_BLOCK: 2,
 		BEST_SCORE: 0,
 		LEADERBOARD_PROPERTY: "Best score"
@@ -174,7 +175,7 @@ let propertiesSQL = {
 }
 
 app.get("/l", loggedIn, (req, res, next) => {
-	connection.query(`SELECT id, username, game.*, streak.* FROM user INNER JOIN game
+	connection.query(`SELECT id, username, darkmode, game.*, streak.* FROM user INNER JOIN game
 		ON user.id=game.user_id INNER JOIN streak ON
 		user.id=streak.user_id WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
 		if (err || !user_data || !user_data.length) return res.render("error");
@@ -228,6 +229,9 @@ app.get("/l", loggedIn, (req, res, next) => {
 				LOGGED_IN: true,
 				USERNAME: u_dat.username,
 
+				DARKMODE_ACTIVE: u_dat.darkmode,
+				DARKMODE: u_dat.darkmode == 1 ? "darkmode" : "",
+
 				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
 				LEADERBOARD_PROPERTY: propertiesUI[u_dat.leaderboardProperty],
 				LARGE_LEADERBOARD_PROPERTY: u_dat.leaderboardProperty == 3 ? true : false,
@@ -273,7 +277,7 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 	});
 });
 
-app.get("/updated-leaderboard", loggedIn, (req, res, next) => {
+app.get("/updated-leaderboard", (req, res, next) => {
 	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.cookies.user_id, (err, user_data) => {
 		if (err) return next(err);
 
@@ -333,6 +337,16 @@ app.get("/toggle-leaderboard/:onoff", loggedIn, (req, res, next) => {
 	let toggleStatus = req.params["onoff"];
 
 	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.cookies.user_id], (err) => {
+		if (err) return next(err);
+
+		res.send("");
+	});
+});
+
+app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
+	let toggleStatus = req.params["onoff"];
+
+	connection.query("UPDATE user SET darkmode=? WHERE id=?", [toggleStatus, req.cookies.user_id], (err) => {
 		if (err) return next(err);
 
 		res.send("");
@@ -607,12 +621,12 @@ app.post("/signup", async (req, res, next) => {
 				let newUUID = uuidv4();
 
 				connection.query("INSERT INTO auth (user_id, authToken, tokenDeath) VALUES (?, ?, ?);",
-					[u_id, newUUID, 86400000], (err) => {
+					[u_id, newUUID, 2629800000], (err) => {
 					if (err)
 						return next(err);
 
-					res.cookie("user_id", u_id, { maxAge: 86400000, httpOnly: true });
-					res.cookie("auth_token", newUUID, { maxAge: 86400000, httpOnly: true });
+					res.cookie("user_id", u_id, { maxAge: 2629800000, httpOnly: true });
+					res.cookie("auth_token", newUUID, { maxAge: 2629800000, httpOnly: true });
 
 					res.json({
 						success: 1,
@@ -645,7 +659,7 @@ function streakUpdate(user) {
 		let currentDate = new Date();
 
 		let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
-		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 86400000 && (dateDiff > 1 && dateDiff < 2))  {
+		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 2629800000 && (dateDiff > 1 && dateDiff < 2))  {
 			connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
 				[currentDate, user.currentStreak + 1, user.currentStreak + 1 > user.bestStreak ?
 				user.currentStreak + 1 : user.bestStreak, user.id], (err) => {
@@ -692,7 +706,7 @@ app.post("/login", (req, res, next) => {
 			if (result) {
 				let newUUID = user_password[0].tokenDeath > 0 ? user_password[0].authToken : uuidv4();
 
-				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=86400000;",
+				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=2629800000;",
 					[user_password[0].id, newUUID, newUUID], async (err) => {
 					if (err)
 						return next(err);
@@ -704,8 +718,8 @@ app.post("/login", (req, res, next) => {
 						return next(error);
 					}
 
-					res.cookie("user_id", user_password[0].id, { maxAge: 86400000, httpOnly: true });
-					res.cookie("auth_token", newUUID, { maxAge: 86400000, httpOnly: true });
+					res.cookie("user_id", user_password[0].id, { maxAge: 2629800000, httpOnly: true });
+					res.cookie("auth_token", newUUID, { maxAge: 2629800000, httpOnly: true });
 
 					res.json({
 						success: 1,
