@@ -445,7 +445,7 @@ a {
 
 .user-column {
   width: 100px;
-  height: 400px;
+  height: 390px;
 
   position: fixed;
   left: 100%;
@@ -1890,15 +1890,15 @@ a.darkmode {
 	background: rgb(55, 36, 61);
 }
 
-.rankcolor11.darkmode,
-.rankcolor12.darkmode,
-.rankcolor13.darkmode,
-.rankcolor14.darkmode,
-.rankcolor15.darkmode,
-.rankcolor16.darkmode,
-.rankcolor17.darkmode,
-.rankcolor18.darkmode,
-.rankcolor19.darkmode,
-.rankcolor20.darkmode {
-	
+.rank-color11.darkmode,
+.rank-color12.darkmode,
+.rank-color13.darkmode,
+.rank-color14.darkmode,
+.rank-color15.darkmode,
+.rank-color16.darkmode,
+.rank-color17.darkmode,
+.rank-color18.darkmode,
+.rank-color19.darkmode,
+.rank-color20.darkmode {
+	background: transparent;
 }

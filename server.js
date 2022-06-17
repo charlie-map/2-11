@@ -230,7 +230,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 				USERNAME: u_dat.username,
 
 				DARKMODE_ACTIVE: u_dat.darkmode,
-				DARKMODE: u_dat.darkmode == 1 ? "\"darkmode\"" : "\"\"",
+				DARKMODE: u_dat.darkmode == 1 ? "darkmode" : "",
 
 				LEADERBOARD_OPEN: u_dat.leaderboardOpen,
 				LEADERBOARD_PROPERTY: propertiesUI[u_dat.leaderboardProperty],
@@ -337,6 +337,16 @@ app.get("/toggle-leaderboard/:onoff", loggedIn, (req, res, next) => {
 	let toggleStatus = req.params["onoff"];
 
 	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.cookies.user_id], (err) => {
+		if (err) return next(err);
+
+		res.send("");
+	});
+});
+
+app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
+	let toggleStatus = req.params["onoff"];
+
+	connection.query("UPDATE user SET darkmode=? WHERE id=?", [toggleStatus, req.cookies.user_id], (err) => {
 		if (err) return next(err);
 
 		res.send("");

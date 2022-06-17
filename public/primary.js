@@ -17,7 +17,7 @@ function LeaderboardPositionCheck(isOpening) {
 		$(".meta-leaderboard-holder").css({
 			width: "calc(100% + 34px)",
 			"margin-left": "-34px",
-			height: 52 * leaderboardEntries + 102 + "px",
+			height: 52 * leaderboardEntries + (leaderboardEntries > 0 ? 102 : 0) + "px",
 			"max-height": "246px"
 		});
 		$("#leaderboard").css({
@@ -101,10 +101,15 @@ $(document).ready(function() {
 			$("#username").focus();
 
 		if (loggedIn) {
-			if (darkmode == "darkmode" && !$(".switch").is(":checked")) {
-				$(".switch").click();
-			} else if (darkmode != "darkmode" && $(".switch").is(":checked")) {
-				$(".switch").click();
+			console.log(darkmode);
+			if (darkmode) {
+				darkmodeOn();
+				if (!$(".switch").is(":checked"))
+					$(".switch").click();
+			} else {
+				darkmodeOff();
+				if ($(".switch").is(":checked"))
+					$(".switch").click();
 			}
 			// $(".user-modal").css({ width: 420 });
 			// $(".user-modal").css({
@@ -143,6 +148,8 @@ $(document).ready(function() {
 					if (checkHeight > normalHeight) {
 						$(".leaderboard-property-choice-hider").addClass("large");
 					}
+
+					$(".leaderboard-tab rect").attr("fill", darkmode ? "#37243d" : "#ddcee2");
 				}
 
 				isInLeaderboardFrame();
@@ -252,6 +259,9 @@ function darkmodeOn() {
 	$(`.dropdown-noti, #page-meta-info, #new-game, #how-to-play, #go-to-how-to,
 		#go-to-title, .final-tag a`).addClass("darkmode");
 
+	$(".leaderboard-entry-rank").addClass("darkmode");
+
+	console.log("cleanup", $(".leaderboard-tab").hasClass("open"));
 	if ($(".leaderboard-tab").hasClass("open")) {
 		$(".leaderboard-tab rect").attr("fill", "#37243d");
 	}
@@ -271,16 +281,25 @@ function darkmodeOff() {
 
 	$(`.dropdown-noti, #page-meta-info, #new-game, #how-to-play, #go-to-how-to,
 		#go-to-title, .final-tag a`).removeClass("darkmode");
+
+	$(".leaderboard-entry-rank").removeClass("darkmode");
+
+	if ($(".leaderboard-tab").hasClass("open")) {
+		$(".leaderboard-tab rect").attr("fill", "#ddcee2");
+	}
 }
 
 $(".switch").click(function() {
 	$(".active-darkmode").text($(this).is(":checked") ? "on" : "off");
 
-	if ($(this).is(":checked")) {
+	let checked = $(this).is(":checked");
+	if (checked) {
 		darkmodeOn();
 	} else {
 		darkmodeOff();
 	}
+
+	$.get("/darkmode/" + (checked ? 1 : 0));
 });
 
 $("#new-game").click(function() {
@@ -720,7 +739,7 @@ $("#choose-remote-board").click(function() {
 // boardClose: decide if leaderboard-property-choice-hider should close
 function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
-		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#ddcee2" : "#37243d");
+		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#37243d" : "#ddcee2");
 		$(".user-personal-low").addClass("fade-in");
 		if ($("body").outerWidth(false) < 1225)
 			LeaderboardPositionCheck(1);
@@ -731,7 +750,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			if (boardClose) {
 				$(".leaderboard-property-choice-hider").addClass("open");
 				$(".user-column").animate({
-					height: "400px"
+					height: "390px"
 				}, 400);
 
 				$(".leaderboard-scrollbar").show();
@@ -777,12 +796,13 @@ function leaderboardCreate(Lboard, boardClose) {
 			return;
 		});
 	} else {
+		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#37243d" : "#ddcee2");
 		$(".user-personal-low").removeClass("fade-in");
 		if (boardClose) {
 			$(Lboard).find("rect").attr("fill", "none");
 			$(".leaderboard-property-choice-hider").removeClass("open");
 			$(".user-column").animate({
-				height: "375px"
+				height: "390px"
 			}, 400);
 		}
 
@@ -895,7 +915,7 @@ $(".leaderboard-pick").click(function() {
 
 		activeLeaderboardProperty = res.split("-")[1];
 
-		$("#leaderboard-shown-property").text($(this).text());
+		$("#leaderboard-shown-property").text(activeLeaderboardProperty);
 		let normalHeight = 19;
 		let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
 
