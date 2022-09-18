@@ -269,12 +269,10 @@ class Board {
 
       $("#column-best-square").children(".best-num").text(newHighestPiece);
 
-      highestPiece = newHighestPiece;
       if (activeLeaderboardProperty == "Best block")
         $(".personal-user-points").text(highestPiece);
-
-      $.get("/update-best-block/" + highestPiece);
     }
+    
     return canMove;
   }
 

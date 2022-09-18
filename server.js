@@ -356,6 +356,10 @@ app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
 	});
 });
 
+function GameEnd(req, res, next) {
+
+}
+
 const moveBoard = {
 	"1": boardJS.moveLeft,
 	"2": boardJS.moveUp,
@@ -369,7 +373,18 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 	connection.query("SELECT currentScore, bestBlock, wholeBoard FROM game INNER JOIN current_board ON game.user_id=current_board.user_id WHERE game.user_id=?", req.cookies.user_id, (err, game) => {
 		if (err || !game || !game.length) return next(err);
 
+		// check that we can move the board
+		if (!boardJS.canMove(game[0].wholeBoard))
+
+
 		let boardDiffs = moveBoard[req.body.move](game[0].wholeBoard);
+
+		if (boardDiffs.error) {
+			// something is wrong with their board
+			// let the frontend know so it resets
+			return res.send("2");
+		}
+
 		game[0].currentScore += boardDiffs.score;
 		game[0].bestBlock = game[0].bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game[0].bestBlock;
 
@@ -379,38 +394,6 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 		res.send("");
 	});
 });
-
-function computeNumFrom(num, end) {
-	let endNum = 0, scale = 1;
-
-	for (let getToNum = num; getToNum > end; getToNum -= (getToNum * 0.5)) {
-		endNum += getToNum * scale;
-		scale *= 2;
-	}
-
-	return endNum;
-}
-
-// guess minimum and maximum score asssuming that only
-// 8's or 2's are spawned respectively:
-function calculateScore(board) {
-	let minScore = 0, maxScore = 0;
-	let bestBlock = 2;
-
-	for (let x = 0; x < board.length; x++) {
-		for (let y = 0; y < board[x].length; y++) {
-			bestBlock = bestBlock < board[x][y].num ? board[x][y].num : bestBlock;
-			minScore += computeNumFrom(parseInt(board[x][y].num, 10), 8);
-			maxScore += computeNumFrom(parseInt(board[x][y].num, 10), 2);
-		}
-	}
-
-	return {
-		min: minScore,
-		max: maxScore,
-		bestBlock
-	};
-}
 
 app.post("/game-over", loggedIn, (req, res, next) => {
 	if (!req.body.board || !req.body.score || !req.body.killerPiece) {
