@@ -417,8 +417,37 @@ function calculateScore(board) {
 		bestBlock
 	};
 }
+
+function socketLoggedIn(socket, next) {
+	if (!socket._211Data.user_id || !socket._211Data.auth_token)
+		return socket.emit("invalid-auth");
+
+	connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
+		if (err)
+			return socket.emit("invalid-auth");
+
+		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
+			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+				if (err)
+					return socket.emit("invalid-auth");
+
+				return next();
+			});
+		} else
+			socket.emit("invalid-auth");
+	});
+}
+
+io.use(socketLoggedIn);
 io.on("connection", socket => {
-	app.post("/save-game", loggedIn, (req, res, next) => {
+	socket._211Data = socket.handshake.headers;
+	connection.query("SELECT wholeBoard FROM current_board WHERE user_id=?", socket._211Data.user_id, (err, board) => {
+		if (err || !board.length) return socket.emit("BigFatError");
+
+		socket._211Data["saved2-11Board"] = JSON.parse(board[0].wholeBoard);
+	});
+
+	socket.on("save-game", loggedIn, (data) => {
 		if (!req.body.board || !req.body.currentScore)
 			return res.send("1");
 
@@ -440,9 +469,9 @@ io.on("connection", socket => {
 		});
 	});
 
-	app.get("/update-best-block/:newblock", loggedIn, (req, res, next) => {
-		if (!allowed_blocks[req.params["newblock"]])
-			return res.send("1");
+	socket.on("update-best-block", loggedIn, (newblock) => {
+		if (!newblock)
+			return socket.emit("no-block");
 
 		connection.query("UPDATE game SET bestBlock=? WHERE user_id=?", [req.params["newblock"], req.cookies.user_id], (err) => {
 			if (err) return next(err);
@@ -451,9 +480,9 @@ io.on("connection", socket => {
 		});
 	});
 
-	app.post("/game-over", loggedIn, (req, res, next) => {
-		if (!req.body.board || !req.body.score || !req.body.killerPiece) {
-			return res.send("1");
+	socket.on("game-over", loggedIn, (data) => {
+		if (!data.killerPiece) {
+			return socket.emit("missing-data");
 		}
 
 		let endBoard = JSON.parse(req.body.board);
