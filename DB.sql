@@ -75,7 +75,7 @@ CREATE TABLE current_board (
 
 	game_id VARCHAR(36) NOT NULL DEFAULT 0,
 
-	wholeBoard TEXT,
+	wholeBoard JSON,
 	startTime DATETIME,
 
 	FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE
@@ -83,6 +83,7 @@ CREATE TABLE current_board (
 
 CREATE TABLE board_history (
 	user_id INT NOT NULL,
+	game_id VARCHAR(36) NOT NULL DEFAULT 0,
 
 	wholeBoard TEXT,
 

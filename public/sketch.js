@@ -25,17 +25,13 @@ function setup(isRestart) {
 
   let oldBoard = null;
   if (!isRestart) {
-    oldBoard = localStorage.getItem("saved2-11Board");
-    metaPoints = localStorage.getItem("savedCurr2-11Score");
+    oldBoard = null
 
     metaPoints = metaPoints ? parseInt(metaPoints, 10) : 0;
     $("#current-score").text(metaPoints);
     $("#best-score").text(bestPoints);
 
     oldBoard = oldBoard ? JSON.parse(oldBoard) : null;
-  } else {
-    localStorage.setItem("saved2-11Board", null);
-    localStorage.setItem("savedCurr2-11Score", 0);
   }
 
   let hasNumbers = 0;
@@ -93,8 +89,6 @@ function draw() {
   } else {
     // end game screen
     board.drawBoard();
-    localStorage.setItem("saved2-11Board", null);
-    localStorage.setItem("savedCurr2-11Score", 0);
 
     fill(rectEndFiller[0], rectEndFiller[1], rectEndFiller[2], opacityEndRoller);
 
@@ -185,7 +179,5 @@ function swiped(event) {
     
     board.moveDown();
   }
-
-  board.saveGame();
 }
 

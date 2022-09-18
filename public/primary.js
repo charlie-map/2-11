@@ -750,7 +750,7 @@ function leaderboardCreate(Lboard, boardClose) {
 			if (boardClose) {
 				$(".leaderboard-property-choice-hider").addClass("open");
 				$(".user-column").animate({
-					height: "390px"
+					height: "420px"
 				}, 400);
 
 				$(".leaderboard-scrollbar").show();

@@ -13,6 +13,8 @@ const { v4: uuidv4 } = require('uuid');
 const email_validator = require("email-validator");
 const date_validator = require("validate-date");
 
+const boardJS = require("./boardMove.js");
+
 const mysql = require('mysql2');
 
 const app = express();
@@ -94,6 +96,7 @@ app.get("/", default_login_check, (req, res, next) => {
 		WINS: 0,
 		LEADERBOARD_OPEN: 0,
 		DARKMODE: "\"\"",
+		DARKMODE_ACTIVE: 0,
 		BEST_BLOCK: 2,
 		BEST_SCORE: 0,
 		LEADERBOARD_PROPERTY: "Best score"
@@ -353,55 +356,27 @@ app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
 	});
 });
 
-app.post("/save-game", loggedIn, (req, res, next) => {
-	if (!req.body.board || !req.body.currentScore)
-		return res.send("1");
-
-	let realCurrentScore = req.body.currentScore.substr(8);
-	connection.query("SELECT bestScore FROM game WHERE user_id=?", req.cookies.user_id, (err, bestscore) => {
-		if (err || !bestscore || !bestscore.length) return next(err);
-
-		let newBestScore = bestscore[0].bestScore < realCurrentScore ? realCurrentScore : bestscore[0].bestScore;
-
-		connection.query("UPDATE game SET bestScore=?, currentScore=? WHERE user_id=?", [newBestScore, realCurrentScore, req.cookies.user_id], (err) => {
-			if (err) return next(err);
-
-			connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [req.body.board, req.cookies.user_id], (err) => {
-				if (err) return next(err);
-
-				res.send("0");
-			});
-		});
-	});
-});
-
-let allowed_blocks = {
-	2: 1,
-	4: 1,
-	8: 1,
-	16: 1,
-	32: 1,
-	64: 1,
-	128: 1,
-	256: 1,
-	512: 1,
-	1024: 1,
-	2048: 1,
-	4096: 1,
-	8192: 1,
-	16384: 1,
-	32768: 1,
-	65536: 1,
-	131072: 1
+const moveBoard = {
+	"1": boardJS.moveLeft,
+	"2": boardJS.moveUp,
+	"3": boardJS.moveRight,
+	"4": boardJS.moveDown
 };
-app.get("/update-best-block/:newblock", loggedIn, (req, res, next) => {
-	if (!allowed_blocks[req.params["newblock"]])
+app.post("/move-game", loggedIn, (req, res, next) => {
+	if (!req.body.move)
 		return res.send("1");
 
-	connection.query("UPDATE game SET bestBlock=? WHERE user_id=?", [req.params["newblock"], req.cookies.user_id], (err) => {
-		if (err) return next(err);
+	connection.query("SELECT currentScore, bestBlock, wholeBoard FROM game INNER JOIN current_board ON game.user_id=current_board.user_id WHERE game.user_id=?", req.cookies.user_id, (err, game) => {
+		if (err || !game || !game.length) return next(err);
 
-		return res.send("0");
+		let boardDiffs = moveBoard[req.body.move](game[0].wholeBoard);
+		game[0].currentScore += boardDiffs.score;
+		game[0].bestBlock = game[0].bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game[0].bestBlock;
+
+		connection.query("UPDATE game SET currentScore=?, bestBlock=? WHERE user_id=?", [game[0].currentScore, game[0].bestBlock, req.cookies.user_id]);
+		connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [game[0].wholeBoard, req.cookies.user_id]);
+
+		res.send("");
 	});
 });
 
