@@ -1,49 +1,82 @@
 class Board {
   constructor(size, tileSize, oldBoard) {
-    this.board = [];
-    this.size = size;
-    this.tileS = tileSize;
-    // all current tiles from smallest to largest
-    //---used for drawing to make large glow effects
-    //---cast over smaller tiles
-    this.orderedPieces = [];
+    return new Promise(async (resolve, reject) => {
+      this.board = [];
+      this.size = size;
+      this.tileS = tileSize;
+      // all current tiles from smallest to largest
+      //---used for drawing to make large glow effects
+      //---cast over smaller tiles
+      this.orderedPieces = [];
 
-    for (let setBoardX = 0; setBoardX < size; setBoardX++) {
-      this.board[setBoardX] = [];
+      for (let setBoardX = 0; setBoardX < size; setBoardX++) {
+        this.board[setBoardX] = [];
 
-      for (let setBoardY = 0; setBoardY < size; setBoardY++) {
-        // if (setBoardX + setBoardY == 0)
-        //   continue;
+        for (let setBoardY = 0; setBoardY < size; setBoardY++) {
+          // if (setBoardX + setBoardY == 0)
+          //   continue;
 
-        // let num = pow(2, (setBoardX * size) + setBoardY + 1);
-        // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
-        if (oldBoard && oldBoard[setBoardX][setBoardY]) {
-          let oldPieceData = oldBoard[setBoardX][setBoardY];
+          // let num = pow(2, (setBoardX * size) + setBoardY + 1);
+          // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
+          if (oldBoard && oldBoard[setBoardX][setBoardY]) {
+            let oldPieceData = oldBoard[setBoardX][setBoardY];
 
-          this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
-            90, 90, oldPieceData.num);
+            this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
+              90, 90, oldPieceData.num);
 
-          continue;
+            continue;
+          }
+
+          this.board[setBoardX][setBoardY] = null;
+        }
+      }
+
+      // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
+      // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
+
+      // pick 2 random initial positions
+      if (!oldBoard) {
+        this.addPiece(tileSize);
+        this.addPiece(tileSize);
+
+        let piece = [];
+
+        for (let x = 0; x < this.board.length; x++) {
+          for (let y = 0; y < this.board[x].length; y++) {
+            if (this.board[x][y])
+              piece.push({
+                x,
+                y,
+                num: this.board[x][y].num
+              });
+          }
         }
 
-        this.board[setBoardX][setBoardY] = null;
+        await new Promise((iresolve, ireject) => {
+          console.log("send board", piece);
+          $.ajax({
+            type: "POST",
+            url: "/new-game",
+            data: { piece: JSON.stringify(piece) },
+
+            success: res => {
+              console.log(res);
+              iresolve();
+            },
+
+            failure: ireject
+          });
+        });
       }
-    }
 
-    // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
-    // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
+      this.boardMove = 0;
+      this.canMove();
 
-    // pick 2 random initial positions
-    if (!oldBoard) {
-      this.addPiece(tileSize);
-      this.addPiece(tileSize);
-    }
+      this.endGameRequest = 0;
+      this.sendingRequest = 0;
 
-    this.boardMove = 0;
-    this.canMove();
-
-    this.endGameRequest = 0;
-    this.sendingRequest = 0;
+      return resolve(this);
+    });
   }
 
   addPiece(tileSize) {

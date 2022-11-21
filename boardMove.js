@@ -19,6 +19,33 @@ const allowed_blocks = {
 };
 
 module.exports = {
+	buildBoard: function(piece, size = 4) {
+		let newBoard = [];
+
+		let piece0 = piece[0];
+		let piece1 = piece[1];
+
+		for (let setBoardX = 0; setBoardX < size; setBoardX++) {
+			newBoard[setBoardX] = [];
+
+			for (let setBoardY = 0; setBoardY < size; setBoardY++) {
+				if (piece0.x == setBoardX && piece0.y == setBoardY) {
+					newBoard[setBoardX][setBoardY] = piece0.num;
+
+					continue;
+				} else if (piece1.x == setBoardX && piece1.y == setBoardY) {
+					newBoard[setBoardX][setBoardY] = piece1.num;
+
+					continue;
+				}
+
+				newBoard[setBoardX][setBoardY] = null;
+			}
+		}
+
+		return newBoard;
+	},
+
 	canMove: function(board) {
 		// check for empty cell:
 		let rowPrevNum = [0, 0, 0, 0];
@@ -47,8 +74,7 @@ module.exports = {
 	},
 
 	// moveDirection = 1
-	moveLeft: function(board) {
-		let bestBlock = 2;
+	moveLeft: function(board, bestBlock) {
 		let points = 0;
 
 		for (let y = 0; y < 4; y++) {
@@ -64,16 +90,16 @@ module.exports = {
 				if (!allowed_blocks[board[x][y]])
 					return { error: 1 };
 
-				if (board[x][y].num == prevNum) { // merge
+				if (board[x][y] == prevNum) { // merge
 					maxMoveLeft++;
 
-					points += board[x][y].num * 2;
-					board[x][y].merging = 1;
-					board[x][y].itemToMerge = board[x - maxMoveLeft][y];
+					board[x][y] *= 2;
+					bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+					points += board[x][y];
 
 					prevNum = 0;
 				} else
-					prevNum = board[x][y].num;
+					prevNum = board[x][y];
 
 				if (x == x - maxMoveLeft)
 					continue;
@@ -83,12 +109,14 @@ module.exports = {
 			}
 		}
 
-		return points;
-	}
+		return {
+			bestBlock,
+			points
+		};
+	},
 
 	// moveDirection = 2
-	moveUp: function(board) {
-		let bestBlock = 2;
+	moveUp: function(board, bestBlock) {
 		let points = 0;
 
 		for (let x = 0; x < 4; x++) {
@@ -104,16 +132,16 @@ module.exports = {
 				if (!allowed_blocks[board[x][y]])
 					return { error: 1 };
 
-				if (board[x][y].num == prevNum) { // merge
+				if (board[x][y] == prevNum) { // merge
 					maxMoveUp++;
 
-					points += board[x][y].num * 2;
-					board[x][y].merging = 1;
-					board[x][y].itemToMerge = board[x][y - maxMoveUp];
+					board[x][y] *= 2;
+					bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+					points += board[x][y];
 
 					prevNum = 0;
 				} else
-					prevNum = board[x][y].num;
+					prevNum = board[x][y];
 
 				if (y == y - maxMoveUp)
 					continue;
@@ -123,12 +151,14 @@ module.exports = {
 			}
 		}
 
-		return points;
-	}
+		return {
+			bestBlock,
+			points
+		};
+	},
 
 	// moveDirection = 3
-	moveRight: function(board) {
-		let bestBlock = 2;
+	moveRight: function(board, bestBlock) {
 		let points = 0;
 
 		for (let y = 0; y < 4; y++) {
@@ -144,16 +174,16 @@ module.exports = {
 				if (!allowed_blocks[board[x][y]])
 					return { error: 1 };
 
-				if (board[x][y].num == prevNum) { // merge
+				if (board[x][y] == prevNum) { // merge
 					maxMoveRight++;
 
-					points += board[x][y].num * 2;
-					board[x][y].merging = 1;
-					board[x][y].itemToMerge = board[x + maxMoveRight][y];
+					board[x][y] *= 2;
+					bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+					points += board[x][y];
 
 					prevNum = 0;
 				} else
-					prevNum = board[x][y].num;
+					prevNum = board[x][y];
 
 				if (x == x + maxMoveRight)
 					continue;
@@ -163,12 +193,14 @@ module.exports = {
 			}
 		}
 
-		return points;
-	}
+		return {
+			bestBlock,
+			points
+		};
+	},
 
 	// moveDirection = 4
-	moveDown: function(board) {
-		let bestBlock = 2;
+	moveDown: function(board, bestBlock) {
 		let points = 0;
 
 		for (let x = 0; x < 4; x++) {
@@ -184,16 +216,16 @@ module.exports = {
 				if (!allowed_blocks[board[x][y]])
 					return { error: 1 };
 
-				if (board[x][y].num == prevNum) { // merge
+				if (board[x][y] == prevNum) { // merge
 					maxMoveDown++;
 
-					points += board[x][y].num * 2;
-					board[x][y].merging = 1;
-					board[x][y].itemToMerge = board[x][y + maxMoveDown];
+					board[x][y] *= 2;
+					bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+					points += board[x][y];
 
 					prevNum = 0;
 				} else
-					prevNum = board[x][y].num;
+					prevNum = board[x][y];
 
 				if (y == y + maxMoveDown)
 					continue;
@@ -203,6 +235,9 @@ module.exports = {
 			}
 		}
 
-		return points;
+		return {
+			bestBlock,
+			points
+		};
 	}
 };

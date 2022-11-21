@@ -1,4 +1,6 @@
-require("dotenv").config({path: __dirname + "/.env"});
+require("dotenv").config({
+	path: __dirname + "/.env"
+});
 
 const express = require("express");
 const mustache = require("mustache-express");
@@ -8,7 +10,9 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const cookieParser = require('cookie-parser');
-const { v4: uuidv4 } = require('uuid');
+const {
+	v4: uuidv4
+} = require('uuid');
 
 const email_validator = require("email-validator");
 const date_validator = require("validate-date");
@@ -59,7 +63,9 @@ app.use(cookieParser());
 app.use((err, req, res, next) => {
 	console.log("ERROR OCCURRED: ", err);
 
-	res.render("error", { error: err });
+	res.render("error", {
+		error: err
+	});
 });
 
 app.set('views', __dirname + "/views");
@@ -68,26 +74,26 @@ app.engine('mustache', mustache());
 
 function default_login_check(req, res, next) {
 	if (!req.cookies.user_id || !req.cookies.auth_token)
-                return next();
+		return next();
 
-        connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
-                if (err)
-                        return res.render("error", {
-                                error
-                        });
+	connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
+		if (err)
+			return res.render("error", {
+				error
+			});
 
-                if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
-                        connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
-                                if (err) {
-                                        console.error(err);
-                                        return next();
-                                }
+		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
+			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
+				if (err) {
+					console.error(err);
+					return next();
+				}
 
-                                return res.redirect("/l");
-                        });
-                } else
-                        next();
-        });
+				return res.redirect("/l");
+			});
+		} else
+			next();
+	});
 }
 
 app.get("/", default_login_check, (req, res, next) => {
@@ -191,15 +197,18 @@ app.get("/l", loggedIn, (req, res, next) => {
 		}
 
 		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
-			if (err || !users) return res.render("error", { error: err });
+			if (err || !users) return res.render("error", {
+				error: err
+			});
 
 			let userBoardOpen;
-			let onLeaderboard = 0, user_special_rank = 0;
+			let onLeaderboard = 0,
+				user_special_rank = 0;
 			let u_dat = user_data[0];
 			let leaderboardIndex = [];
 
-                        if (u_dat.leaderboardProperty == 4)
-                                leaderboardSort(users, 0, users.length - 1);
+			if (u_dat.leaderboardProperty == 4)
+				leaderboardSort(users, 0, users.length - 1);
 
 			for (let i = 0; i < users.length; i++) {
 				if (i >= 20) {
@@ -294,8 +303,8 @@ app.get("/updated-leaderboard", (req, res, next) => {
 			let onLeaderboard = 0
 			let lowUser = null;
 
-                        if (u_dat.leaderboardProperty == 4)
-                                leaderboardSort(users, 0, users.length - 1);
+			if (u_dat.leaderboardProperty == 4)
+				leaderboardSort(users, 0, users.length - 1);
 
 			for (let i = 0; i < users.length; i++) {
 				if (i >= 20) {
@@ -356,16 +365,55 @@ app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
 	});
 });
 
-function GameEnd(req, res, next) {
+/**
+ * Takes two new game positions from user and initializes the user board
+ * 
+ * @params { Array } piece array of two objects that represent that two new blocks:
+ */
+ 	const allowed_new_blocks = {
+ 		2: 1,
+ 		4: 1,
+ 		8: 1
+ 	};
+/**
+ */
+app.post("/new-game", loggedIn, (req, res, next) => {
+	if (!req.body.piece || !req.body.piece.length)
+		return res.end("1");
 
-}
+	let pieces = JSON.parse(req.body.piece);
+	console.log(pieces);
+
+	if (pieces.length != 2)
+		return res.end("1");
+
+	if (!allowed_new_blocks[pieces[0].num] ||
+		!allowed_new_blocks[pieces[1].num])
+		return res.end("2");
+
+	let newBoard = boardJS.buildBoard(pieces);
+	console.log("build board", newBoard);
+
+	// TODO: save old board and update game
+
+	connection.query("UPDATE current_board SET wholeBoard=?, startTime=? WHERE user_id=?",
+		[newBoard, new Date(), req.cookies.user_id], (complete) => {
+			res.end();
+		});
+});
 
 const moveBoard = {
-	"1": boardJS.moveLeft,
-	"2": boardJS.moveUp,
-	"3": boardJS.moveRight,
-	"4": boardJS.moveDown
+	1: boardJS.moveLeft,
+	2: boardJS.moveUp,
+	3: boardJS.moveRight,
+	4: boardJS.moveDown
 };
+/**
+ * Moves game the given number of moves forward and gives a user responses based on that
+ * 
+ * @params { Array } array of moves that have occured
+ *  - either left (1), up (2), right (3), or down (4) 
+ */
 app.post("/move-game", loggedIn, (req, res, next) => {
 	if (!req.body.move)
 		return res.send("1");
@@ -375,18 +423,21 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 
 		// check that we can move the board
 		if (!boardJS.canMove(game[0].wholeBoard))
+			// send back error response
+			return res.send("1");
 
+		for (let move = 0; move < req.body.move.length; move++) {
+			let boardDiffs = moveBoard[req.body.move](game[0].wholeBoard);
 
-		let boardDiffs = moveBoard[req.body.move](game[0].wholeBoard);
+			if (boardDiffs.error) {
+				// something is wrong with their board
+				// let the frontend know so it resets
+				return res.send("2");
+			}
 
-		if (boardDiffs.error) {
-			// something is wrong with their board
-			// let the frontend know so it resets
-			return res.send("2");
+			game[0].currentScore += boardDiffs.points;
+			game[0].bestBlock = game[0].bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game[0].bestBlock;
 		}
-
-		game[0].currentScore += boardDiffs.score;
-		game[0].bestBlock = game[0].bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game[0].bestBlock;
 
 		connection.query("UPDATE game SET currentScore=?, bestBlock=? WHERE user_id=?", [game[0].currentScore, game[0].bestBlock, req.cookies.user_id]);
 		connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [game[0].wholeBoard, req.cookies.user_id]);
@@ -395,10 +446,15 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 	});
 });
 
+function game_over(req, res) {
+	connection.query("SELECT game_id, wholeBoard, startTime, ")
+}
+
 app.post("/game-over", loggedIn, (req, res, next) => {
 	if (!req.body.board || !req.body.score || !req.body.killerPiece) {
 		return res.send("1");
 	}
+
 
 	let endBoard = JSON.parse(req.body.board);
 	let scores = calculateScore(endBoard);
@@ -420,7 +476,8 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 		"killedBy2=(SELECT killedBy2 FROM game WHERE user_id=?)+1"},
 		totalGames=(SELECT totalGames FROM game WHERE user_id=?)+1 WHERE user_id=?`,
 		[req.cookies.user_id, scores.bestBlock >= 2048 ? 1 : 0, req.cookies.user_id,
-		scores.bestBlock < 2048 ? 1 : 0, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id], (err) => {
+			scores.bestBlock < 2048 ? 1 : 0, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id, req.cookies.user_id
+		], (err) => {
 			if (err) return next(err);
 
 			connection.query(`INSERT INTO board_history (user_id, wholeBoard, score, startTime, endTime) VALUES
@@ -443,10 +500,11 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 					} catch (error) {
 						return next(error);
 					}
-				
+
 					connection.query("UPDATE game SET averageScore=? WHERE user_id=?",
 						[((prevAvgScore_totalGames.avS * (prevAvgScore_totalGames.tG - 1)) / (prevAvgScore_totalGames.tG)) +
-						(score / prevAvgScore_totalGames.tG), req.cookies.user_id], (err) => {
+							(score / prevAvgScore_totalGames.tG), req.cookies.user_id
+						], (err) => {
 							if (err) return next(err);
 
 							return res.send("0");
@@ -580,19 +638,25 @@ app.post("/signup", async (req, res, next) => {
 
 				connection.query("INSERT INTO auth (user_id, authToken, tokenDeath) VALUES (?, ?, ?);",
 					[u_id, newUUID, 2629800000], (err) => {
-					if (err)
-						return next(err);
+						if (err)
+							return next(err);
 
-					res.cookie("user_id", u_id, { maxAge: 2629800000, httpOnly: true });
-					res.cookie("auth_token", newUUID, { maxAge: 2629800000, httpOnly: true });
+						res.cookie("user_id", u_id, {
+							maxAge: 2629800000,
+							httpOnly: true
+						});
+						res.cookie("auth_token", newUUID, {
+							maxAge: 2629800000,
+							httpOnly: true
+						});
 
-					res.json({
-						success: 1,
-						best: 0,
-						wholeBoard: null
+						res.json({
+							success: 1,
+							best: 0,
+							wholeBoard: null
+						});
+						return;
 					});
-					return;
-				});
 			});
 		});
 });
@@ -617,10 +681,11 @@ function streakUpdate(user) {
 		let currentDate = new Date();
 
 		let dateDiff = getDifferenceInDays(currentDate, lastLoginDate);
-		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 2629800000 && (dateDiff > 1 && dateDiff < 2))  {
+		if (currentDate.getMilliseconds() - lastLoginDate.getMilliseconds() < 2629800000 && (dateDiff > 1 && dateDiff < 2)) {
 			connection.query("UPDATE streak SET lastLogin=?, currentStreak=?, bestStreak=? WHERE user_id=?",
 				[currentDate, user.currentStreak + 1, user.currentStreak + 1 > user.bestStreak ?
-				user.currentStreak + 1 : user.bestStreak, user.id], (err) => {
+					user.currentStreak + 1 : user.bestStreak, user.id
+				], (err) => {
 					if (err) return reject(err);
 
 					resolve();
@@ -666,28 +731,34 @@ app.post("/login", (req, res, next) => {
 
 				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=2629800000;",
 					[user_password[0].id, newUUID, newUUID], async (err) => {
-					if (err)
-						return next(err);
+						if (err)
+							return next(err);
 
-					// update streak
-					try {
-						await streakUpdate(user_password[0]);
-					} catch (error) {
-						return next(error);
-					}
+						// update streak
+						try {
+							await streakUpdate(user_password[0]);
+						} catch (error) {
+							return next(error);
+						}
 
-					res.cookie("user_id", user_password[0].id, { maxAge: 2629800000, httpOnly: true });
-					res.cookie("auth_token", newUUID, { maxAge: 2629800000, httpOnly: true });
+						res.cookie("user_id", user_password[0].id, {
+							maxAge: 2629800000,
+							httpOnly: true
+						});
+						res.cookie("auth_token", newUUID, {
+							maxAge: 2629800000,
+							httpOnly: true
+						});
 
-					res.json({
-						success: 1,
-						username: user_password[0].username,
-						bestScore: user_password[0].bestScore,
-						currentScore: user_password[0].currentScore,
-						board: user_password[0].wholeBoard
+						res.json({
+							success: 1,
+							username: user_password[0].username,
+							bestScore: user_password[0].bestScore,
+							currentScore: user_password[0].currentScore,
+							board: user_password[0].wholeBoard
+						});
+						return;
 					});
-					return;
-				});
 			} else
 				return res.send("3");
 		});
@@ -695,5 +766,5 @@ app.post("/login", (req, res, next) => {
 });
 
 app.listen("2048", () => {
-	console.log("server go vroom");
+	console.log("server go vroom: 2048");
 });

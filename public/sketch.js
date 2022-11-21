@@ -1,4 +1,4 @@
-function setup(isRestart) {
+async function setup(isRestart) {
   createCanvas(400, 400);
   
   $("#how-to-play").outerWidth($("#defaultCanvas0").outerWidth());
@@ -49,8 +49,10 @@ function setup(isRestart) {
     }
   }
 
-  board = new Board(4, 90, hasNumbers ? oldBoard : null);
   moveBuildup = [];
+  postMoveSync = [];
+
+  framesSinceSync = 0;
 
   let options = {
     preventDefault: true
@@ -65,9 +67,16 @@ function setup(isRestart) {
 
     hammer.on("swipe", swiped);
   }
+
+  boardReady = 0;
+  board = await new Board(4, 90, hasNumbers ? oldBoard : null);
+
+  boardReady = 1;
 }
 
 function draw() {
+  if (!boardReady) return;
+
   background(220);
   
   if (!endGame) {
@@ -82,9 +91,17 @@ function draw() {
         board.moveDown();
       }
       
+      postMoveSync.push(moveBuildup[0]);
       moveBuildup = moveBuildup.slice(1);
     }
     
+    if (postMoveSync.length > 20 || framesSinceSync > 360) {
+      framesSinceSync = 0;
+      SyncMoves();
+    }
+
+    framesSinceSync++;
+
     board.drawBoard();
   } else {
     // end game screen
@@ -121,6 +138,7 @@ function keyPressed() {
       return;
     }
     
+    postMoveSync.push(1);
     board.moveLeft();
   } else if (keyCode == UP_ARROW || key == 'w' || key == 'k') {
     if (board.boardMove) {
@@ -128,6 +146,7 @@ function keyPressed() {
       return;
     }
     
+    postMoveSync.push(2);
     board.moveUp();
   } else if (keyCode == RIGHT_ARROW || key == 'd' || key == 'l') {
     if (board.boardMove) {
@@ -135,6 +154,7 @@ function keyPressed() {
       return;
     }
     
+    postMoveSync.push(3);
     board.moveRight();
   } else if (keyCode == DOWN_ARROW || key == 's' || key == 'j') {
     if (board.boardMove) {
@@ -142,6 +162,7 @@ function keyPressed() {
       return;
     }
     
+    postMoveSync.push(4);
     board.moveDown();
   }
 }
@@ -156,6 +177,7 @@ function swiped(event) {
       return;
     }
     
+    postMoveSync.push(1);
     board.moveLeft();
   } else if (event.angle < -45 && event.angle >= -135) {
     if (board.boardMove) {
@@ -163,6 +185,7 @@ function swiped(event) {
       return;
     }
     
+    postMoveSync.push(2);
     board.moveUp();
   } else if (event.angle < 45 && event.angle >= -45) {
     if (board.boardMove) {
@@ -170,6 +193,7 @@ function swiped(event) {
       return;
     }
     
+    postMoveSync.push(3);
     board.moveRight();
   } else if (event.angle > 45 && event.angle <= 135) {
     if (board.boardMove) {
@@ -177,7 +201,26 @@ function swiped(event) {
       return;
     }
     
+    postMoveSync.push(4);
     board.moveDown();
   }
 }
 
+
+function SyncMoves() {
+  let MovesToSend = postMoveSync;
+  postMoveSync = [];
+
+  console.log(MovesToSend);
+  $.post("/move-game", MovesToSend).then(res => {
+    console.log(res);
+
+    if (res == "2") {
+      // game broken
+    } else if (res == "1") {
+      // game broken
+    }
+  }).catch(e => {
+
+  });
+}
