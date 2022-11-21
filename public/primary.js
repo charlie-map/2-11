@@ -725,8 +725,11 @@ $("#register").click(function(e) {
 });
 
 // boardClose: decide if leaderboard-property-choice-hider should close
-function leaderboardCreate(Lboard, boardClose) {
+async function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
+		if (postMoveSync.length)
+			await SyncMoves();
+
 		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#37243d" : "#ddcee2");
 		$(".user-personal-low").addClass("fade-in");
 		if ($("body").outerWidth(false) < 1225)
