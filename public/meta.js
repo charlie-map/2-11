@@ -23,6 +23,7 @@ const Meta = {
 					// handle error
 					if (xhr.status != 200) return params.failure(xhr.response);
 
+					if (!params.success) return;
 					params.success(params.responseHandle ? params.responseHandle(xhr) :
 						Meta.xhr.responseText(xhr));
 				}
