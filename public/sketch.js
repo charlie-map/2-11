@@ -257,10 +257,7 @@ function SyncMoves() {
         "Content-type": "application/json"
       },
 
-      success: res => {
-        console.log("finish sync", res);
-        resolve();
-      },
+      success: res => resolve,
 
       failure: (e) => {
         console.log(e);
