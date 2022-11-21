@@ -301,7 +301,7 @@ $(".switch").click(function() {
 
 	Meta.xhr.send({
 		type: "GET",
-		url: "/darkmode" + (checked ? 1 : 0)
+		url: "/darkmode/" + (checked ? 1 : 0)
 	});
 });
 
