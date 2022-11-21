@@ -1,66 +1,88 @@
 class Board {
   constructor(size, tileSize, oldBoard) {
-    this.board = [];
-    this.size = size;
-    this.tileS = tileSize;
-    // all current tiles from smallest to largest
-    //---used for drawing to make large glow effects
-    //---cast over smaller tiles
-    this.orderedPieces = [];
+    return new Promise(async (resolve, reject) => {
+      this.board = [];
+      this.size = size;
+      this.tileS = tileSize;
+      // all current tiles from smallest to largest
+      //---used for drawing to make large glow effects
+      //---cast over smaller tiles
+      this.orderedPieces = [];
 
-    for (let setBoardX = 0; setBoardX < size; setBoardX++) {
-      this.board[setBoardX] = [];
+      for (let setBoardX = 0; setBoardX < size; setBoardX++) {
+        this.board[setBoardX] = [];
 
-      for (let setBoardY = 0; setBoardY < size; setBoardY++) {
-        // if (setBoardX + setBoardY == 0)
-        //   continue;
+        for (let setBoardY = 0; setBoardY < size; setBoardY++) {
+          // if (setBoardX + setBoardY == 0)
+          //   continue;
 
-        // let num = pow(2, (setBoardX * size) + setBoardY + 1);
-        // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
-        if (oldBoard && oldBoard[setBoardX][setBoardY]) {
-          let oldPieceData = oldBoard[setBoardX][setBoardY];
+          // let num = pow(2, (setBoardX * size) + setBoardY + 1);
+          // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
+          if (oldBoard && oldBoard[setBoardX][setBoardY]) {
+            this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
+              90, 90, oldBoard[setBoardX][setBoardY]);
 
-          this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
-            90, 90, oldPieceData.num);
+            continue;
+          }
 
-          continue;
+          this.board[setBoardX][setBoardY] = null;
+        }
+      }
+
+      // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
+      // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
+
+      // pick 2 random initial positions
+      if (!oldBoard) {
+        this.addPiece(tileSize);
+        this.addPiece(tileSize);
+
+        let piece = [];
+
+        for (let x = 0; x < this.board.length; x++) {
+          for (let y = 0; y < this.board[x].length; y++) {
+            if (this.board[x][y])
+              piece.push({
+                x,
+                y,
+                num: this.board[x][y].num
+              });
+          }
         }
 
-        this.board[setBoardX][setBoardY] = null;
+        await new Promise((iresolve, ireject) => {
+          console.log("send board", piece);
+          Meta.xhr.send({
+            type: "POST",
+            url: "/new-game",
+
+            data: JSON.stringify({ piece }),
+
+            headers: {
+              "Content-type": "application/json"
+            },
+
+            success: res => {
+              console.log(res);
+              iresolve();
+            },
+
+            failure: (e) => {
+              console.log(e);
+              ireject();
+            }
+          });
+        });
       }
-    }
 
-    this.saveGame();
+      this.boardMove = 0;
+      this.canMove();
 
-    // this.board[0][0] = new Piece(0, 0, 90, 90, 131072);
-    // this.board[1][0] = new Piece(100, 0, 90, 90, 131072);
+      this.endGameRequest = 0;
+      this.sendingRequest = 0;
 
-    // pick 2 random initial positions
-    if (!oldBoard) {
-      this.addPiece(tileSize);
-      this.addPiece(tileSize);
-    }
-
-    this.boardMove = 0;
-    this.canMove();
-
-    this.endGameRequest = 0;
-    this.sendingRequest = 0;
-  }
-
-  saveGame() {
-    this.sendingRequest = 1;
-    let stringedBoard = JSON.stringify(this.board)
-
-    localStorage.setItem("saved2-11Board", stringedBoard);
-
-    localStorage.setItem("savedCurr2-11Score", metaPoints);
-    localStorage.setItem("savedBest2-11Score", bestPoints);
-
-    $.post("/save-game", {
-      board: stringedBoard,
-      currentScore: "83e0a301" + metaPoints
-    }, () => { this.sendingRequest = 0; });
+      return resolve(this);
+    });
   }
 
   addPiece(tileSize) {
@@ -97,10 +119,10 @@ class Board {
     mostRecentPiece = start_number;
     this.board[findOpenX][findOpenY] = new Piece(100 * findOpenX, 100 * findOpenY, tileSize, tileSize, start_number);
 
-    return 1;
+    return { x: findOpenX, y: findOpenY, num: start_number };
   }
 
-  drawBoard() {
+  async drawBoard() {
     let boxWidth = width * 0.25;
     let boxHeight = height * 0.25;
 
@@ -142,9 +164,6 @@ class Board {
 
     if (!activelyMovingLeaderboardRank && needLeaderboardCheck)
       checkUserRankLeaderboard(metaPoints);
-
-    if (movingPieces == 0 && !this.sendingRequest)
-      this.saveGame();
 
     if (isMoving < (45 * movingPieces) && points) {
       let prevScore = metaPoints;
@@ -206,6 +225,7 @@ class Board {
     this.boardMove = movingPieces ? 1 : 0;
 
     if (!this.boardMove && !this.canMove() && !this.endGameRequest) {
+      console.log("GAME OVER");
       if (activeLeaderboardProperty == "Average score" ||
           activeLeaderboardProperty == "Wins" ||
           activeLeaderboardProperty == "% Wins") {
@@ -221,18 +241,26 @@ class Board {
 
       this.endGameRequest = 1;
 
-      $.post("/game-over", {
-        board: JSON.stringify(this.board),
-        score: metaPoints,
-        killerPiece: mostRecentPiece
-      }, (res) => {
-        endGame = 1;
+      if (postMoveSync.length)
+        await SyncMoves();
 
-        localStorage.setItem("saved2-11Board", null);
-        localStorage.setItem("savedCurr2-11Score", 0);
+      console.log("sync data");
+      Meta.xhr.send({
+        type: "POST",
+        url: "/game-over",
 
-        $("#new-game").text("Try again");
-      });
+        data: JSON.stringify({ killerPiece: mostRecentPiece }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        success: (res) => {
+          console.log("finished sync");
+          endGame = 1;
+
+          $("#new-game").text("Try again");
+        }
+      })
     }
   }
 
@@ -289,12 +317,10 @@ class Board {
 
       $("#column-best-square").children(".best-num").text(newHighestPiece);
 
-      highestPiece = newHighestPiece;
       if (activeLeaderboardProperty == "Best block")
         $(".personal-user-points").text(highestPiece);
-
-      $.get("/update-best-block/" + highestPiece);
     }
+    
     return canMove;
   }
 
@@ -336,7 +362,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 2
@@ -377,7 +403,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 3
@@ -418,7 +444,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 4
@@ -459,6 +485,6 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 }

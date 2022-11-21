@@ -19,7 +19,7 @@
 	</head>
 	<body class="{{DARKMODE}}">
 		{{#LOGGED_IN}}
-		<div class="user-column" style="{{^LEADERBOARD_OPEN}}height: 305px;{{/LEADERBOARD_OPEN}}">
+		<div class="user-column" style="{{#LEADERBOARD_OPEN}}height: 420px;{{/LEADERBOARD_OPEN}}">
 			<!-- <div class="column-tab profile">
 				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
 			</div> -->
@@ -139,7 +139,7 @@
 								<div class="sub-scorer">
 									<p id="add-to-current-score"></p>
 									<p id="current-score">
-										0
+										{{#LOGGED_IN}}{{CURRENT_SCORE}}{{/LOGGED_IN}}{{^LOGGED_IN}}0{{/LOGGED_IN}}
 									</p>
 								</div>
 							</div>
@@ -231,7 +231,7 @@
 		<!-- META DATA -->
 		<script>
 			let board;
-			let moveBuildup;
+			let moveBuildup, postMoveSync, framesSinceSync;
 			let currentWins = {{{WINS}}};
 			let highestPiece = {{{BEST_BLOCK}}}, mostRecentPiece = 2;
 			let loggedIn = {{{LOGGED_IN}}};
@@ -244,14 +244,9 @@
 
 			// stores background color, text color, and glow for a given tile
 			let levelConverter;
-			let bestPoints = localStorage.getItem("savedBest2-11Score");
-			bestPoints = bestPoints ? parseInt(bestPoints, 10) : 0;
+			let bestPoints = {{{BEST_SCORE}}};
 
-			if ({{{BEST_SCORE}}} > bestPoints) {
-				bestPoints = {{{BEST_SCORE}}};
-				localStorage.setItem("savedBest2-11Score", {{{BEST_SCORE}}});
-			}
-			let points = 0, metaPoints = 0;
+			let points = 0, metaPoints = {{{CURRENT_SCORE}}};
 
 			let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
 			let activelyMovingLeaderboardRank = 0, needLeaderboardCheck = 0;
@@ -261,6 +256,8 @@
 			let currentScoreAnimationTimeout;
 			let logging_in = undefined;
 		</script>
+		<script src="meta.js"></script>
+
 		<script src="piece.js"></script>
 		<script src="board.js"></script>
 		<script src="sketch.js" defer></script>

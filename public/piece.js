@@ -8,6 +8,8 @@ class Piece {
     
     this.num = num;
     this.c = c;
+
+    this.speed = 40;
     
     this.og_growth = 4;
     this.animation_time = 0;
@@ -29,7 +31,7 @@ class Piece {
     if (this.moveAmount <= 0)
       return;
     
-    let mover = this.moveAmount > 35 ? 35 : this.moveAmount;
+    let mover = this.moveAmount > this.speed ? this.speed : this.moveAmount;
     if (this.moveDirection == 1) { // left
       this.x -= mover;
     } else if (this.moveDirection == 2) { // up
@@ -40,7 +42,7 @@ class Piece {
       this.y += mover;
     }
     
-    this.moveAmount -= 35;
+    this.moveAmount -= this.speed;
   }
   
   upgrade() {

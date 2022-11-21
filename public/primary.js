@@ -111,51 +111,53 @@ $(document).ready(function() {
 				if ($(".switch").is(":checked"))
 					$(".switch").click();
 			}
-			// $(".user-modal").css({ width: 420 });
-			// $(".user-modal").css({
-			// 	"margin-left": $(".user-column").outerWidth(false) + 420,
-			// 	"margin-bottom": -1 * $(".user-modal").outerHeight(false)
-			// });
 
-			$.get("/updated-leaderboard", (res) => {
-				let set_width = $(document).outerWidth(false) - 460;
-				set_width = set_width > 400 ? 400 : set_width;
-				$("#leaderboard").css({
-					width: set_width
-				});
-				$(".user-personal-low").css({
-					width: set_width - 8
-				});
-				$(".meta-leaderboard-holder").css({
-					width: $(document).outerWidth(false)
-				});
-				$(".ultra-meta-leaderboard-holder").css({
-					left: "calc(50% + " + (300 * 0.5) + "px)"
-				});
+			Meta.xhr.send({
+				type: "GET",
+				url: "/updated-leaderboard",
 
-				if (!wantsLeaderboardOpen) {
-					$("#leaderboard").html("");
-					$(".leaderboard-scrollbar").hide();
-				} else {
-					$(".leaderboard-entry").addClass("fade-in");
-					$(".leaderboard-tab").addClass("open");
-					$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
-					$(".user-personal-low").addClass("fade-in");
+				responseHandle: Meta.xhr.responseJSON,
 
-					let normalHeight = 19;
-					let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+				success: res => {
+					let set_width = $(document).outerWidth(false) - 460;
+					set_width = set_width > 400 ? 400 : set_width;
+					$("#leaderboard").css({
+						width: set_width
+					});
+					$(".user-personal-low").css({
+						width: set_width - 8
+					});
+					$(".meta-leaderboard-holder").css({
+						width: $(document).outerWidth(false)
+					});
+					$(".ultra-meta-leaderboard-holder").css({
+						left: "calc(50% + " + (300 * 0.5) + "px)"
+					});
 
-					if (checkHeight > normalHeight) {
-						$(".leaderboard-property-choice-hider").addClass("large");
+					if (!wantsLeaderboardOpen) {
+						$("#leaderboard").html("");
+						$(".leaderboard-scrollbar").hide();
+					} else {
+						$(".leaderboard-entry").addClass("fade-in");
+						$(".leaderboard-tab").addClass("open");
+						$(".leaderboard-tab").find("rect").attr("fill", "#ddcee2");
+						$(".user-personal-low").addClass("fade-in");
+
+						let normalHeight = 19;
+						let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+
+						if (checkHeight > normalHeight) {
+							$(".leaderboard-property-choice-hider").addClass("large");
+						}
+
+						$(".leaderboard-tab rect").attr("fill", darkmode ? "#37243d" : "#ddcee2");
 					}
 
-					$(".leaderboard-tab rect").attr("fill", darkmode ? "#37243d" : "#ddcee2");
+					isInLeaderboardFrame();
+					LeaderboardPositionCheck(1);
+					LEADERBOARD_USERS = res.users;
 				}
-
-				isInLeaderboardFrame();
-				LeaderboardPositionCheck(1);
-				LEADERBOARD_USERS = res.users;
-			});
+			})
 
 			let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
 			$(".user-column").css({
@@ -299,14 +301,24 @@ $(".switch").click(function() {
 		darkmodeOff();
 	}
 
-	$.get("/darkmode/" + (checked ? 1 : 0));
+	Meta.xhr.send({
+		type: "GET",
+		url: "/darkmode" + (checked ? 1 : 0)
+	});
 });
 
-$("#new-game").click(function() {
-	$.post("/game-over", {
-		board: JSON.stringify(board.board),
-		score: metaPoints,
-		killerPiece: 0
+$("#new-game").click(async function() {
+	if (endGame == 0 && postMoveSync.length)
+		await SyncMoves();
+
+	Meta.xhr.send({
+		type: "POST",
+		url: "/game-over",
+
+		data: JSON.stringify({ killerPiece: 0 }),
+		headers: {
+			"Content-Type": "application/json"
+		}
 	});
 
 	metaPoints = 0, points = 0;
@@ -495,16 +507,21 @@ $("#username").focusout(function() {
 		return;
 	}
 
-	$.get("/username-available/" + username, (res) => {
-		if (res == "0") { // username taken
-			invalidate($("#username"));
+	Meta.xhr.send({
+		type: "GET",
+		url: "/username-available" + username,
 
-			$("#username-taken").html("taken");
-			$("#username-taken").addClass("is-taken");
-			$("#username").addClass("taken");
-		} else {
-			$("#username-taken").removeClass("is-taken");
-			$("#username").removeClass("taken");
+		success: res => {
+			if (res == "0") { // username taken
+				invalidate($("#username"));
+	
+				$("#username-taken").html("taken");
+				$("#username-taken").addClass("is-taken");
+				$("#username").addClass("taken");
+			} else {
+				$("#username-taken").removeClass("is-taken");
+				$("#username").removeClass("taken");
+			}
 		}
 	});
 });
@@ -523,15 +540,20 @@ $("#email").focusout(function() {
 	if (!email.length)
 		return;
 
-	$.get("/email-available/" + email, (res) => {
-		if (res == "0") { // email taken
-			invalidate($("#email"));
+	Meta.xhr.send({
+		type: "GET",
+		url: "/email-available/" + email,
 
-			$("#email-taken").addClass("is-taken");
-			$("#email").addClass("taken");
-		} else {
-			$("#email-taken").removeClass("is-taken");
-			$("#email").removeClass("taken");
+		success: res => {
+			if (res == "0") { // email taken
+				invalidate($("#email"));
+	
+				$("#email-taken").addClass("is-taken");
+				$("#email").addClass("taken");
+			} else {
+				$("#email-taken").removeClass("is-taken");
+				$("#email").removeClass("taken");
+			}
 		}
 	});
 });
@@ -609,63 +631,43 @@ $("#register").click(function(e) {
 			invalidate($("#password"));
 		}
 
-		$.post("/login", {
-			username_email: username_or_email,
-			password
-		}, (res) => {
+		Meta.xhr.send({
+			type: "POST",
+			url: "/login",
 
-			if (!res.success) {
-				if (res == "1") { // invalid inputs
-					let errorNumbers = res.split("-")[1];
+			data: JSON.stringify({ username_email: username_or_email, password }),
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-					let errorNumberSplit = errorNumbers.split(",");
-					let formInputs = {
-						"0": $("#username"),
-						"1": $("#password")
+			responseHandle: Meta.xhr.responseJSON,
+			success: res => {
+				if (!res.success) {
+					if (res == "1") { // invalid inputs
+						let errorNumbers = res.split("-")[1];
+
+						let errorNumberSplit = errorNumbers.split(",");
+						let formInputs = {
+							"0": $("#username"),
+							"1": $("#password")
+						}
+
+						for (let i = 0; i < errorNumberSplit.length; i++) {
+							invalidate(formInputs[errorNumberSplit[i]]);
+						}
+					} else if (res == "2") { // no user
+						$("#username-email-unknown").addClass("is-taken");
+						invalidate($("#username"));
+					} else if (res == "3") { // incorrect password
+						$("#login-password-invalid").addClass("is-taken");
+						invalidate($("#password"));
 					}
-
-					for (let i = 0; i < errorNumberSplit.length; i++) {
-						invalidate(formInputs[errorNumberSplit[i]]);
-					}
-				} else if (res == "2") { // no user
-					$("#username-email-unknown").addClass("is-taken");
-					invalidate($("#username"));
-				} else if (res == "3") { // incorrect password
-					$("#login-password-invalid").addClass("is-taken");
-					invalidate($("#password"));
+					// error
+					return;
 				}
-				// error
-				return;
-			}
-
-			let currentLocalBoard = localStorage.getItem("saved2-11Board");
-			let currentLocalScore = localStorage.getItem("savedCurr2-11Score");
-
-			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
-			let JSONres_board = JSON.parse(res.board);
-
-			localStorage.setItem("savedBest2-11Score", res.bestScore);
-			if ((!currentLocalBoard || !JSONcurrentLocalBoard) || (!res.board || !JSONres_board)) {
-				localStorage.setItem("saved2-11Board", res.board);
-				localStorage.setItem("savedBest2-11Score", res.currentScore);
 
 				window.location.href = window.location.href.split("/")[0] + "/l";
-				return;
 			}
-
-			if (!differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
-				window.location.href = window.location.href.split("/")[0] + "/l";
-				return;
-			}
-
-			stringBoardToVisual($("#local-board"), JSONcurrentLocalBoard);
-			stringBoardToVisual($("#remote-board"), JSONres_board);
-
-			// choose which board to continue with
-			$("#choose-board-username").text(res.username);
-			$("#choose-board").addClass("fix-conflict");
-
-			res_buffer = res;
 		});
 	} else {
 		let invalids = 0;
@@ -690,50 +692,39 @@ $("#register").click(function(e) {
 		if (invalids)
 			return;
 
-		$.post("/signup", {
-			email,
-			username,
-			password
-		}, (res) => {
-			if (res.success) {
+		Meta.xhr.send({
+			type: "POST",
+			url: "/signup",
 
-				window.location.href = window.location.href.split("/")[0] + "/l";
+			data: JSON.stringify({ email, username, password }),
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-				return;
-			}
+			responseHandle: Meta.xhr.responseJSON,
+			success: res => {
+				if (res.success) {
 
-			let errorNumbers = res.split("-")[1];
+					window.location.href = window.location.href.split("/")[0] + "/l";
 
-			let errorNumberSplit = errorNumbers.split(",");
-			let formInputs = {
-				"0": $("#email"),
-				"1": $("#username"),
-				"2": $("#password")
-			}
+					return;
+				}
 
-			for (let i = 0; i < errorNumberSplit.length; i++) {
-				invalidate(formInputs[errorNumberSplit[i]]);
+				let errorNumbers = res.split("-")[1];
+
+				let errorNumberSplit = errorNumbers.split(",");
+				let formInputs = {
+					"0": $("#email"),
+					"1": $("#username"),
+					"2": $("#password")
+				}
+
+				for (let i = 0; i < errorNumberSplit.length; i++) {
+					invalidate(formInputs[errorNumberSplit[i]]);
+				}
 			}
 		});
 	}
-});
-
-$("#choose-local-board").click(function() {
-	$.post("/save-game", {
-		board: localStorage.getItem("saved2-11Board"),
-		currentScore: "83e0a301" + localStorage.getItem("savedCurr2-11Score")
-	}, (res) => {
-		window.location.href = window.location.href.split("/")[0] + "/l";
-	});
-});
-
-$("#choose-remote-board").click(function() {
-	console.log(res_buffer);
-	localStorage.setItem("saved2-11Board", res_buffer.board);
-	localStorage.setItem("savedCurr2-11Score", res_buffer.currentScore);
-	localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
-
-	window.location.href = window.location.href.split("/")[0] + "/l";
 });
 
 // boardClose: decide if leaderboard-property-choice-hider should close
@@ -744,56 +735,65 @@ function leaderboardCreate(Lboard, boardClose) {
 		if ($("body").outerWidth(false) < 1225)
 			LeaderboardPositionCheck(1);
 
-		$.get("/updated-leaderboard", (res) => {
-			LEADERBOARD_USERS = res.leaderboardIndex;
+		Meta.xhr.send({
+			type: "GET",
+			url: "/updated-leaderboard",
 
-			if (boardClose) {
-				$(".leaderboard-property-choice-hider").addClass("open");
-				$(".user-column").animate({
-					height: "390px"
-				}, 400);
+			responseHandle: Meta.xhr.responseJSON,
+			success: res => {
+				LEADERBOARD_USERS = res.leaderboardIndex;
+				console.log(LEADERBOARD_USERS);
 
-				$(".leaderboard-scrollbar").show();
-			}
+				if (boardClose) {
+					$(".leaderboard-property-choice-hider").addClass("open");
+					$(".user-column").animate({
+						height: "420px"
+					}, 400);
 
-			if (res.lowUser) {
-				$(".user-personal-low").find(".leaderboard-entry-rank").text(res.lowUser.rank);
-				$(".user-personal-low").find(".leaderboard-entry-score").text(res.lowUser.score);
-			} else
-				$(".user-personal-low").removeClass("fade-in");
+					$(".leaderboard-scrollbar").show();
+				}
 
-			for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
-				setTimeout(function(in_dat) {
-					let e = in_dat[0];
+				if (res.lowUser) {
+					$(".user-personal-low").find(".leaderboard-entry-rank").text(res.lowUser.rank);
+					$(".user-personal-low").find(".leaderboard-entry-score").text(res.lowUser.score);
+				} else
+					$(".user-personal-low").removeClass("fade-in");
 
-					$("#leaderboard").append(`
-					<div class="leaderboard-entry fade-in in-frame">
-						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
-						<div class="leaderboard-entry-meta">
-							<div class="leaderboard-entry-username">${e.username}</div>
-							<div class="leaderboard-entry-score ${e.personal_user ? e.personal_user : ""}">${e.score}</div>
+				for (let i = 0; i < LEADERBOARD_USERS.length; i++) {
+					setTimeout(function(in_dat) {
+						let e = in_dat[0];
+
+						console.log("add", e);
+						$("#leaderboard").append(`
+						<div class="leaderboard-entry fade-in in-frame">
+							<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
+							<div class="leaderboard-entry-meta">
+								<div class="leaderboard-entry-username">${e.username}</div>
+								<div class="leaderboard-entry-score ${e.personal_user ? e.personal_user : ""}">${e.score}</div>
+							</div>
 						</div>
-					</div>
-					`);
+						`);
 
-					if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
-						setTimeout(function() {
-							isInLeaderboardFrame();
-							
-							$(".leaderboard-scrollbar-position").css({
-								height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
-							});
-						}, 800);
-					}
+						if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
+							setTimeout(function() {
+								isInLeaderboardFrame();
+								
+								$(".leaderboard-scrollbar-position").css({
+									height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
+								});
+							}, 800);
+						}
 
-					if ($("body").outerWidth(false) < 1225)
-						LeaderboardPositionCheck(1);
-				}, i * 40, [LEADERBOARD_USERS[i], i]);
+						if ($("body").outerWidth(false) < 1225)
+							LeaderboardPositionCheck(1);
+					}, i * 40, [LEADERBOARD_USERS[i], i]);
+				}
 			}
-		});
+		})
 
-		$.get("/toggle-leaderboard/1", (res) => {
-			return;
+		Meta.xhr.send({
+			type: "GET",
+			url: "/toggle-leaderboard/1"
 		});
 	} else {
 		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#37243d" : "#ddcee2");
@@ -822,8 +822,9 @@ function leaderboardCreate(Lboard, boardClose) {
 			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 60, $(delete_child[i]));
 		}
 
-		$.get("/toggle-leaderboard/0", (res) => {
-			return;
+		Meta.xhr.send({
+			type: "GET",
+			url: "/toggle-leaderboard/0"
 		});
 	}
 }
@@ -898,7 +899,7 @@ $(".leaderboard-current-property").click(function() {
 	}
 });
 
-$(".leaderboard-pick").click(function() {
+$(".leaderboard-pick").click(async function() {
 	if ($(this).text() == $("#leaderboard-shown-property").text()) {
 		$(".leaderboard-property-choices").removeClass("select");
 		$(".dropdown-property-choice").removeClass("open");
@@ -909,37 +910,46 @@ $(".leaderboard-pick").click(function() {
 	}
 	let leaderboardProperty = $(this).attr("lead-prop");
 
-	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
-		if (res == "1")
-			return;
+	if (postMoveSync.length) {
+		await SyncMoves();
+	}
 
-		activeLeaderboardProperty = res.split("-")[1];
+	Meta.xhr.send({
+		type: "GET",
+		url: "/leaderboard-property/" + leaderboardProperty,
 
-		$("#leaderboard-shown-property").text(activeLeaderboardProperty);
-		let normalHeight = 19;
-		let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
+		success: res => {
+			if (res == "1")
+				return;
 
-		if (checkHeight > normalHeight) {
-			$(".leaderboard-property-choice-hider").addClass("large");
-		} else
-			$(".leaderboard-property-choice-hider").removeClass("large");
+			activeLeaderboardProperty = res.split("-")[1];
 
-		let lTab = $(".leaderboard-tab");
-		if ($(lTab).hasClass("open")) {
-			$(lTab).removeClass("open")
-			leaderboardCreate(lTab, 0);
+			$("#leaderboard-shown-property").text(activeLeaderboardProperty);
+			let normalHeight = 19;
+			let checkHeight = $("#leaderboard-shown-property").outerHeight(false);
 
-			setTimeout(function() {
-				$(lTab).addClass("open");
+			if (checkHeight > normalHeight) {
+				$(".leaderboard-property-choice-hider").addClass("large");
+			} else
+				$(".leaderboard-property-choice-hider").removeClass("large");
+
+			let lTab = $(".leaderboard-tab");
+			if ($(lTab).hasClass("open")) {
+				$(lTab).removeClass("open")
 				leaderboardCreate(lTab, 0);
-			}, 800);
-		} else
-			leaderboardCreate(lTab);
 
-		$(".leaderboard-property-choices").removeClass("select");
-		$(".dropdown-property-choice").removeClass("open");
+				setTimeout(function() {
+					$(lTab).addClass("open");
+					leaderboardCreate(lTab, 0);
+				}, 800);
+			} else
+				leaderboardCreate(lTab);
 
-		$("body").off("click", leaderboardCloser);
+			$(".leaderboard-property-choices").removeClass("select");
+			$(".dropdown-property-choice").removeClass("open");
+
+			$("body").off("click", leaderboardCloser);
+		}
 	});
 });
 

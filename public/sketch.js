@@ -1,4 +1,4 @@
-function setup(isRestart) {
+async function setup(isRestart) {
   createCanvas(400, 400);
   
   $("#how-to-play").outerWidth($("#defaultCanvas0").outerWidth());
@@ -23,19 +23,31 @@ function setup(isRestart) {
     131072: [color(0, 0, 0), color(220, 220, 220), 25]
   };
 
+  boardReady = 0;
   let oldBoard = null;
-  if (!isRestart) {
-    oldBoard = localStorage.getItem("saved2-11Board");
-    metaPoints = localStorage.getItem("savedCurr2-11Score");
+  if (loggedIn) {
+    await new Promise((resolve, reject) => {
+      Meta.xhr.send({
+        type: "GET",
+        url: "/previous-board",
 
+        responseHandle: Meta.xhr.responseJSON,
+        success: (res) => {
+          if (!res || res == null) return resolve();
+
+          oldBoard = res;
+          resolve();
+        }
+      })
+    });
+  }
+  
+  if (!isRestart) {
     metaPoints = metaPoints ? parseInt(metaPoints, 10) : 0;
     $("#current-score").text(metaPoints);
     $("#best-score").text(bestPoints);
-
-    oldBoard = oldBoard ? JSON.parse(oldBoard) : null;
   } else {
-    localStorage.setItem("saved2-11Board", null);
-    localStorage.setItem("savedCurr2-11Score", 0);
+    oldBoard = null;
   }
 
   let hasNumbers = 0;
@@ -53,8 +65,10 @@ function setup(isRestart) {
     }
   }
 
-  board = new Board(4, 90, hasNumbers ? oldBoard : null);
   moveBuildup = [];
+  postMoveSync = [];
+
+  framesSinceSync = 0;
 
   let options = {
     preventDefault: true
@@ -69,32 +83,48 @@ function setup(isRestart) {
 
     hammer.on("swipe", swiped);
   }
+
+  board = await new Board(4, 90, hasNumbers ? oldBoard : null);
+
+  boardReady = 1;
 }
 
 function draw() {
+  if (!boardReady) return;
+
   background(220);
   
   if (!endGame) {
     if (!board.boardMove && moveBuildup.length) {
+      let piece;
       if (moveBuildup[0] == 1) {
-        board.moveLeft();
+        piece = board.moveLeft();
       } else if (moveBuildup[0] == 2) {
-        board.moveUp();
+        piece = board.moveUp();
       } else if (moveBuildup[0]  == 3) {
-        board.moveRight();
+        piece = board.moveRight();
       } else {
-        board.moveDown();
+        piece = board.moveDown();
       }
       
+      postMoveSync.push({
+        move: moveBuildup[0],
+        piece
+      });
       moveBuildup = moveBuildup.slice(1);
     }
     
+    if ((postMoveSync.length > 6 && framesSinceSync > 240) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
+      framesSinceSync = 0;
+      SyncMoves();
+    }
+
+    framesSinceSync++;
+
     board.drawBoard();
   } else {
     // end game screen
     board.drawBoard();
-    localStorage.setItem("saved2-11Board", null);
-    localStorage.setItem("savedCurr2-11Score", 0);
 
     fill(rectEndFiller[0], rectEndFiller[1], rectEndFiller[2], opacityEndRoller);
 
@@ -127,28 +157,40 @@ function keyPressed() {
       return;
     }
     
-    board.moveLeft();
+    postMoveSync.push({
+      move: 1,
+      piece: board.moveLeft()
+    });
   } else if (keyCode == UP_ARROW || key == 'w' || key == 'k') {
     if (board.boardMove) {
       moveBuildup.push(2);
       return;
     }
-    
-    board.moveUp();
+
+    postMoveSync.push({
+      move: 2,
+      piece: board.moveUp()
+    });
   } else if (keyCode == RIGHT_ARROW || key == 'd' || key == 'l') {
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
-    board.moveRight();
+    postMoveSync.push({
+      move: 3,
+      piece: board.moveRight()
+    });
   } else if (keyCode == DOWN_ARROW || key == 's' || key == 'j') {
     if (board.boardMove) {
       moveBuildup.push(4);
       return;
     }
-    
-    board.moveDown();
+
+    postMoveSync.push({
+      move: 4,
+      piece: board.moveDown()
+    });
   }
 }
 
@@ -162,30 +204,65 @@ function swiped(event) {
       return;
     }
     
-    board.moveLeft();
+    postMoveSync.push({
+      move: 1,
+      piece: board.moveLeft()
+    });
   } else if (event.angle < -45 && event.angle >= -135) {
     if (board.boardMove) {
       moveBuildup.push(2);
       return;
     }
     
-    board.moveUp();
+    postMoveSync.push({
+      move: 2,
+      piece: board.moveUp()
+    });
   } else if (event.angle < 45 && event.angle >= -45) {
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
-    board.moveRight();
+    postMoveSync.push({
+      move: 3,
+      piece: board.moveRight()
+    });
   } else if (event.angle > 45 && event.angle <= 135) {
     if (board.boardMove) {
       moveBuildup.push(4);
       return;
     }
     
-    board.moveDown();
+    postMoveSync.push({
+      move: 4,
+      piece: board.moveDown()
+    });
   }
-
-  board.saveGame();
 }
 
+
+function SyncMoves() {
+  let MovesToSend = postMoveSync;
+  postMoveSync = [];
+
+  return new Promise((resolve, reject) => {
+    Meta.xhr.send({
+      type: "POST",
+      url: "/move-game",
+
+      data: JSON.stringify({ move: MovesToSend }),
+
+      headers: {
+        "Content-type": "application/json"
+      },
+
+      success: res => resolve,
+
+      failure: (e) => {
+        console.log(e);
+        reject(e);
+      }
+    });
+  });
+}
