@@ -413,21 +413,30 @@ const moveBoard = {
  * 
  * @params { Array } array of moves that have occured
  *  - either left (1), up (2), right (3), or down (4) 
+ *
+ * @returns { Number } status move-game result:
+ *  - 0: success
+ *  - 1: failed
+ *  - 2: invalid board, reset on client side
+ *  - 3: game over, reset on client side
  */
 app.post("/move-game", loggedIn, (req, res, next) => {
 	if (!req.body.move)
 		return res.send("1");
 
-	connection.query("SELECT currentScore, bestBlock, wholeBoard FROM game INNER JOIN current_board ON game.user_id=current_board.user_id WHERE game.user_id=?", req.cookies.user_id, (err, game) => {
-		if (err || !game || !game.length) return next(err);
+	connection.query(`SELECT currentScore, averageScore, bestBlock, totalGames, game_id, wholeBoard,
+		startTime FROM game INNER JOIN current_board ON game.user_id=current_board.user_id
+		WHERE game.user_id=?`, req.cookies.user_id, (err, gameState) => {
+		if (err || !gameState || !gameState.length) return next(err);
 
+		let game = gameState[0];
 		// check that we can move the board
-		if (!boardJS.canMove(game[0].wholeBoard))
+		if (!boardJS.canMove(game.wholeBoard))
 			// send back error response
 			return res.send("1");
 
 		for (let move = 0; move < req.body.move.length; move++) {
-			let boardDiffs = moveBoard[req.body.move](game[0].wholeBoard);
+			let boardDiffs = moveBoard[req.body.move](game.wholeBoard);
 
 			if (boardDiffs.error) {
 				// something is wrong with their board
@@ -435,19 +444,44 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 				return res.send("2");
 			}
 
-			game[0].currentScore += boardDiffs.points;
-			game[0].bestBlock = game[0].bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game[0].bestBlock;
+			game.currentScore += boardDiffs.points;
+			game.currBestBlock = boardDiffs.bestBlock;
+			game.bestBlock = game.bestBlock < boardDiffs.bestBlock ? boardDiffs.bestBlock : game.bestBlock;
+
+			if (!boardJS.canMove(game[0].wholeBoard))
+				return game_over(req, res, game);
 		}
 
-		connection.query("UPDATE game SET currentScore=?, bestBlock=? WHERE user_id=?", [game[0].currentScore, game[0].bestBlock, req.cookies.user_id]);
-		connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [game[0].wholeBoard, req.cookies.user_id]);
+		connection.query("UPDATE game SET currentScore=?, bestBlock=? WHERE user_id=?", [game.currentScore, game.bestBlock, req.cookies.user_id]);
+		connection.query("UPDATE current_board SET wholeBoard=? WHERE user_id=?", [game.wholeBoard, req.cookies.user_id]);
 
-		res.send("");
+		res.send("0");
 	});
 });
 
-function game_over(req, res) {
-	connection.query("SELECT game_id, wholeBoard, startTime, ")
+function game_over(req, res, game) {
+	connection.query("INSERT INTO board_history VALUES (?, ?, ?, ?, ?, ?);",
+		[req.cookies.user_id, game.game_id, JSON.stringify(game.wholeBoard, game.startTime, new Date)],
+		await (err) => {
+			if (err) return res.end("1");
+
+			game.totalGames += 1;
+			let newAverageScore = game.averageScore / game.totalGames + game.currentScore / game.totalGames;
+			await Promise.all([
+				new Promise(resolve => {
+					connection.query(`UPDATE game SET currentScore=?, bestBlock=?, averageScore=?,
+				totalGames=?, wins=(SELECT wins FROM game WHERE user_id=?)+?
+				WHERE user_id=?`, [0, game.bestBlock, newAverageScore, game.totalGames,
+				req.cookies.user_id, game.currBestBlock >= 2048, req.cookies.user_id], resolve);
+				}),
+				new Promise(resolve => {
+					connection.query(`UPDATE current_board SET game_id=?, wholeBoard=?, startTime=?
+						WHERE user_id=?`, [uuidv4(), null, null, req.cookies.user_id], resolve);
+				})
+			]);
+
+			return res.end("3");
+		});
 }
 
 app.post("/game-over", loggedIn, (req, res, next) => {

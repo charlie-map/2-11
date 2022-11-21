@@ -49,28 +49,27 @@ module.exports = {
 	canMove: function(board) {
 		// check for empty cell:
 		let rowPrevNum = [0, 0, 0, 0];
-		let canMove = 0;
 
 		for (let x = 0; x < 4; x++) {
 			let prevNum = 0;
 
 			for (let y = 0; y < 4; y++) {
-				if (!board[x][y]) {
-					canMove = 1;
-					continue;
-				}
+				if (!board[x][y]) 
+					return 1; // found a place to move
 
-				if (prevNum == board[x][y].num)
-					canMove = 1;
+				if (prevNum == board[x][y])
+					return 1; // found
 				else
-					prevNum = board[x][y].num;
+					prevNum = board[x][y];
 
-				if (rowPrevNum[y] == board[x][y].num)
-					canMove = 1;
+				if (rowPrevNum[y] == board[x][y])
+					return 1; // found
 				else
-					rowPrevNum[y] = board[x][y].num;
+					rowPrevNum[y] = board[x][y];
 			}
 		}
+
+		return 0;
 	},
 
 	// moveDirection = 1

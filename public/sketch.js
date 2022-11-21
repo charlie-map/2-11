@@ -49,7 +49,7 @@ async function setup(isRestart) {
     }
   }
 
-  moveBuildup = [];
+  moveBuildup = [];game
   postMoveSync = [];
 
   framesSinceSync = 0;
@@ -95,7 +95,7 @@ function draw() {
       moveBuildup = moveBuildup.slice(1);
     }
     
-    if (postMoveSync.length > 20 || framesSinceSync > 360) {
+    if ((postMoveSync.length > 20 && framesSinceSync > 240) || framesSinceSync > 360) {
       framesSinceSync = 0;
       SyncMoves();
     }
