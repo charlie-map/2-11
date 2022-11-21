@@ -19,10 +19,8 @@ class Board {
           // let num = pow(2, (setBoardX * size) + setBoardY + 1);
           // this.board[setBoardX][setBoardY] = new Piece(100 * setBoardX, 100 * setBoardY, tileSize, tileSize, levelConverter[num].length ? num : 2);
           if (oldBoard && oldBoard[setBoardX][setBoardY]) {
-            let oldPieceData = oldBoard[setBoardX][setBoardY];
-
             this.board[setBoardX][setBoardY] = new Piece(setBoardX * 100, setBoardY * 100,
-              90, 90, oldPieceData.num);
+              90, 90, oldBoard[setBoardX][setBoardY]);
 
             continue;
           }
@@ -54,17 +52,25 @@ class Board {
 
         await new Promise((iresolve, ireject) => {
           console.log("send board", piece);
-          $.ajax({
+          Meta.xhr.send({
             type: "POST",
             url: "/new-game",
-            data: { piece: JSON.stringify(piece) },
+
+            data: JSON.stringify({ piece }),
+
+            headers: {
+              "Content-type": "application/json"
+            },
 
             success: res => {
               console.log(res);
               iresolve();
             },
 
-            failure: ireject
+            failure: (e) => {
+              console.log(e);
+              ireject();
+            }
           });
         });
       }
@@ -113,10 +119,10 @@ class Board {
     mostRecentPiece = start_number;
     this.board[findOpenX][findOpenY] = new Piece(100 * findOpenX, 100 * findOpenY, tileSize, tileSize, start_number);
 
-    return 1;
+    return { x: findOpenX, y: findOpenY, num: start_number };
   }
 
-  drawBoard() {
+  async drawBoard() {
     let boxWidth = width * 0.25;
     let boxHeight = height * 0.25;
 
@@ -219,6 +225,7 @@ class Board {
     this.boardMove = movingPieces ? 1 : 0;
 
     if (!this.boardMove && !this.canMove() && !this.endGameRequest) {
+      console.log("GAME OVER");
       if (activeLeaderboardProperty == "Average score" ||
           activeLeaderboardProperty == "Wins" ||
           activeLeaderboardProperty == "% Wins") {
@@ -234,18 +241,26 @@ class Board {
 
       this.endGameRequest = 1;
 
-      $.post("/game-over", {
-        board: JSON.stringify(this.board),
-        score: metaPoints,
-        killerPiece: mostRecentPiece
-      }, (res) => {
-        endGame = 1;
+      if (postMoveSync.length)
+        await SyncMoves();
 
-        localStorage.setItem("saved2-11Board", null);
-        localStorage.setItem("savedCurr2-11Score", 0);
+      console.log("sync data");
+      Meta.xhr.send({
+        type: "POST",
+        url: "/game-over",
 
-        $("#new-game").text("Try again");
-      });
+        data: JSON.stringify({ killerPiece: mostRecentPiece }),
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        success: (res) => {
+          console.log("finished sync");
+          endGame = 1;
+
+          $("#new-game").text("Try again");
+        }
+      })
     }
   }
 
@@ -347,7 +362,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 2
@@ -388,7 +403,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 3
@@ -429,7 +444,7 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 
   // moveDirection = 4
@@ -470,6 +485,6 @@ class Board {
     }
 
     if (somethingMoved)
-      this.addPiece(this.tileS);
+      return this.addPiece(this.tileS);
   }
 }

@@ -47,6 +47,8 @@ module.exports = {
 	},
 
 	canMove: function(board) {
+		if (!board) return 0;
+
 		// check for empty cell:
 		let rowPrevNum = [0, 0, 0, 0];
 

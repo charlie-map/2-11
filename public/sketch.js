@@ -23,15 +23,31 @@ async function setup(isRestart) {
     131072: [color(0, 0, 0), color(220, 220, 220), 25]
   };
 
+  boardReady = 0;
   let oldBoard = null;
-  if (!isRestart) {
-    oldBoard = null
+  if (loggedIn) {
+    await new Promise((resolve, reject) => {
+      Meta.xhr.send({
+        type: "GET",
+        url: "/previous-board",
 
+        responseHandle: Meta.xhr.responseJSON,
+        success: (res) => {
+          if (!res || res == null) return resolve();
+
+          oldBoard = res;
+          resolve();
+        }
+      })
+    });
+  }
+  
+  if (!isRestart) {
     metaPoints = metaPoints ? parseInt(metaPoints, 10) : 0;
     $("#current-score").text(metaPoints);
     $("#best-score").text(bestPoints);
-
-    oldBoard = oldBoard ? JSON.parse(oldBoard) : null;
+  } else {
+    oldBoard = null;
   }
 
   let hasNumbers = 0;
@@ -49,7 +65,7 @@ async function setup(isRestart) {
     }
   }
 
-  moveBuildup = [];game
+  moveBuildup = [];
   postMoveSync = [];
 
   framesSinceSync = 0;
@@ -68,7 +84,6 @@ async function setup(isRestart) {
     hammer.on("swipe", swiped);
   }
 
-  boardReady = 0;
   board = await new Board(4, 90, hasNumbers ? oldBoard : null);
 
   boardReady = 1;
@@ -81,21 +96,25 @@ function draw() {
   
   if (!endGame) {
     if (!board.boardMove && moveBuildup.length) {
+      let piece;
       if (moveBuildup[0] == 1) {
-        board.moveLeft();
+        piece = board.moveLeft();
       } else if (moveBuildup[0] == 2) {
-        board.moveUp();
+        piece = board.moveUp();
       } else if (moveBuildup[0]  == 3) {
-        board.moveRight();
+        piece = board.moveRight();
       } else {
-        board.moveDown();
+        piece = board.moveDown();
       }
       
-      postMoveSync.push(moveBuildup[0]);
+      postMoveSync.push({
+        move: moveBuildup[0],
+        piece
+      });
       moveBuildup = moveBuildup.slice(1);
     }
     
-    if ((postMoveSync.length > 20 && framesSinceSync > 240) || framesSinceSync > 360) {
+    if ((postMoveSync.length > 6 && framesSinceSync > 240) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
       framesSinceSync = 0;
       SyncMoves();
     }
@@ -138,32 +157,40 @@ function keyPressed() {
       return;
     }
     
-    postMoveSync.push(1);
-    board.moveLeft();
+    postMoveSync.push({
+      move: 1,
+      piece: board.moveLeft()
+    });
   } else if (keyCode == UP_ARROW || key == 'w' || key == 'k') {
     if (board.boardMove) {
       moveBuildup.push(2);
       return;
     }
-    
-    postMoveSync.push(2);
-    board.moveUp();
+
+    postMoveSync.push({
+      move: 2,
+      piece: board.moveUp()
+    });
   } else if (keyCode == RIGHT_ARROW || key == 'd' || key == 'l') {
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
-    postMoveSync.push(3);
-    board.moveRight();
+    postMoveSync.push({
+      move: 3,
+      piece: board.moveRight()
+    });
   } else if (keyCode == DOWN_ARROW || key == 's' || key == 'j') {
     if (board.boardMove) {
       moveBuildup.push(4);
       return;
     }
-    
-    postMoveSync.push(4);
-    board.moveDown();
+
+    postMoveSync.push({
+      move: 4,
+      piece: board.moveDown()
+    });
   }
 }
 
@@ -177,32 +204,40 @@ function swiped(event) {
       return;
     }
     
-    postMoveSync.push(1);
-    board.moveLeft();
+    postMoveSync.push({
+      move: 1,
+      piece: board.moveLeft()
+    });
   } else if (event.angle < -45 && event.angle >= -135) {
     if (board.boardMove) {
       moveBuildup.push(2);
       return;
     }
     
-    postMoveSync.push(2);
-    board.moveUp();
+    postMoveSync.push({
+      move: 2,
+      piece: board.moveUp()
+    });
   } else if (event.angle < 45 && event.angle >= -45) {
     if (board.boardMove) {
       moveBuildup.push(3);
       return;
     }
     
-    postMoveSync.push(3);
-    board.moveRight();
+    postMoveSync.push({
+      move: 3,
+      piece: board.moveRight()
+    });
   } else if (event.angle > 45 && event.angle <= 135) {
     if (board.boardMove) {
       moveBuildup.push(4);
       return;
     }
     
-    postMoveSync.push(4);
-    board.moveDown();
+    postMoveSync.push({
+      move: 4,
+      piece: board.moveDown()
+    });
   }
 }
 
@@ -211,16 +246,26 @@ function SyncMoves() {
   let MovesToSend = postMoveSync;
   postMoveSync = [];
 
-  console.log(MovesToSend);
-  $.post("/move-game", MovesToSend).then(res => {
-    console.log(res);
+  return new Promise((resolve, reject) => {
+    Meta.xhr.send({
+      type: "POST",
+      url: "/move-game",
 
-    if (res == "2") {
-      // game broken
-    } else if (res == "1") {
-      // game broken
-    }
-  }).catch(e => {
+      data: JSON.stringify({ move: MovesToSend }),
 
+      headers: {
+        "Content-type": "application/json"
+      },
+
+      success: res => {
+        console.log("finish sync", res);
+        resolve();
+      },
+
+      failure: (e) => {
+        console.log(e);
+        reject(e);
+      }
+    });
   });
 }

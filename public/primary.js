@@ -302,10 +302,11 @@ $(".switch").click(function() {
 	$.get("/darkmode/" + (checked ? 1 : 0));
 });
 
-$("#new-game").click(function() {
+$("#new-game").click(async function() {
+	if (endGame == 0 && postMoveSync.length)
+		await SyncMoves();
+
 	$.post("/game-over", {
-		board: JSON.stringify(board.board),
-		score: metaPoints,
 		killerPiece: 0
 	});
 
@@ -609,63 +610,43 @@ $("#register").click(function(e) {
 			invalidate($("#password"));
 		}
 
-		$.post("/login", {
-			username_email: username_or_email,
-			password
-		}, (res) => {
+		Meta.xhr.send({
+			type: "POST",
+			url: "/login",
 
-			if (!res.success) {
-				if (res == "1") { // invalid inputs
-					let errorNumbers = res.split("-")[1];
+			data: JSON.stringify({ username_email: username_or_email, password }),
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-					let errorNumberSplit = errorNumbers.split(",");
-					let formInputs = {
-						"0": $("#username"),
-						"1": $("#password")
+			responseHandle: Meta.xhr.responseJSON,
+			success: res => {
+				if (!res.success) {
+					if (res == "1") { // invalid inputs
+						let errorNumbers = res.split("-")[1];
+
+						let errorNumberSplit = errorNumbers.split(",");
+						let formInputs = {
+							"0": $("#username"),
+							"1": $("#password")
+						}
+
+						for (let i = 0; i < errorNumberSplit.length; i++) {
+							invalidate(formInputs[errorNumberSplit[i]]);
+						}
+					} else if (res == "2") { // no user
+						$("#username-email-unknown").addClass("is-taken");
+						invalidate($("#username"));
+					} else if (res == "3") { // incorrect password
+						$("#login-password-invalid").addClass("is-taken");
+						invalidate($("#password"));
 					}
-
-					for (let i = 0; i < errorNumberSplit.length; i++) {
-						invalidate(formInputs[errorNumberSplit[i]]);
-					}
-				} else if (res == "2") { // no user
-					$("#username-email-unknown").addClass("is-taken");
-					invalidate($("#username"));
-				} else if (res == "3") { // incorrect password
-					$("#login-password-invalid").addClass("is-taken");
-					invalidate($("#password"));
+					// error
+					return;
 				}
-				// error
-				return;
-			}
-
-			let currentLocalBoard = localStorage.getItem("saved2-11Board");
-			let currentLocalScore = localStorage.getItem("savedCurr2-11Score");
-
-			let JSONcurrentLocalBoard = JSON.parse(currentLocalBoard);
-			let JSONres_board = JSON.parse(res.board);
-
-			localStorage.setItem("savedBest2-11Score", res.bestScore);
-			if ((!currentLocalBoard || !JSONcurrentLocalBoard) || (!res.board || !JSONres_board)) {
-				localStorage.setItem("saved2-11Board", res.board);
-				localStorage.setItem("savedBest2-11Score", res.currentScore);
 
 				window.location.href = window.location.href.split("/")[0] + "/l";
-				return;
 			}
-
-			if (!differentNumbers(JSONcurrentLocalBoard, JSONres_board)) {
-				window.location.href = window.location.href.split("/")[0] + "/l";
-				return;
-			}
-
-			stringBoardToVisual($("#local-board"), JSONcurrentLocalBoard);
-			stringBoardToVisual($("#remote-board"), JSONres_board);
-
-			// choose which board to continue with
-			$("#choose-board-username").text(res.username);
-			$("#choose-board").addClass("fix-conflict");
-
-			res_buffer = res;
 		});
 	} else {
 		let invalids = 0;
@@ -690,50 +671,39 @@ $("#register").click(function(e) {
 		if (invalids)
 			return;
 
-		$.post("/signup", {
-			email,
-			username,
-			password
-		}, (res) => {
-			if (res.success) {
+		Meta.xhr.send({
+			type: "POST",
+			url: "/signup",
 
-				window.location.href = window.location.href.split("/")[0] + "/l";
+			data: JSON.stringify({ email, username, password }),
+			headers: {
+				"Content-Type": "application/json"
+			},
 
-				return;
-			}
+			responseHandle: Meta.xhr.responseJSON,
+			success: res => {
+				if (res.success) {
 
-			let errorNumbers = res.split("-")[1];
+					window.location.href = window.location.href.split("/")[0] + "/l";
 
-			let errorNumberSplit = errorNumbers.split(",");
-			let formInputs = {
-				"0": $("#email"),
-				"1": $("#username"),
-				"2": $("#password")
-			}
+					return;
+				}
 
-			for (let i = 0; i < errorNumberSplit.length; i++) {
-				invalidate(formInputs[errorNumberSplit[i]]);
+				let errorNumbers = res.split("-")[1];
+
+				let errorNumberSplit = errorNumbers.split(",");
+				let formInputs = {
+					"0": $("#email"),
+					"1": $("#username"),
+					"2": $("#password")
+				}
+
+				for (let i = 0; i < errorNumberSplit.length; i++) {
+					invalidate(formInputs[errorNumberSplit[i]]);
+				}
 			}
 		});
 	}
-});
-
-$("#choose-local-board").click(function() {
-	$.post("/save-game", {
-		board: localStorage.getItem("saved2-11Board"),
-		currentScore: "83e0a301" + localStorage.getItem("savedCurr2-11Score")
-	}, (res) => {
-		window.location.href = window.location.href.split("/")[0] + "/l";
-	});
-});
-
-$("#choose-remote-board").click(function() {
-	console.log(res_buffer);
-	localStorage.setItem("saved2-11Board", res_buffer.board);
-	localStorage.setItem("savedCurr2-11Score", res_buffer.currentScore);
-	localStorage.setItem("savedBest2-11Score", res_buffer.bestScore);
-
-	window.location.href = window.location.href.split("/")[0] + "/l";
 });
 
 // boardClose: decide if leaderboard-property-choice-hider should close
@@ -746,6 +716,7 @@ function leaderboardCreate(Lboard, boardClose) {
 
 		$.get("/updated-leaderboard", (res) => {
 			LEADERBOARD_USERS = res.leaderboardIndex;
+			console.log(LEADERBOARD_USERS);
 
 			if (boardClose) {
 				$(".leaderboard-property-choice-hider").addClass("open");
@@ -766,6 +737,7 @@ function leaderboardCreate(Lboard, boardClose) {
 				setTimeout(function(in_dat) {
 					let e = in_dat[0];
 
+					console.log("add", e);
 					$("#leaderboard").append(`
 					<div class="leaderboard-entry fade-in in-frame">
 						<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
@@ -898,7 +870,7 @@ $(".leaderboard-current-property").click(function() {
 	}
 });
 
-$(".leaderboard-pick").click(function() {
+$(".leaderboard-pick").click(async function() {
 	if ($(this).text() == $("#leaderboard-shown-property").text()) {
 		$(".leaderboard-property-choices").removeClass("select");
 		$(".dropdown-property-choice").removeClass("open");
@@ -908,6 +880,10 @@ $(".leaderboard-pick").click(function() {
 		return;
 	}
 	let leaderboardProperty = $(this).attr("lead-prop");
+
+	if (postMoveSync.length) {
+		await SyncMoves();
+	}
 
 	$.get("/leaderboard-property/" + leaderboardProperty, (res) => {
 		if (res == "1")
