@@ -101,7 +101,6 @@ $(document).ready(function() {
 			$("#username").focus();
 
 		if (loggedIn) {
-			console.log(darkmode);
 			if (darkmode) {
 				darkmodeOn();
 				if (!$(".switch").is(":checked"))
@@ -263,7 +262,6 @@ function darkmodeOn() {
 
 	$(".leaderboard-entry-rank").addClass("darkmode");
 
-	console.log("cleanup", $(".leaderboard-tab").hasClass("open"));
 	if ($(".leaderboard-tab").hasClass("open")) {
 		$(".leaderboard-tab rect").attr("fill", "#37243d");
 	}
@@ -741,7 +739,6 @@ function leaderboardCreate(Lboard, boardClose) {
 			responseHandle: Meta.xhr.responseJSON,
 			success: res => {
 				LEADERBOARD_USERS = res.leaderboardIndex;
-				console.log(LEADERBOARD_USERS);
 
 				if (boardClose) {
 					$(".leaderboard-property-choice-hider").addClass("open");
@@ -762,7 +759,6 @@ function leaderboardCreate(Lboard, boardClose) {
 					setTimeout(function(in_dat) {
 						let e = in_dat[0];
 
-						console.log("add", e);
 						$("#leaderboard").append(`
 						<div class="leaderboard-entry fade-in in-frame">
 							<div class="leaderboard-entry-rank rank-color${e.rank}">${e.rank}</div>
