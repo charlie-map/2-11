@@ -51,7 +51,6 @@ class Board {
         }
 
         await new Promise((iresolve, ireject) => {
-          console.log("send board", piece);
           Meta.xhr.send({
             type: "POST",
             url: "/new-game",
@@ -63,7 +62,6 @@ class Board {
             },
 
             success: res => {
-              console.log(res);
               iresolve();
             },
 
@@ -225,7 +223,6 @@ class Board {
     this.boardMove = movingPieces ? 1 : 0;
 
     if (!this.boardMove && !this.canMove() && !this.endGameRequest) {
-      console.log("GAME OVER");
       if (activeLeaderboardProperty == "Average score" ||
           activeLeaderboardProperty == "Wins" ||
           activeLeaderboardProperty == "% Wins") {
@@ -244,7 +241,6 @@ class Board {
       if (postMoveSync.length)
         await SyncMoves();
 
-      console.log("sync data");
       Meta.xhr.send({
         type: "POST",
         url: "/game-over",
@@ -255,7 +251,6 @@ class Board {
         },
 
         success: (res) => {
-          console.log("finished sync");
           endGame = 1;
 
           $("#new-game").text("Try again");
