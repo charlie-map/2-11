@@ -2,6 +2,8 @@ require("dotenv").config({
 	path: __dirname + "/.env"
 });
 
+const fs = require("fs");
+
 const express = require("express");
 const mustache = require("mustache-express");
 const bodyParser = require("body-parser");
@@ -20,6 +22,20 @@ const date_validator = require("validate-date");
 const boardJS = require("./boardMove.js");
 
 const mysql = require('mysql2');
+
+fs.readFile("allEmailEnds.txt", "utf8", (err, content) => {
+	if (err) {
+		console.error(err);
+		process.exit(1);
+	}
+
+	let emailEndTemp = {};
+	content.split("\n").forEach(i => {
+		emailEndTemp[i] = 1;
+	});
+
+	allEmailEnds = emailEndTemp;
+});
 
 const app = express();
 
@@ -586,6 +602,14 @@ app.get("/signup", (req, res) => {
 	});
 });
 
+
+function hard_email_validate(email) {
+	if (!email_validator.validate(email)) return 0;
+
+	if (!allEmailEnds[email.split("@")[1]]) return 0;
+
+	return 1;
+}
 /*
 	invalid codes:
 
@@ -603,7 +627,7 @@ app.get("/signup", (req, res) => {
 function signup_valid(body) {
 	let invalid_response = "";
 
-	if (!email_validator.validate(body.email))
+	if (!hard_email_validate(body.email))
 		invalid_response += "0,";
 
 	if (!body.username || !body.username.length || body.username.includes("@"))
@@ -621,8 +645,9 @@ function signup_valid(body) {
 app.post("/signup", async (req, res, next) => {
 	let signup_validator;
 	if ((signup_validator = signup_valid(req.body)).length) {
-		res.send("1-" + signup_validator);
-		return;
+		return res.json({
+			error: "1-" + signup_validator
+		});
 	}
 
 	let encryptPass = await new Promise((resolve, reject) => {

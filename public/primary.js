@@ -509,7 +509,7 @@ $("#username").focusout(function() {
 
 	Meta.xhr.send({
 		type: "GET",
-		url: "/username-available" + username,
+		url: "/username-available/" + username,
 
 		success: res => {
 			if (res == "0") { // username taken
@@ -704,13 +704,12 @@ $("#register").click(function(e) {
 			responseHandle: Meta.xhr.responseJSON,
 			success: res => {
 				if (res.success) {
-
 					window.location.href = window.location.href.split("/")[0] + "/l";
 
 					return;
 				}
 
-				let errorNumbers = res.split("-")[1];
+				let errorNumbers = res.error.split("-")[1];
 
 				let errorNumberSplit = errorNumbers.split(",");
 				let formInputs = {
