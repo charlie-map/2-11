@@ -23,7 +23,7 @@ const boardJS = require("./boardMove.js");
 
 const mysql = require('mysql2');
 
-fs.readFile("allEmailEnds.txt", "utf8", (err, content) => {
+fs.readFile(__dirname + "/allEmailEnds.txt", "utf8", (err, content) => {
 	if (err) {
 		console.error(err);
 		process.exit(1);
