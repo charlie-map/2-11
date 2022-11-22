@@ -114,7 +114,7 @@ function draw() {
       moveBuildup = moveBuildup.slice(1);
     }
     
-    if ((postMoveSync.length > 6 && framesSinceSync > 240) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
+    if ((postMoveSync.length > 6 && framesSinceSync > 120) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
       framesSinceSync = 0;
       SyncMoves();
     }
@@ -147,7 +147,7 @@ function computeColor(rank) {
 }
 
 function keyPressed() {
-  if (endGame)
+  if (endGame || !board)
     return;
 
   key = key.toLowerCase();
@@ -195,7 +195,7 @@ function keyPressed() {
 }
 
 function swiped(event) {
-  if (endGame)
+  if (endGame || !board)
     return;
 
   if (event.angle > 135 || event.angle < -135) {
@@ -257,7 +257,9 @@ function SyncMoves() {
         "Content-type": "application/json"
       },
 
-      success: res => resolve,
+      success: res => {
+        resolve()
+      },
 
       failure: (e) => {
         console.log(e);

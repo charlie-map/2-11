@@ -623,11 +623,54 @@ $("#register").click(function(e) {
 			invalids++;
 			invalidate($("#username"));
 		}
+
+		if (recovering) {
+			if (invalids) return;
+
+			Meta.xhr.send({
+				type: "POST",
+				url: "/recover",
+
+				data: JSON.stringify({ username_email: username_or_email }),
+				headers: {
+					"Content-Type": "application/json"
+				},
+
+				responseHandle: Meta.xhr.responseJSON,
+				success: res => {
+					if (!res.success) {
+						if (res == "1") { // invalid inputs
+							let errorNumbers = res.split("-")[1];
+
+							let errorNumberSplit = errorNumbers.split(",");
+							let formInputs = { "0": $("#username") };
+
+							for (let i = 0; i < errorNumberSplit.length; i++)
+								invalidate(formInputs[errorNumberSplit[i]]);
+						} else if (res == "2") { // no user
+							$("#username-email-unknown").addClass("is-taken");
+							invalidate($("#username"));
+						}
+
+						// error
+						return;
+					}
+
+					window.location.href = window.location.href.split("/")[0] + "/l";
+				}
+			});
+
+			return;
+		}
+
 		let password = $("#password").val();
 		if (!password.length) {
 			invalids++;
 			invalidate($("#password"));
 		}
+
+		if (invalids)
+			return;
 
 		Meta.xhr.send({
 			type: "POST",

@@ -860,6 +860,15 @@ a {
   align-items: center;
 }
 
+.registration-button-group > div {
+	display: flex;
+
+	align-items: flex-start;
+	justify-content: space-around;
+
+	flex-direction: column;
+}
+
 #how-to-play {
 	margin-top: 20px;
 	padding-left: 5px;

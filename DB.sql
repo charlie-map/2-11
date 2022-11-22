@@ -11,6 +11,7 @@ CREATE TABLE user (
 	wantsEmail TINYINT NOT NULL DEFAULT 1,
 
 	password VARCHAR(60) NOT NULL,
+	recovery_nonce VARCHAR(36),
 
 	joindate DATE NOT NULL,
 

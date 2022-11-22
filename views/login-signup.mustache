@@ -24,7 +24,12 @@
 				<h4 class="barlow">{{LOG_OR_SIGN}} <span>2^11</span></h4>
 				<p class="barlow">
 					{{#LOGGING_IN}}
+						{{#RECOVERING}}
+						Forgot password? We can help:
+						{{/RECOVERING}}
+						{{^RECOVERING}}
 						Welcome back! Log in to get back to the game:
+						{{/RECOVERING}}
 					{{/LOGGING_IN}}
 					{{^LOGGING_IN}}
 						Welcome! Sign up to start your <span>2^11</span> journey:
@@ -62,6 +67,7 @@
 					</div>
 				{{/LOGGING_IN}}
 				
+				{{^RECOVERING}}
 				<div id="password-container" class="floating-label {{LOG_OR_SIGN}}">
 					<input class="barlow" placeholder="Password" type="password" name="password" id="password" autocomplete="off">
 					<label class="barlow" for="password">Password: <span id="login-password-invalid" class="barlow">invalid</span></label>
@@ -71,14 +77,20 @@
 						<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Lock Closed</title><path d="M336 208v-95a80 80 0 00-160 0v95" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="96" y="208" width="320" height="272" rx="48" ry="48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
 					</div>
 				</div>
+				{{/RECOVERING}}
 
 				<div class="registration-button-group">
-					{{#LOGGING_IN}}
-						<span class="barlow">No account? <a href="/signup">Signup</a></span>
-					{{/LOGGING_IN}}
-					{{^LOGGING_IN}}
-						<span class="barlow">Already have an account? <a href="/login">Login</a></span>
-					{{/LOGGING_IN}}
+					<div>
+						{{#LOGGING_IN}}
+							<span class="barlow">No account? <a href="/signup">Signup</a></span>
+							{{^RECOVERING}}
+							<!-- <span class="barlow">Forgot password? <a href="/recover">Recover account</a></span> -->
+							{{/RECOVERING}}
+						{{/LOGGING_IN}}
+						{{^LOGGING_IN}}
+							<span class="barlow">Already have an account? <a href="/login">Login</a></span>
+						{{/LOGGING_IN}}
+					</div>
 					<button id="register" class="yellow-button" type="submit">{{LOG_OR_SIGN}}</button>
 				</div>
 			</form>
@@ -101,6 +113,7 @@
 		<script>
 			let loggedIn = {{LOGGED_IN}};
 			let logging_in = {{LOGGING_IN}};
+			let recovering = {{RECOVERING}};
 		</script>
 		<script src="meta.js"></script>
 		<script src="primary.js"></script>

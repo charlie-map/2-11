@@ -519,14 +519,18 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 });
 
 function game_over(req, res, game, killerPiece) {
-	connection.query("INSERT INTO board_history VALUES (?, ?, ?, ?, ?, ?);",
-		[req.cookies.user_id, game.game_id, JSON.stringify(game.wholeBoard), game.currentScore, game.startTime, new Date],
+	connection.query(`INSERT INTO board_history (user_id, game_id, wholeBoard, score, startTime, endTime)
+		VALUES (?, ?, ?, ?, ?, ?)`, [req.cookies.user_id, game.game_id,
+		JSON.stringify(game.wholeBoard), game.currentScore, game.startTime, new Date],
 		async (err) => {
-			console.log(err);
 			if (err) return res.send("1");
 
+			let newAverageScore =
+				(game.averageScore * ((game.totalGames - 1) / game.totalGames))
+				+ (game.currentScore * (1 / game.totalGames));
 			game.totalGames += 1;
-			let newAverageScore = game.averageScore / game.totalGames + game.currentScore / game.totalGames;
+
+			console.log(game);
 			await Promise.all([
 				new Promise(resolve => {
 					connection.query(`UPDATE game SET currentScore=?, bestBlock=?, averageScore=?,
@@ -598,7 +602,8 @@ app.get("/signup", (req, res) => {
 	res.render("login-signup", {
 		LOG_OR_SIGN: "Signup",
 		LOGGED_IN: false,
-		LOGGING_IN: false
+		LOGGING_IN: false,
+		RECOVERING: false
 	});
 });
 
@@ -719,11 +724,21 @@ app.post("/signup", async (req, res, next) => {
 		});
 });
 
+app.get("/recover", (req, res) => {
+	res.render("login-signup", {
+		LOG_OR_SIGN: "Recover",
+		LOGGED_IN: false,
+		LOGGING_IN: true,
+		RECOVERING: true
+	});
+});
+
 app.get("/login", (req, res) => {
 	res.render("login-signup", {
 		LOG_OR_SIGN: "Login",
 		LOGGED_IN: false,
-		LOGGING_IN: true
+		LOGGING_IN: true,
+		RECOVERING: false
 	});
 });
 
@@ -822,6 +837,38 @@ app.post("/login", (req, res, next) => {
 		});
 	});
 });
+
+// status codes:
+// 0: success
+// 1: error with inputs (no email / no password)
+// 2: could not find username
+app.post("/recover", (req, res, next) => {
+	if (!req.body.username_email) {
+		res.send("1-" + (req.body.username_email ? "" : "0,"));
+		return;
+	}
+
+	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
+	connection.query(`SELECT id, email FROM user WHERE ${email_or_username}=?`,
+		req.body.username_email, (err, user_password) => {
+		if (err || !user_password) return next(err);
+
+		if (!user_password.length) {
+			res.send("2");
+			return;
+		}
+
+		let nonce = uuidv4();
+		connection.query("UPDATE user SET recovery_nonce=? WHERE user_id=?",
+			[nonce, user_password[0].id], async (err) => {
+				if (err)
+					return next(err);
+
+			// email send here
+		});
+	});
+});
+
 
 app.listen("2048", () => {
 	console.log("server go vroom: 2048");
