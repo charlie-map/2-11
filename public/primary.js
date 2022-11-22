@@ -192,6 +192,12 @@ window.onresize = function() {
 			left: $(".leaderboard-current-property").offset().left + 113,
 			top: $(".leaderboard-current-property").offset().top
 		});
+
+		let bodyWidth = set_width + 460;
+		if (bodyWidth <= 980) {
+			$("#defaultCanvas0").attr("width", (bodyWidth - 60) + "px");
+			$("#defaultCanvas0").attr("height", (bodyWidth - 60) + "px");
+		}
 	}
 
 	if (logging_in == undefined || logging_in)
