@@ -529,8 +529,8 @@ function game_over(req, res, game, killerPiece) {
 			if (err) return res.send("1");
 
 			let newAverageScore =
-				(game.averageScore * ((game.totalGames - 1) / game.totalGames))
-				+ (game.currentScore * (1 / game.totalGames));
+				(game.averageScore * (game.totalGames / (game.totalGames + 1)))
+				+ (game.currentScore * (1 / (game.totalGames + 1)));
 			game.totalGames += 1;
 
 			// if (!game.currBestBlock)
