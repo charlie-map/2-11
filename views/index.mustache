@@ -18,92 +18,6 @@
 		<title>2^11</title>
 	</head>
 	<body class="{{DARKMODE}}">
-		{{#LOGGED_IN}}
-		<div class="user-column" style="{{#LEADERBOARD_OPEN}}height: 420px;{{/LEADERBOARD_OPEN}}">
-			<!-- <div class="column-tab profile">
-				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
-			</div> -->
-			<div class="column-tab leaderboard-tab">
-				<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
-			</div>
-			<div class="leaderboard-current-property">
-				<div id="leaderboard-shown-property" class="barlow">{{LEADERBOARD_PROPERTY}}</div>
-				<div class="dropdown-property-choice">
-					<ion-icon name="chevron-forward-outline"></ion-icon>
-				</div>
-			</div>
-			<div class="leaderboard-property-choice-hider {{#LEADERBOARD_OPEN}}open{{/LEADERBOARD_OPEN}} {{#LARGE_LEADERBOARD_PROPERTY}}large{{/LARGE_LEADERBOARD_PROPERTY}}"></div>
-			<!-- <div class="user-modal open">
-				<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
-			</div> -->
-			<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
-				<div class="barlow best-sq-descript">Best tile</div>
-				<div class="best-num">{{BEST_BLOCK}}</div>
-			</div>
-			<div class="column-tab current-streak">
-				<div class="barlow current-streak-descript">Streak (days)</div>
-				<div class="curr-streak">{{#STREAK_FIRE}}<div class="fire">
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-					<div class="particle"></div>
-				</div>{{/STREAK_FIRE}}{{CURRENT_STREAK}}</div>
-			</div>
-
-			<div class="darkmode-status barlow">
-				Darkmode: <div class="active-darkmode barlow">{{#DARKMODE_ACTIVE}}on{{/DARKMODE_ACTIVE}}{{^DARKMODE_ACTIVE}}off{{/DARKMODE_ACTIVE}}</div>
-			</div>
-			<div class="darkmode-wrapper">
-				<input type="checkbox" name="checkbox" class="switch">
-			</div>
-		</div>
-		{{/LOGGED_IN}}
 	  	<div id="all-content">
 			<main id="page-body">
 				<div class="dropdown-noti {{#LOGGED_IN}}logged-in-box{{/LOGGED_IN}}{{^LOGGED_IN}}logged-out-box{{/LOGGED_IN}}">
@@ -153,6 +67,95 @@
 							</div>
 						</div>
 					</div>
+					{{#LOGGED_IN}}
+					<div class="user-column">
+						<!-- <div class="column-tab profile">
+							<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Person</title><path d="M344 144c-3.92 52.87-44 96-88 96s-84.15-43.12-88-96c-4-55 35-96 88-96s92 42 88 96z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path d="M256 304c-87 0-175.3 48-191.64 138.6C62.39 453.52 68.57 464 80 464h352c11.44 0 17.62-10.48 15.65-21.4C431.3 352 343 304 256 304z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/></svg>
+						</div> -->
+						<div class="flex-item flex-column flex-center">
+							<div class="column-tab leaderboard-tab">
+								<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Leaderboard Chart</title><rect x="64" y="320" width="48" height="160" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="288" y="224" width="48" height="256" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="400" y="112" width="48" height="368" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><rect x="176" y="32" width="48" height="448" rx="8" ry="8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+							</div>
+							<div class="leaderboard-current-property {{^LEADERBOARD_OPEN}}hidden{{/LEADERBOARD_OPEN}}">
+								<div id="leaderboard-shown-property" class="barlow">{{LEADERBOARD_PROPERTY}}</div>
+								<div class="dropdown-property-choice">
+									<ion-icon name="chevron-forward-outline"></ion-icon>
+								</div>
+							</div>
+						</div>
+						<!-- <div class="user-modal open">
+							<div class="user-modal-username leaderboard-entry-username">{{USERNAME}}</div>
+						</div> -->
+						<div id="column-best-square" class="column-tab best-square bs-{{BEST_BLOCK}}">
+							<div class="barlow best-sq-descript">Best tile</div>
+							<div class="best-num">{{BEST_BLOCK}}</div>
+						</div>
+						<div class="column-tab current-streak">
+							<div class="barlow current-streak-descript">Streak (days)</div>
+							<div class="curr-streak">{{#STREAK_FIRE}}<div class="fire">
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+								<div class="particle"></div>
+							</div>{{/STREAK_FIRE}}{{CURRENT_STREAK}}</div>
+						</div>
+
+						<div class="flex-item flex-column flex-center">
+							<div class="darkmode-status barlow">
+								Darkmode: <div class="active-darkmode barlow">{{#DARKMODE_ACTIVE}}on{{/DARKMODE_ACTIVE}}{{^DARKMODE_ACTIVE}}off{{/DARKMODE_ACTIVE}}</div>
+							</div>
+							<div class="darkmode-wrapper">
+								<input type="checkbox" name="checkbox" class="switch">
+							</div>
+						</div>
+					</div>
+					{{/LOGGED_IN}}
 					<div style="display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
 						<div style="display: flex; flex-direction: column; justify-content: center;">
 							<p class="barlow">Join the tiles to get to 2^11 (2048)!</p>

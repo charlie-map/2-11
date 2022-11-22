@@ -1,3 +1,15 @@
+.flex-item {
+	display: flex;
+}
+.flex-column {
+	flex-direction: column;
+}
+.flex-center {
+	justify-content: center;
+	align-items: center;
+}
+
+
 * {
     font-family: 'Koulen', cursive
 }
@@ -411,6 +423,10 @@ a {
 	background: #ce5c24;
 }
 
+.error {
+	background: #cc4e7d;
+}
+
 .signup-sys {
 	width: 30%;
 
@@ -445,11 +461,11 @@ a {
 
 .user-column {
   width: 100px;
-  height: 390px;
+  height: 400px;
 
   position: fixed;
-  left: 100%;
-  top: 10%;
+  left: -114px;
+  top: 120px;
 
   margin-right: 5px;
 
@@ -484,6 +500,8 @@ a {
 
   padding-left: 2px;
 
+  opacity: 1;
+
   transition: all 0.4s ease-in-out;
 }
 
@@ -491,6 +509,10 @@ a {
   cursor: pointer;
 
   transform: scale(1.1);
+}
+
+.leaderboard-current-property.hidden {
+	opacity: 0;
 }
 
 .leaderboard-current-property.open {
@@ -1910,4 +1932,51 @@ a.darkmode {
 .rank-color19.darkmode,
 .rank-color20.darkmode {
 	background: transparent;
+}
+
+@media only screen and (max-width: 660px) {
+	#all-content {
+		width: calc(100% - 208px);
+
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.user-column {
+		position: relative;
+
+		flex-direction: row;
+
+		width: 405px;
+		height: 132px;
+
+		left: 0px;
+		top: 0px;
+	}
+
+	#column-best-square {
+		margin: 4px;
+	}
+
+	.current-streak-descript {
+		text-align: center;
+	}
+
+	.current-streak {
+		padding: 4px;
+	}
+
+	.darkmode-status-content {
+		width: 100px;
+	}
+
+	.darkmode-status {
+		margin-top: 0;
+	}
+
+
+	.ultra-meta-leaderboard-holder {
+		width: ;
+	}
 }

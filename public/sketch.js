@@ -37,7 +37,9 @@ async function setup(isRestart) {
 
           oldBoard = res;
           resolve();
-        }
+        },
+
+        failure: Meta.GetGenericError
       })
     });
   }
@@ -261,10 +263,7 @@ function SyncMoves() {
         resolve()
       },
 
-      failure: (e) => {
-        console.log(e);
-        reject(e);
-      }
+      failure: Meta.GetGenericError
     });
   });
 }

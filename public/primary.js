@@ -28,25 +28,20 @@ function LeaderboardPositionCheck(isOpening) {
 			// "padding-bottom": leaderboardEntries > 1 ? "34px" : "0px"
 		});
 
-		if (!isOpening) {
-			$("#how-to-play").css({
-				"margin-top": (leaderboardEntries < 4 ? "-68px" : "0px")
-			});
-
-			return;
-		}
+		$("#how-to-play").css({
+			"margin-top": "0px"
+		});
 
 		$("#page-body").after($(".ultra-meta-leaderboard-holder"));
 
 		$(".leaderboard-entry").addClass("in-frame");
-		$("#how-to-play").css({
-			"margin-top": (leaderboardEntries < 4 ? "-68px" : "0px")
-		});
 
 		$($("#how-to-play").children("p")[0]).css({
 			"margin-top": "0px"
 		});
-		$("#leaderboard").last().css({ "margin-bottom": "0 !important" })
+		$("#leaderboard").last().css({
+			"margin-bottom": "0 !important"
+		})
 		$(".user-personal-low").css({
 			"margin-top": "6px",
 			"padding-left": "34px",
@@ -78,11 +73,6 @@ function LeaderboardPositionCheck(isOpening) {
 		});
 		$(".ultra-meta-leaderboard-holder").css({
 			left: "calc(50% + " + (300 * 0.5) + "px)"
-		});
-
-		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
-		$(".user-column").css({
-			left: user_column_left - $(".user-column").outerWidth(false)
 		});
 	}
 }
@@ -155,13 +145,10 @@ $(document).ready(function() {
 					isInLeaderboardFrame();
 					LeaderboardPositionCheck(1);
 					LEADERBOARD_USERS = res.users;
-				}
-			})
+				},
 
-			let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
-			$(".user-column").css({
-				left: user_column_left - $(".user-column").outerWidth(false)
-			});
+				failure: Meta.GetGenericError
+			})
 
 			$(".leaderboard-property-choices").css({
 				"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
@@ -195,11 +182,6 @@ window.onresize = function() {
 		});
 		LeaderboardPositionCheck(1);
 		isInLeaderboardFrame();
-
-		let user_column_left = $(document).outerWidth(false) * 0.5 - 230;
-		$(".user-column").css({
-			left: user_column_left - $(".user-column").outerWidth(false)
-		});
 
 		$(".leaderboard-property-choices").css({
 			"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
@@ -313,7 +295,9 @@ $("#new-game").click(async function() {
 		type: "POST",
 		url: "/game-over",
 
-		data: JSON.stringify({ killerPiece: 0 }),
+		data: JSON.stringify({
+			killerPiece: 0
+		}),
 		headers: {
 			"Content-Type": "application/json"
 		}
@@ -340,7 +324,7 @@ function checkUserRankLeaderboard(newMetaPoints) {
 	if (personal_user_rank > 20) { // extended position, replace bottom of leaderboard
 		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-score").text(newMetaPoints);
 		$("#leaderboard .leaderboard-entry:last-child").find(".leaderboard-entry-username").html($(personal_user).find(".leaderboard-entry-username").html());
-	
+
 		$(personal_user).remove();
 		personal_user = $("#leaderboard .leaderboard-entry:last-child");
 		$(personal_user).find(".leaderboard-entry-score").addClass("personal-user-points");
@@ -512,7 +496,7 @@ $("#username").focusout(function() {
 		success: res => {
 			if (res == "0") { // username taken
 				invalidate($("#username"));
-	
+
 				$("#username-taken").html("taken");
 				$("#username-taken").addClass("is-taken");
 				$("#username").addClass("taken");
@@ -545,7 +529,7 @@ $("#email").focusout(function() {
 		success: res => {
 			if (res == "0") { // email taken
 				invalidate($("#email"));
-	
+
 				$("#email-taken").addClass("is-taken");
 				$("#email").addClass("taken");
 			} else {
@@ -580,7 +564,8 @@ function stringBoardToVisual(mainDiv, fullBoard) {
 
 function differentNumbers(board1, board2) {
 	let isDifferent = 0;
-	let tilesBoard1 = 0, tilesBoard2 = 0;
+	let tilesBoard1 = 0,
+		tilesBoard2 = 0;
 
 	for (let x = 0; x < 4; x++) {
 		if (!board1[x] && !board2[x])
@@ -631,7 +616,9 @@ $("#register").click(function(e) {
 				type: "POST",
 				url: "/recover",
 
-				data: JSON.stringify({ username_email: username_or_email }),
+				data: JSON.stringify({
+					username_email: username_or_email
+				}),
 				headers: {
 					"Content-Type": "application/json"
 				},
@@ -643,7 +630,9 @@ $("#register").click(function(e) {
 							let errorNumbers = res.split("-")[1];
 
 							let errorNumberSplit = errorNumbers.split(",");
-							let formInputs = { "0": $("#username") };
+							let formInputs = {
+								"0": $("#username")
+							};
 
 							for (let i = 0; i < errorNumberSplit.length; i++)
 								invalidate(formInputs[errorNumberSplit[i]]);
@@ -676,7 +665,10 @@ $("#register").click(function(e) {
 			type: "POST",
 			url: "/login",
 
-			data: JSON.stringify({ username_email: username_or_email, password }),
+			data: JSON.stringify({
+				username_email: username_or_email,
+				password
+			}),
 			headers: {
 				"Content-Type": "application/json"
 			},
@@ -737,7 +729,11 @@ $("#register").click(function(e) {
 			type: "POST",
 			url: "/signup",
 
-			data: JSON.stringify({ email, username, password }),
+			data: JSON.stringify({
+				email,
+				username,
+				password
+			}),
 			headers: {
 				"Content-Type": "application/json"
 			},
@@ -767,6 +763,7 @@ $("#register").click(function(e) {
 	}
 });
 
+let stillChangingLeaderboard = 0;
 // boardClose: decide if leaderboard-property-choice-hider should close
 async function leaderboardCreate(Lboard, boardClose) {
 	if ($(Lboard).hasClass("open")) {
@@ -778,6 +775,7 @@ async function leaderboardCreate(Lboard, boardClose) {
 		if ($("body").outerWidth(false) < 1225)
 			LeaderboardPositionCheck(1);
 
+		stillChangingLeaderboard = 1;
 		Meta.xhr.send({
 			type: "GET",
 			url: "/updated-leaderboard",
@@ -788,9 +786,6 @@ async function leaderboardCreate(Lboard, boardClose) {
 
 				if (boardClose) {
 					$(".leaderboard-property-choice-hider").addClass("open");
-					$(".user-column").animate({
-						height: "420px"
-					}, 400);
 
 					$(".leaderboard-scrollbar").show();
 				}
@@ -818,10 +813,12 @@ async function leaderboardCreate(Lboard, boardClose) {
 						if (in_dat[1] == LEADERBOARD_USERS.length - 1) {
 							setTimeout(function() {
 								isInLeaderboardFrame();
-								
+
 								$(".leaderboard-scrollbar-position").css({
 									height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
 								});
+
+								stillChangingLeaderboard = 0;
 							}, 800);
 						}
 
@@ -837,14 +834,13 @@ async function leaderboardCreate(Lboard, boardClose) {
 			url: "/toggle-leaderboard/1"
 		});
 	} else {
+		stillChangingLeaderboard = 1;
+
 		$(Lboard).find("rect").attr("fill", $(Lboard).hasClass("darkmode") ? "#37243d" : "#ddcee2");
 		$(".user-personal-low").removeClass("fade-in");
 		if (boardClose) {
 			$(Lboard).find("rect").attr("fill", "none");
 			$(".leaderboard-property-choice-hider").removeClass("open");
-			$(".user-column").animate({
-				height: "390px"
-			}, 400);
 		}
 
 		let delete_child = $("#leaderboard").children("div");
@@ -857,10 +853,15 @@ async function leaderboardCreate(Lboard, boardClose) {
 				setTimeout(function(e) {
 					$(e).remove();
 
-					if ($("body").outerWidth(false) < 1225)
+					if ($("body").outerWidth(false) < 1225) {
 						LeaderboardPositionCheck(0);
+					}
 				}, 800, e);
 			}, map(i, delete_child.length - 1, 0, 0, delete_child.length - 1) * 60, $(delete_child[i]));
+
+			if (i == 0) setTimeout(function() {
+				stillChangingLeaderboard = 0;
+			}, 800);
 		}
 
 		Meta.xhr.send({
@@ -871,7 +872,20 @@ async function leaderboardCreate(Lboard, boardClose) {
 }
 
 $(".leaderboard-tab").click(function() {
+	if (stillChangingLeaderboard) return;
+
 	$(this).toggleClass("open");
+
+	if ($(this).hasClass("open") == true) {
+		wantsLeaderboardOpen = 1;
+
+		$(this).parent().children(".leaderboard-current-property").removeClass("hidden");
+	} else {
+		wantsLeaderboardOpen = 0;
+
+		$(this).parent().children(".leaderboard-current-property").addClass("hidden");
+	}
+
 	leaderboardCreate($(this), 1);
 });
 

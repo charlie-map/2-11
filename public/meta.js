@@ -43,5 +43,23 @@ const Meta = {
 
 			xhr.send(params.data);
 		}
+	},
+
+	GetGenericError: (e) => {
+		let dropdown = $(".dropdown-noti");
+
+		$(dropdown).removeClass("logged-in-box");
+        $(dropdown).removeClass("logged-out-box");
+        $(dropdown).addClass("error");
+
+        $(dropdown).html(`
+          <p class="barlow">An error has occured. Please try again</p>
+        `);
+
+        $(dropdown).removeClass("slide-out");
+
+        setTimeout(function() {
+			$(".dropdown-noti").addClass("slide-out");
+		}, 4800);
 	}
 };
