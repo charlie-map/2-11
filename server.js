@@ -476,6 +476,7 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 		if (err || !gameState || !gameState.length) return next(err);
 
 		let game = gameState[0];
+		game.currBestBlock = 2;
 		// check that we can move the board
 		game.wholeBoard = JSON.parse(game.wholeBoard);
 		if (!boardJS.canMove(game.wholeBoard))
@@ -483,7 +484,7 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 			return res.send("1");
 
 		for (let play = 0; play < move.length; play++) {
-			let boardDiffs = moveBoard[move[play].move](game.wholeBoard, game.bestBlock);
+			let boardDiffs = moveBoard[move[play].move](game.wholeBoard, game.currBestBlock);
 
 			if (boardDiffs.error) {
 				// something is wrong with their board
@@ -519,6 +520,8 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 });
 
 function game_over(req, res, game, killerPiece) {
+	if (!game.wholeBoard) return res.end();
+
 	connection.query(`INSERT INTO board_history (user_id, game_id, wholeBoard, score, startTime, endTime)
 		VALUES (?, ?, ?, ?, ?, ?)`, [req.cookies.user_id, game.game_id,
 		JSON.stringify(game.wholeBoard), game.currentScore, game.startTime, new Date],

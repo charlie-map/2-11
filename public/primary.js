@@ -300,18 +300,22 @@ $("#new-game").click(async function() {
 		}),
 		headers: {
 			"Content-Type": "application/json"
-		}
+		},
+
+		success: res => {
+			metaPoints = 0, points = 0;
+			endGame = 0;
+			opacityEndRoller = 60
+
+			$("#new-game").text("New game");
+
+			$("#current-score").text("0");
+
+			setup(1);
+		},
+
+		failure: Meta.GetGenericError
 	});
-
-	metaPoints = 0, points = 0;
-	endGame = 0;
-	opacityEndRoller = 60
-
-	$("#new-game").text("New game");
-
-	$("#current-score").text("0");
-
-	setup(1);
 });
 
 function checkUserRankLeaderboard(newMetaPoints) {
