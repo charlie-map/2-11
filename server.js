@@ -533,7 +533,15 @@ function game_over(req, res, game, killerPiece) {
 				+ (game.currentScore * (1 / game.totalGames));
 			game.totalGames += 1;
 
-			console.log(game);
+			// if (!game.currBestBlock)
+			// 	game.currBestBlock = game.wholeBoard.reduce(function(x_prev, x) {
+			// 		let colBestBlock = x.reduce(function(y_prev, y) {
+			// 			return y_prev > y ? y_prev : y;
+			// 		}, x_prev)
+
+			// 		return x_prev > colBestBlock ? x_prev : colBestBlock;
+			// 	}, 2)
+			
 			await Promise.all([
 				new Promise(resolve => {
 					connection.query(`UPDATE game SET currentScore=?, bestBlock=?, averageScore=?,

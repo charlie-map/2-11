@@ -83,6 +83,8 @@ module.exports = {
 			let maxMoveLeft = 0;
 
 			for (let x = 0; x < 4; x++) {
+				bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+
 				if (!board[x][y]) {
 					maxMoveLeft++;
 					continue;
@@ -125,6 +127,7 @@ module.exports = {
 			let maxMoveUp = 0;
 
 			for (let y = 0; y < 4; y++) {
+				bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
 				if (!board[x][y]) {
 					maxMoveUp++;
 					continue;
@@ -167,6 +170,8 @@ module.exports = {
 			let maxMoveRight = 0;
 
 			for (let x = 3; x >= 0; x--) {
+				bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+
 				if (!board[x][y]) {
 					maxMoveRight++;
 					continue;
@@ -209,6 +214,8 @@ module.exports = {
 			let maxMoveDown = 0;
 
 			for (let y = 3; y >= 0; y--) {
+				bestBlock = bestBlock < board[x][y] ? board[x][y] : bestBlock;
+				
 				if (!board[x][y]) {
 					maxMoveDown++;
 					continue;
