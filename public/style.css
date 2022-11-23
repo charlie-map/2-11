@@ -50,7 +50,11 @@ a {
 }
 
 #all-content {
-  width: 410px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .top-leaderboard-gradient {
@@ -456,10 +460,10 @@ a {
   width: 100px;
   height: 400px;
 
-  position: fixed;
-  left: -114px;
+  position: absolute;
   top: 120px;
 
+  margin-left: -528px;
   margin-right: 5px;
 
   display: flex;
@@ -722,18 +726,10 @@ a {
 
 #page-meta-info {
   margin-top: -20px;
-
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
 }
 
 #page-body {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
+  width: 100%;
 }
 
 #page-title {
@@ -1928,21 +1924,9 @@ a.darkmode {
 }
 
 @media only screen and (max-width: 980px) {
-	#all-content {
-		width: 100%;
-
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	#page-body {
-		width: 100%;
-	}
-
-	#page-meta-info {
-		width: 100%;
-	}
+  #page-meta-info {
+    width: 100%;
+  }
 
 	.user-column {
 		position: relative;
@@ -1954,6 +1938,8 @@ a.darkmode {
 
 		left: 0px;
 		top: 0px;
+
+    margin: 0;
 	}
 
 	#column-best-square {

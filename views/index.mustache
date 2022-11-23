@@ -19,7 +19,7 @@
 	</head>
 	<body class="{{DARKMODE}} flex-item flex-column">
 	  	<div id="all-content" class="flex-item flex-column flex-center">
-			<main id="page-body">
+			<main id="page-body" class="flex-item flex-column flex-center">
 				<div class="dropdown-noti {{#LOGGED_IN}}logged-in-box{{/LOGGED_IN}}{{^LOGGED_IN}}logged-out-box{{/LOGGED_IN}}">
 					{{^LOGGED_IN}}
 						<p class="barlow">
@@ -44,8 +44,8 @@
 						</p>
 					{{/LOGGED_IN}}
 				</div>
-				<div id="page-meta-info">
-					<div style="display: flex; justify-content: center; align-items: center">
+				<div id="page-meta-info" class="flex-item flex-column flex-center">
+					<div class="flex-item flex-center">
 						<div id="page-title">2<p class="shooter">^</p>11</div>
 						<div class="scores">
 							<div class="score-card current-score-card">
