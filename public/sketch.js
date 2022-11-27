@@ -116,12 +116,14 @@ function draw() {
       moveBuildup = moveBuildup.slice(1);
     }
     
-    if ((postMoveSync.length > 6 && framesSinceSync > 120) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
-      framesSinceSync = 0;
-      SyncMoves();
-    }
+    if (loggedIn) {
+      if ((postMoveSync.length > 6 && framesSinceSync > 120) || (postMoveSync.length > 0 && framesSinceSync > 360)) {
+        framesSinceSync = 0;
+        SyncMoves();
+      }
 
-    framesSinceSync++;
+      framesSinceSync++;
+    }
 
     board.drawBoard();
   } else {
