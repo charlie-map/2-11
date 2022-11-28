@@ -1,3 +1,13 @@
+const week_days = [
+	"Mon",
+	"Tue",
+	"Web",
+	"Thu",
+	"Fri",
+	"Sat",
+	"Sun"
+];
+
 const Meta = {
 	/**
 	 * Sends xhr request using the passed params
@@ -61,5 +71,73 @@ const Meta = {
         setTimeout(function() {
 			$(".dropdown-noti").addClass("slide-out");
 		}, 4800);
+	},
+
+	/**
+	 * Builds the profile of the user someone clicks on
+	 * Uses the profile component built into index.mustache
+	 *
+	 * @params { Number } full decides if this should build the entire profile
+	 *  or the subcomponent to display in the leaderboard tab
+	 * @params { Element } this the element that someone clicks (represents user)
+	 *
+	 * @returns { String } constructs profile modal
+	 */
+	BuildProfile: function(full) {
+		// ensure empty profile tab
+		let profile = document.querySelector(".profile");
+		
+		let isSelf = this.querySelector("#leaderboard-personal") ? 1 : 0;
+
+		let allInnerText = this.innerText;
+		let username = isSelf ? allInnerText.substring(0,
+			allInnerText.length - this.querySelector("#leaderboard-personal").innerText.length) :
+			allInnerText;
+		let rank = this.parentNode.parentNode.querySelector(".leaderboard-entry-rank").innerText;
+
+		SetupProfileTab(profile, username, rank);
+		profile.classList.add("show");
+
+		// use username to gather data from server:
+		Meta.xhr.send({
+			type: "GET",
+			url: "/user/" + username,
+
+			
+		});
 	}
 };
+
+function SetupProfileTab(profile, username, rank) {
+
+	// .leaderboard-entry-rank -> 0
+	let leaderboardEntryRank = profile.querySelector(".leaderboard-entry-rank");
+	for (let removeRank = 1; removeRank <= 20; removeRank++)
+		leaderboardEntryRank.classList.remove(
+			"rank-color" + removeRank, 
+		);
+	if (rank) {
+		leaderboardEntryRank.classList.remove("rank-color-1");
+		leaderboardEntryRank.classList.add(rank ? "rank-color" + rank : "rank-color-1");
+	} else {
+		leaderboardEntryRank.classList.add("rank-color-1");
+	}
+	leaderboardEntryRank.innerHTML = rank;
+
+	// .leaderboard-entry-username -> Loading
+	profile.querySelector(".leaderboard-entry-username").innerHTML = username;
+
+	// #current-score -> ...
+	profile.querySelector("#current-score").innerHTML = "...";
+	// #best-score -> ...
+	profile.querySelector("#best-score").innerHTML = "...";
+
+	let dayStats = profile.querySelector(".profile-stats-recent-inner");
+	for (let dsSet = 0; dsSet < dayStats.length; dsSet++) {
+		dayStats.querySelector("div").classList.remove("max", "up-mid", "down-mid", "min");
+
+		dayStats.querySelector("div").classList.add("zero");
+
+		dayStats.querySelector("p").innerHTML = "..";
+	}
+}

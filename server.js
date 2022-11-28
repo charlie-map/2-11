@@ -293,6 +293,10 @@ app.get("/l", loggedIn, (req, res, next) => {
 	});
 });
 
+app.get("/user/:username/", loggedIn, (req, res, next) => {
+	connection.query("SELECT ")
+});
+
 app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 	let propNum = properties[req.params.lbprop];
 

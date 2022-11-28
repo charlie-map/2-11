@@ -8,6 +8,14 @@
 	justify-content: center;
 	align-items: center;
 }
+.flex-between {
+  justify-content: space-between;
+  align-items: center;
+}
+.flex-around {
+  justify-content: space-around;
+  align-items: center;
+}
 
 
 * {
@@ -81,6 +89,8 @@ a {
   position: fixed;
 
   height: calc(90%);
+
+  z-index: 1;
 
   left: 100%;
   top: 0;
@@ -223,8 +233,8 @@ a {
 
 	font-size: 14px;
 
-	padding: 14px;
-	padding-left: 20px;
+	padding: 12px;
+	padding-left: 18px;
 	border-radius: 2px;
 
 	margin-right: 8px;
@@ -232,7 +242,21 @@ a {
 	line-height: 18px;
 	vertical-align: middle;
 
+  border: 2px solid transparent;
+
 	z-index: 3;
+
+  transition: all 0.2s ease;
+}
+
+.leaderboard-entry-username:hover {
+  border: 2px solid black;
+  border-radius: 6px;
+
+  cursor: pointer;
+}
+.ultra-meta-leaderboard-holder.darkmode .leaderboard-entry-username:hover {
+  border: 2px solid white;
 }
 
 .leaderboard-entry-score {
@@ -306,12 +330,8 @@ a {
 }
 
 .rank-color4 {
-	 background: #ce5c24;
+	background: #ce5c24;
   color: #46324b;
-
-  -webkit-box-shadow:0px 0px 46px 26px rgba(207,93,36,0.0.8);
-  -moz-box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
-  box-shadow: 0px 0px 46px 26px rgba(207,93,36,0.0.8);
 
   z-index: 10;
 }
@@ -474,8 +494,14 @@ a {
   padding: 2px;
   z-index: 6;
 
-  background: rgba(120, 207, 210, 0.3);
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  
   border-radius: 4px;
+}
+.user-column.darkmode {
+  box-shadow: none;
+
+  background: rgba(120, 207, 210, 0.3);
 }
 
 .column-tab {
@@ -779,11 +805,6 @@ a {
 }
 
 .scores {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-
 	margin-left: 30px;
 }
 
@@ -1467,6 +1488,161 @@ input:focus {
   margin-left: 10px;
 }
 
+
+/*
+                  __ _ _      
+ _ __  _ __ ___  / _(_) | ___ 
+| '_ \| '__/ _ \| |_| | |/ _ \
+| |_) | | | (_) |  _| | |  __/
+| .__/|_|  \___/|_| |_|_|\___|
+|_|
+*/
+.profile {
+  width: 390px;
+  padding: 10px;
+  margin-top: 10px;
+  margin-bottom: 4px;
+
+  height: 0px;
+  opacity: 0;
+
+  z-index: 0;
+
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+
+  transition: all 0.2s ease-in-out;
+}
+.profile.show {
+  height: 274px;
+  opacity: 1;
+  z-index: 4;
+}
+.profile.darkmode {
+  box-shadow: none;
+
+  background: rgba(120, 207, 210, 0.3);
+}
+
+.profile .profile-header {
+  width: 100%;
+  margin: 2px 0;
+}
+
+.profile .profile-header h2 {
+  margin: 6px 0 6px 6px;
+}
+
+#close-profile {
+  width: 42px;
+  height: 42px;
+}
+#close-profile:hover {
+  cursor: pointer;
+}
+.profile.darkmode #close-profile {
+  fill: white;
+}
+
+.profile .leaderboard-entry {
+  width: calc(100% - 30px);
+}
+
+.profile .leaderboard-entry {
+  width: calc(100% - 32px);
+}
+
+.profile .leaderboard-entry-rank {
+  width: 48px;
+  height: 48px;
+
+  font-size: 36px;
+
+  margin: 0;
+}
+
+.profile .leaderboard-entry-username {
+  width: calc(100% - 50px);
+
+  margin: 0;
+}
+
+.profile .leaderboard-entry-username:hover {
+  cursor: default;
+  border: 2px solid transparent;
+
+  border-radius: 2px;
+}
+
+.profile-stats {
+  width: calc(100% - 2px);
+  height: 146px;
+}
+
+.profile-scores {
+  width: 100px;
+}
+
+.profile .score-card {
+  height: 58px;
+}
+
+.profile-stats-recent-context {
+  width: calc(100% - 112px);
+  padding: 2px;
+
+  margin: 0 2px;
+}
+.profile-stats-recent-context h3 {
+  margin: 0 0 2px 2px;
+}
+
+.profile-stats-recent {
+  width: 100%;
+
+  align-items: flex-end;
+}
+.profile-stats-recent {
+  height: 100%;
+}
+
+.profile .profile-stats-recent-inner {
+  width: calc(100% * 0.15 - 12px);
+  height: 100%;
+
+  justify-content: flex-end;
+
+  margin: 0 6px;
+}
+.profile .profile-stats-recent-inner .bar, .profile .profile-stats-recent-inner p {
+  margin: 0;
+
+  border-radius: 6px 6px 0 0;
+  width: 100%;
+}
+.profile .profile-stats-recent-inner .bar {
+  height: 0;
+  transition: height 0.2s ease-in-out;
+}
+.profile .bar.max {
+  background: #ce5c24;
+  height: calc(100% - 20px);
+}
+.profile .bar.up-mid {
+  background: #e1a019;
+  height: calc(80% - 20px);
+}
+.profile .bar.down-mid {
+  background: #ffe014;
+  height: calc(60% - 20px);
+}
+.profile .bar.min {
+  background: #caef17;
+  height: calc(40% - 20px);
+}
+.profile .bar.zero {
+  height: 0;
+}
+
 /* FIRE ANIMATION FROM: Jon Kantner */
 .fire {
   font-size: 24px;
@@ -1905,6 +2081,7 @@ a.darkmode {
 	background: rgb(24, 26, 27);
 }
 
+.profile.darkmode .leaderboard-entry-username,
 .ultra-meta-leaderboard-holder.darkmode .leaderboard-entry-username,
 .ultra-meta-leaderboard-holder.darkmode .leaderboard-entry-score {
 	background: rgb(55, 36, 61);
@@ -1940,6 +2117,7 @@ a.darkmode {
 		top: 0px;
 
     margin: 0;
+    margin-bottom: 8px;
 	}
 
 	#column-best-square {
@@ -1960,10 +2138,5 @@ a.darkmode {
 
 	.darkmode-status {
 		margin-top: 0;
-	}
-
-
-	.ultra-meta-leaderboard-holder {
-		width: ;
 	}
 }
