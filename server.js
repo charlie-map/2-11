@@ -294,7 +294,65 @@ app.get("/l", loggedIn, (req, res, next) => {
 });
 
 app.get("/user/:username/", loggedIn, (req, res, next) => {
-	connection.query("SELECT ")
+	connection.query("SELECT id, currentScore, bestScore FROM game INNER JOIN user ON game.user_id=user.id WHERE username=?", req.params.username, (err, user_data) => {
+		if (err) return next(err);
+		if (!user_data || !user_data.length) return res.send("1");
+
+		connection.query("SELECT game_id, endTime FROM board_history WHERE user_id=? AND (YEARWEEK(endTime) = YEARWEEK(NOW() - INTERVAL 1 WEEK) OR YEARWEEK(endTime) = YEARWEEK(NOW())) ORDER BY endTime ASC", user_data[0].id, (err, boards) => {
+			if (err) return ext(err);
+
+			let currentDate = new Date();
+			let currentDatePieces = {
+				y: currentDate.getFullYear(),
+				m: currentDate.getMonth(),
+				d: currentDate.getDate(),
+				h: currentDate.getHours(),
+				min: currentDate.getMinutes(),
+				s: currentDate.getSeconds(),
+				mil: currentDate.getMilliseconds()
+			};
+
+			let totalGames = {};
+			for (let cd = 0; cd < 7; cd++) {
+				let postDate = new Date(
+					currentDatePieces.y,
+					currentDatePieces.m,
+					currentDatePieces.d - cd,
+					currentDatePieces.h,
+					currentDatePieces.min,
+					currentDatePieces.s,
+					currentDatePieces.mil
+				);
+				totalGames[postDate.getDate()] = 0;
+			}
+
+			let maxTotalGames = 0;
+
+			let newBoardList = [];
+			for (let b = 0; b < boards.length; b++) {
+				let bTime = new Date(boards[b].endTime);
+
+				let bTimeDate = bTime.getDate();
+				if (totalGames[bTimeDate] == undefined) continue;
+
+				newBoardList.push(boards[b]);
+
+				totalGames[bTimeDate]++;
+				maxTotalGames = totalGames[bTimeDate] > maxTotalGames ? totalGames[bTimeDate] : maxTotalGames;
+			}
+
+			res.json({
+				currentScore: user_data[0].currentScore,
+				bestScore: user_data[0].bestScore,
+
+				currentDate: currentDatePieces,
+				totalGames: Object.values(totalGames),
+				maxTotalGames,
+
+				newBoardList
+			});
+		});
+	})
 });
 
 app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {

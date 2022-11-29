@@ -1,12 +1,18 @@
-const week_days = [
+const WEEK_DAYS = [
+	"Sun",
 	"Mon",
 	"Tue",
-	"Web",
+	"Wed",
 	"Thu",
 	"Fri",
-	"Sat",
-	"Sun"
+	"Sat"
 ];
+const TOTAL_GAME_BAR = {
+	100: "max",
+	75: "up-mid",
+	50: "down-mid",
+	25: "min"
+};
 
 const Meta = {
 	/**
@@ -95,7 +101,7 @@ const Meta = {
 			allInnerText;
 		let rank = this.parentNode.parentNode.querySelector(".leaderboard-entry-rank").innerText;
 
-		SetupProfileTab(profile, username, rank);
+		SetupProfileTab(profile, isSelf, isSelf ? allInnerText : username, rank);
 		profile.classList.add("show");
 
 		// use username to gather data from server:
@@ -103,13 +109,57 @@ const Meta = {
 			type: "GET",
 			url: "/user/" + username,
 
-			
+			responseHandle: Meta.xhr.responseJSON,
+			success: async (res) => {
+				profile.querySelector("#current-score").innerHTML = res.currentScore;
+				profile.querySelector("#best-score").innerHTML = res.bestScore;
+
+				let currentDateInfo = res.currentDate;
+				let currentDate = new Date(
+					currentDateInfo.y,
+					currentDateInfo.m,
+					currentDateInfo.d,
+					currentDateInfo.h,
+					currentDateInfo.min,
+					currentDateInfo.s,
+					currentDateInfo.mil
+				);
+
+				let profileStatPosition = profile.querySelectorAll(".profile-stats-recent-inner");
+
+				let datesShown = 7;
+				for (let i = datesShown - 1; i >= 0; i--) {
+					profileStatPosition[i].querySelector("p").innerHTML = WEEK_DAYS[currentDate.getDay()];
+
+					let datePercentage = res.maxTotalGames ? res.totalGames[i] / res.maxTotalGames : 0;
+
+					let profileStatBar = profileStatPosition[i].querySelector(".bar");
+					if (datePercentage > 0.9) { // max
+						profileStatBar.classList.add("max");
+					} else if (datePercentage >= 0.7) { // up-mid
+						profileStatBar.classList.add("up-mid");
+					} else if (datePercentage >= 0.4) { // down-mid
+						profileStatBar.classList.add("down-mid");
+					} else if (datePercentage > 0.1) { // min
+						profileStatBar.classList.add("min");
+					} // otherwise add nothing
+
+					currentDate = new Date(
+						currentDate.getFullYear(),
+						currentDate.getMonth(),
+						currentDate.getDate() - 1,
+						currentDate.getHours(),
+						currentDate.getMinutes(),
+						currentDate.getSeconds(),
+						currentDate.getMilliseconds()
+					);
+				}
+			}
 		});
 	}
 };
 
 function SetupProfileTab(profile, username, rank) {
-
 	// .leaderboard-entry-rank -> 0
 	let leaderboardEntryRank = profile.querySelector(".leaderboard-entry-rank");
 	for (let removeRank = 1; removeRank <= 20; removeRank++)
@@ -132,12 +182,10 @@ function SetupProfileTab(profile, username, rank) {
 	// #best-score -> ...
 	profile.querySelector("#best-score").innerHTML = "...";
 
-	let dayStats = profile.querySelector(".profile-stats-recent-inner");
+	let dayStats = profile.querySelectorAll(".profile-stats-recent-inner");
 	for (let dsSet = 0; dsSet < dayStats.length; dsSet++) {
-		dayStats.querySelector("div").classList.remove("max", "up-mid", "down-mid", "min");
+		dayStats[dsSet].querySelector(".bar").classList.remove("max", "up-mid", "down-mid", "min");
 
-		dayStats.querySelector("div").classList.add("zero");
-
-		dayStats.querySelector("p").innerHTML = "..";
+		dayStats[dsSet].querySelector("p").innerHTML = "..";
 	}
 }

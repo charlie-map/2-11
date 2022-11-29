@@ -823,7 +823,7 @@ async function leaderboardCreate(Lboard, boardClose) {
 								$(".leaderboard-scrollbar-position").css({
 									height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
 								});
-								console.log($(".leaderboard-entry-username"));
+
 								$(".leaderboard-entry-username").click(Meta.BuildProfile);
 
 								stillChangingLeaderboard = 0;
