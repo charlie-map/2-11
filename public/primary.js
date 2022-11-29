@@ -148,7 +148,9 @@ $(document).ready(function() {
 				},
 
 				failure: Meta.GetGenericError
-			})
+			});
+
+			$(".leaderboard-entry-username").click(Meta.BuildProfile);
 
 			$(".leaderboard-property-choices").css({
 				"margin-bottom": -1 * $(".leaderboard-property-choices").outerHeight(false)
@@ -212,7 +214,7 @@ function darkmodeOn() {
 		.leaderboard-current-property, .leaderboard-shown-property,
 		.dropdown-property-choice, .leaderboard-property-choice-hider,
 		.leaderboard-property-choices, .ultra-meta-leaderboard-holder,
-		.leaderboard-entry-rank`).addClass("darkmode");
+		.leaderboard-entry-rank, .profile`).addClass("darkmode");
 	/*
 		#column-best-square
 		.best-sq-descript
@@ -254,7 +256,7 @@ function darkmodeOff() {
 		.leaderboard-current-property, .leaderboard-shown-property,
 		.dropdown-property-choice, .leaderboard-property-choice-hider,
 		.leaderboard-property-choices, .ultra-meta-leaderboard-holder,
-		.leaderboard-entry-rank`).removeClass("darkmode");
+		.leaderboard-entry-rank, .profile`).removeClass("darkmode");
 
 	$(`#column-best-square, .best-sq-descript, .best-num, .column-tab.current-streak,
 		.current-streak-descript, .curr-streak`).removeClass("darkmode");
@@ -822,6 +824,8 @@ async function leaderboardCreate(Lboard, boardClose) {
 									height: "calc(100% * " + ($("#leaderboard").outerHeight(false) / $("#leaderboard").prop("scrollHeight")) + ")"
 								});
 
+								$(".leaderboard-entry-username").click(Meta.BuildProfile);
+
 								stillChangingLeaderboard = 0;
 							}, 800);
 						}
@@ -909,22 +913,25 @@ $(".user-modal").mouseenter(function() {
 		$("body").on("click", profileCloser);
 });
 
-$(".profile").click(function() {
-	$(this).toggleClass("open");
+// $(".profile").click(function() {
+// 	$(this).toggleClass("open");
 
-	if ($(this).hasClass("open")) {
-		$(this).find("path").attr("fill", "#ddcee2");
-		$(".user-modal").addClass("open");
+// 	if ($(this).hasClass("open")) {
+// 		$(this).find("path").attr("fill", "#ddcee2");
+// 		$(".user-modal").addClass("open");
 
-		setTimeout(function() {
-			$("body").on("click", profileCloser);
-		}, 100);
-	} else {
-		$(this).find("path").attr("fill", "none");
-		$(".user-modal").removeClass("open");
+// 		setTimeout(function() {
+// 			$("body").on("click", profileCloser);
+// 		}, 100);
+// 	} else {
+// 		$(this).find("path").attr("fill", "none");
+// 		$(".user-modal").removeClass("open");
 
-		$("body").off("click", profileCloser);
-	}
+// 		$("body").off("click", profileCloser);
+// 	}
+// });
+$("#close-profile").click(function() {
+	$(".profile").removeClass("show");
 });
 
 function leaderboardCloser() {
