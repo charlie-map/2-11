@@ -92,6 +92,12 @@ const Meta = {
 	BuildProfile: function(full) {
 		// ensure empty profile tab
 		let profile = document.querySelector(".profile");
+
+		let usernameElement = this == window ?
+			document.getElementById("leaderboard").
+				querySelector(".leaderboard-entry-score.personal-user-points").
+				parentNode.querySelector(".leaderboard-entry-username")
+			: this;
 		
 		let isSelf = this.querySelector("#leaderboard-personal") ? 1 : 0;
 
@@ -99,9 +105,9 @@ const Meta = {
 		let username = isSelf ? allInnerText.substring(0,
 			allInnerText.length - this.querySelector("#leaderboard-personal").innerText.length) :
 			allInnerText;
-		let rank = this.parentNode.parentNode.querySelector(".leaderboard-entry-rank").innerText;
+		let rank = parseInt(this.parentNode.parentNode.querySelector(".leaderboard-entry-rank").innerText, 10);
 
-		SetupProfileTab(profile, isSelf, isSelf ? allInnerText : username, rank);
+		let profileTabPromise = SetupProfileTab(profile, isSelf ? this.innerHTML : username, rank);
 		profile.classList.add("show");
 
 		// use username to gather data from server:
@@ -113,6 +119,9 @@ const Meta = {
 			success: async (res) => {
 				profile.querySelector("#current-score").innerHTML = res.currentScore;
 				profile.querySelector("#best-score").innerHTML = res.bestScore;
+
+				profile.querySelector("#current-score").style.filter = "none";
+				profile.querySelector("#best-score").style.filter = "none";
 
 				let currentDateInfo = res.currentDate;
 				let currentDate = new Date(
@@ -126,6 +135,7 @@ const Meta = {
 				);
 
 				let profileStatPosition = profile.querySelectorAll(".profile-stats-recent-inner");
+				await profileTabPromise;
 
 				let datesShown = 7;
 				for (let i = datesShown - 1; i >= 0; i--) {
@@ -166,7 +176,7 @@ function SetupProfileTab(profile, username, rank) {
 		leaderboardEntryRank.classList.remove(
 			"rank-color" + removeRank, 
 		);
-	if (rank) {
+	if (rank <= 20) {
 		leaderboardEntryRank.classList.remove("rank-color-1");
 		leaderboardEntryRank.classList.add(rank ? "rank-color" + rank : "rank-color-1");
 	} else {
@@ -177,15 +187,15 @@ function SetupProfileTab(profile, username, rank) {
 	// .leaderboard-entry-username -> Loading
 	profile.querySelector(".leaderboard-entry-username").innerHTML = username;
 
-	// #current-score -> ...
-	profile.querySelector("#current-score").innerHTML = "...";
-	// #best-score -> ...
-	profile.querySelector("#best-score").innerHTML = "...";
+	profile.querySelector("#current-score").style.filter = "blur(0.2em)";
+	profile.querySelector("#best-score").style.filter = "blur(0.2em)";
 
 	let dayStats = profile.querySelectorAll(".profile-stats-recent-inner");
 	for (let dsSet = 0; dsSet < dayStats.length; dsSet++) {
 		dayStats[dsSet].querySelector(".bar").classList.remove("max", "up-mid", "down-mid", "min");
-
-		dayStats[dsSet].querySelector("p").innerHTML = "..";
 	}
+
+	return new Promise(resolve => {
+		setTimeout(resolve, 170);
+	});
 }

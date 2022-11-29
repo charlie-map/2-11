@@ -772,6 +772,8 @@ a {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+  height: 200px;
 }
 
 .shooter {
@@ -877,6 +879,10 @@ a {
 	-webkit-box-shadow:0px 0px 26px 12px rgba(225,225,0,0.8);
 	-moz-box-shadow: 0px 0px 26px 12px rgba(225,225,0,0.8);
 	box-shadow: 0px 0px 26px 12px rgba(225,225,0,0.8);
+}
+
+#new-game {
+  z-index: 2;
 }
 
 .yellow-button {
