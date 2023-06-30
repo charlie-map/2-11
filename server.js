@@ -12,9 +12,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
 const cookieParser = require('cookie-parser');
-const {
-	v4: uuidv4
-} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 
 const email_validator = require("email-validator");
 const date_validator = require("validate-date");
