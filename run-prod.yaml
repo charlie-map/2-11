@@ -1,0 +1,9 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deploy-prod
+spec:
+  template:
+    spec:
+      containers:
+      - image: 2-11-app

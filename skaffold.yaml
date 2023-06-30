@@ -1,0 +1,23 @@
+apiVersion: skaffold/v3alpha1
+kind: Config
+metadata:
+  name: 2-11-pipeline
+
+build:
+  artifacts:
+    - image: 2-11-app
+      context: 2-11-app
+  googleCloudBuild:
+    projectId: ${PROJECT_ID}
+
+profiles:
+- name: alpha
+  manifests:
+    rawYaml:
+      - run-alpha.yaml
+- name: prod
+  manifests:
+    rawYaml:
+      - run-prod.yaml
+deploy:
+  cloudrun: {}

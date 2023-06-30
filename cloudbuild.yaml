@@ -1,0 +1,47 @@
+steps:
+  # Pack the container image
+  - name: gcr.io/k8s-skaffold/pack
+    args:
+      - build
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+      - '--builder=gcr.io/buildpacks/builder:v1'
+      - '--network=cloudbuild'
+      - '--path=.'
+    id: Buildpack
+    entrypoint: pack
+
+  # Push the container image to Container Registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - >-
+        $_AR_HOSTNAME/$PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    id: Push
+
+  # Create a new release to alpha
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk
+    id: Release
+    args:
+    - '-c'
+    - |
+      commit=$COMMIT_SHA
+      gcloud deploy releases create test-release-${commit:0:12} \
+        --project=${$PROJECT_ID} \
+        --region=us-central1 \
+        --delivery-pipeline=2-11-app \
+        --images=2-11-app=$_AR_HOSTNAME/$PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    entrypoint: bash
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  substitutionOption: ALLOW_LOOSE
+
+images:
+  - >-
+    $_AR_HOSTNAME/$PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+
+tags:
+  - gcp-cloud-build-deploy-cloud-run
+  - gcp-cloud-build-deploy-cloud-run-managed
+  - 2-11

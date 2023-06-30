@@ -1,0 +1,30 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: app-2-11
+description: main application pipeline
+serialPipeline:
+  stages:
+  - targetId: run-alpha
+    profiles: [alpha]
+  - targetId: run-prod
+    profiles: [prod]
+---
+
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: run-alpha
+description: Cloud Run alpha service
+run:
+  location: projects/friendly-maker-309221/locations/us-central1
+---
+
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: run-prod
+requireApproval: true
+description: Cloud Run production service
+run:
+  location: projects/localfoodhub/locations/us-central1
