@@ -27,8 +27,9 @@ steps:
     - |
       echo "$REPO_NAME"
       commit=$COMMIT_SHA
+      project_id=$PROJECT_ID
       gcloud deploy releases create test-release-${commit:0:12} \
-        --project=${$PROJECT_ID} \
+        --project=${project_id} \
         --region=us-central1 \
         --delivery-pipeline=2-11-app \
         --images=store-2-11=$_AR_HOSTNAME/$PROJECT_ID/store-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
