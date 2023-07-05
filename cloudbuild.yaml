@@ -27,10 +27,10 @@ steps:
     - |
       commit=$COMMIT_SHA
       gcloud deploy releases create test-release-${commit:0:12} \
-        --project=${$PROJECT_ID} \
+        --project=${$_ALPHA_PROJECT_ID} \
         --region=us-central1 \
         --delivery-pipeline=2-11-app \
-        --images=2-11-app=$_AR_HOSTNAME/$PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        --images=2-11-app=$_AR_HOSTNAME/$_ALPHA_PROJECT_ID/2-11-app/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
     entrypoint: bash
 
 options:
