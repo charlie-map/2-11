@@ -4,7 +4,7 @@ steps:
     args:
       - build
       - >-
-        $_AR_HOSTNAME/$PROJECT_ID/prod-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        $_AR_HOSTNAME/$PROJECT_ID/store-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
       - '--builder=gcr.io/buildpacks/builder:v1'
       - '--network=cloudbuild'
       - '--path=.'
@@ -16,7 +16,7 @@ steps:
     args:
       - push
       - >-
-        $_AR_HOSTNAME/$PROJECT_ID/prod-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        $_AR_HOSTNAME/$PROJECT_ID/store-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
     id: Push
 
   # Create a new release to alpha
@@ -31,7 +31,7 @@ steps:
         --project=${$PROJECT_ID} \
         --region=us-central1 \
         --delivery-pipeline=2-11-app \
-        --images=prod-2-11=$_AR_HOSTNAME/$PROJECT_ID/prod-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+        --images=store-2-11=$_AR_HOSTNAME/$PROJECT_ID/store-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
     entrypoint: bash
 
 options:
@@ -40,7 +40,7 @@ options:
 
 images:
   - >-
-    $_AR_HOSTNAME/$PROJECT_ID/prod-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
+    $_AR_HOSTNAME/$PROJECT_ID/store-2-11/$REPO_NAME/$_SERVICE_NAME:$COMMIT_SHA
 
 tags:
   - gcp-cloud-build-deploy-cloud-run
