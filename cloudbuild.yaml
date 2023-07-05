@@ -25,6 +25,7 @@ steps:
     args:
     - '-c'
     - |
+      echo "$REPO_NAME"
       commit=$COMMIT_SHA
       gcloud deploy releases create test-release-${commit:0:12} \
         --project=${$PROJECT_ID} \
