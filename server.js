@@ -17,7 +17,6 @@ const {
 } = require('uuid');
 
 const email_validator = require("email-validator");
-const date_validator = require("validate-date");
 
 const boardJS = require("./boardMove.js");
 
@@ -51,10 +50,10 @@ function loggedIn(req, res, next) {
 		return res.redirect("/");
 
 	connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
-		if (err)
-			return res.render("error", {
-				error
-			});
+		if (err) {
+			console.error(err);
+			return res.redirect("/");
+		}
 
 		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
 			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
@@ -74,43 +73,58 @@ app.use(express.static(__dirname + "/public"));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use((err, req, res, next) => {
-	console.log("ERROR OCCURRED: ", err);
+/**
+ * Handles all server-side errors, logs the error, and sends a clean message
+ *  to the frontend.
+ *
+ * @param {err: Error, msg: string} err The error (to log on server side) and an error message.
+ * @param {Request} req ignore.
+ * @param {Response} res Response to send to user
+ * @param next ignore.
+ */
+function error_handler(err, req, res, next) {
+	console.error("ERROR OCCURRED: ", err);
 
 	res.render("error", {
-		error: err
+		error: 'An error occurred'
 	});
-});
+}
+app.use(error_handler);
 
 app.set('views', __dirname + "/views");
 app.set('view engine', 'mustache');
 app.engine('mustache', mustache());
 
 function default_login_check(req, res, next) {
-	if (!req.cookies.user_id || !req.cookies.auth_token)
+	if (!req.cookies.user_id || !req.cookies.auth_token) 
 		return next();
 
 	connection.query("SELECT authToken, tokenDeath FROM auth WHERE user_id=?", req.cookies.user_id, (err, authToken) => {
-		if (err)
-			return res.render("error", {
-				error
+		if (err) {
+			return next({
+				err,
+				msg: 'An error occurred checking login'
 			});
+		}
 
 		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
 			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
 				if (err) {
-					console.error(err);
-					return next();
+					return next({
+						err,
+						msg: 'An error occurred setting token death'
+					});
 				}
 
 				return res.redirect("/l");
 			});
-		} else
+		} else {
 			next();
+		}
 	});
 }
 
-app.get("/", default_login_check, (req, res, next) => {
+app.get("/", default_login_check, (_req, res) => {
 	res.render("index", {
 		LOGGED_IN: false,
 		WINS: 0,
@@ -202,21 +216,32 @@ app.get("/l", loggedIn, (req, res, next) => {
 	connection.query(`SELECT id, username, darkmode, game.*, streak.* FROM user INNER JOIN game
 		ON user.id=game.user_id INNER JOIN streak ON
 		user.id=streak.user_id WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
-		if (err || !user_data || !user_data.length) return res.render("error");
+		if (err || !user_data || !user_data.length) {
+			return next({
+				err,
+				msg: 'Failed to collect user data'
+			});
+		}
 
 		// update streak
 		try {
 			await streakUpdate(user_data[0]);
-		} catch (error) {
-			return next(error);
+		} catch (err) {
+			return next({
+				err,
+				msg: 'An error occurred while updating user streak'
+			});
 		}
 
 		connection.query(`SELECT username, currentScore, bestScore, bestBlock, wins, averageScore,
 			totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`,
 			(err, users) => {
-				if (err || !users) return res.render("error", {
-					error: err
-				});
+				if (err || !users) {
+					return next({
+						err,
+						msg: 'Failed to collect user data'
+					});
+				}
 
 				let userBoardOpen;
 				let onLeaderboard = 0,
@@ -295,11 +320,17 @@ app.get("/l", loggedIn, (req, res, next) => {
 
 app.get("/user/:username/", loggedIn, (req, res, next) => {
 	connection.query("SELECT id, currentScore, bestScore FROM game INNER JOIN user ON game.user_id=user.id WHERE username=?", req.params.username, (err, user_data) => {
-		if (err) return next(err);
+		if (err) {
+			return next({
+				err,
+				msg: `An error occurred finding data on user: ${req.params.username}`
+			});
+		}
+
 		if (!user_data || !user_data.length) return res.send("1");
 
 		connection.query("SELECT game_id, endTime FROM board_history WHERE user_id=? AND (YEARWEEK(endTime) = YEARWEEK(NOW() - INTERVAL 1 WEEK) OR YEARWEEK(endTime) = YEARWEEK(NOW())) ORDER BY endTime ASC", user_data[0].id, (err, boards) => {
-			if (err) return ext(err);
+			if (err) return next(err);
 
 			let currentDate = new Date();
 			let currentDatePieces = {
@@ -362,7 +393,12 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 		return res.send("1");
 
 	connection.query("UPDATE game SET leaderboardProperty=? WHERE user_id=?", [propNum, req.cookies.user_id], (err) => {
-		if (err) return next(err);
+		if (err) {
+			return next({
+				err,
+				msg: 'An error occurred while updating leaderboard parameter'
+			});
+		}
 
 		return res.send("0-" + propertiesUI[propNum]);
 	});
@@ -370,12 +406,21 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 
 app.get("/updated-leaderboard", (req, res, next) => {
 	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.cookies.user_id, (err, user_data) => {
-		if (err) return next(err);
+		if (err) {
+			return next({
+				err,
+				msg: 'An error occurred while fetching updated leaderboard'
+			});
+		}
 
 		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
-			if (err || !users) return next(err);
+			if (err || !users) {
+				return next({
+					err,
+					msg: 'An error occurred while fetching updated leaderboard'
+				});
+			}
 
-			let userBoardOpen;
 			let u_dat = user_data[0];
 			let leaderboardIndex = [];
 
@@ -428,7 +473,12 @@ app.get("/toggle-leaderboard/:onoff", loggedIn, (req, res, next) => {
 	let toggleStatus = req.params["onoff"];
 
 	connection.query("UPDATE game SET leaderboardOpen=? WHERE user_id=?", [toggleStatus, req.cookies.user_id], (err) => {
-		if (err) return next(err);
+		if (err) {
+			return next({
+				err,
+				msg: 'An error occurred while toggling leaderboard'
+			});
+		}
 
 		res.send("");
 	});
@@ -438,7 +488,12 @@ app.get("/darkmode/:onoff", loggedIn, (req, res, next) => {
 	let toggleStatus = req.params["onoff"];
 
 	connection.query("UPDATE user SET darkmode=? WHERE id=?", [toggleStatus, req.cookies.user_id], (err) => {
-		if (err) return next(err);
+		if (err) {
+			return next({
+				err,
+				msg: 'An error occurred while toggling dark mode'
+			});
+		}
 
 		res.send("");
 	});
@@ -535,7 +590,12 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 	connection.query(`SELECT currentScore, bestScore, averageScore, bestBlock, totalGames, game_id, wholeBoard,
 		startTime FROM game INNER JOIN current_board ON game.user_id=current_board.user_id
 		WHERE game.user_id=?`, req.cookies.user_id, (err, gameState) => {
-		if (err || !gameState || !gameState.length) return next(err);
+		if (err || !gameState || !gameState.length) {
+			return next({
+				err,
+				msg: 'An error occurred while moving 2^11 board'
+			});
+		}
 
 		let game = gameState[0];
 		game.currBestBlock = 2;
@@ -633,7 +693,12 @@ app.post("/game-over", loggedIn, (req, res, next) => {
 	connection.query(`SELECT currentScore, bestScore, averageScore, bestBlock, totalGames, game_id, wholeBoard,
 		startTime FROM game INNER JOIN current_board ON game.user_id=current_board.user_id
 		WHERE game.user_id=?`, req.cookies.user_id, (err, gameState) => {
-		if (err || !gameState || !gameState.length) return next(err);
+		if (err || !gameState || !gameState.length) {
+			return next({
+				err,
+				msg: 'An error occurred while handling game over'
+			});
+		}
 
 		game_over(req, res, gameState[0], killerPiece);
 	});
@@ -646,7 +711,12 @@ app.get("/username-available/:username", (req, res, next) => {
 		return res.send("0");
 
 	connection.query("SELECT id FROM user WHERE username=?;", [username], (err, is_user) => {
-		if (err || !is_user) return next(err);
+		if (err || !is_user) {
+			return next({
+				err,
+				msg: 'An error occurred while checking username availability'
+			});
+		}
 
 		if (is_user.length)
 			return res.send("0");
@@ -662,7 +732,12 @@ app.get("/email-available/:email", (req, res, next) => {
 		return res.send("0");
 
 	connection.query("SELECT id FROM user WHERE email=?;", [email], (err, is_user) => {
-		if (err || !is_user) return next(err);
+		if (err || !is_user) {
+			return next({
+				err,
+				msg: 'An error occurred while checking email availability'
+			});
+		}
 
 		if (is_user.length)
 			return res.send("0");
@@ -730,7 +805,12 @@ app.post("/signup", async (req, res, next) => {
 
 	let encryptPass = await new Promise((resolve, reject) => {
 		bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-			if (err) return next(err);
+			if (err) {
+				return next({
+					err,
+					msg: 'An error occurred while encrypting passcode'
+				});
+			}
 
 			resolve(hash);
 		});
@@ -738,16 +818,31 @@ app.post("/signup", async (req, res, next) => {
 
 	connection.query("INSERT INTO user (username, email, password, joindate) VALUES(?, ?, ?, NOW());",
 		[req.body.username, req.body.email, encryptPass], (err) => {
-			if (err) return next(err);
+			if (err) {
+				return next({
+					err,
+					msg: 'An error occurred while creating new user'
+				});
+			}
 
 			connection.query("SELECT id FROM user WHERE username=? AND email=?", [req.body.username, req.body.email], async (err, newUserID) => {
-				if (err || !newUserID || !newUserID.length) return next(err);
+				if (err || !newUserID || !newUserID.length) {
+					return next({
+						err,
+						msg: 'An error occurred while creating new user'
+					});
+				}
 
 				let u_id = parseInt(newUserID[0].id);
 
-				await new Promise((resolve, reject) => {
+				await new Promise((resolve) => {
 					connection.query("INSERT INTO streak (user_id, lastLogin, currentStreak, bestStreak) VALUES (?, ?, 1, 1)", [u_id, new Date()], (err) => {
-						if (err) return next(err);
+						if (err) {
+							return next({
+								err,
+								msg: 'An error occurred while creating new user'
+							});
+						}
 
 						resolve();
 					});
@@ -755,7 +850,12 @@ app.post("/signup", async (req, res, next) => {
 
 				await new Promise((resolve, reject) => {
 					connection.query("INSERT INTO game (user_id) VALUES (?)", [u_id], (err) => {
-						if (err) return next(err);
+						if (err) {
+							return next({
+								err,
+								msg: 'An error occurred while creating new user'
+							});
+						}
 
 						resolve();
 					});
@@ -764,7 +864,12 @@ app.post("/signup", async (req, res, next) => {
 				let game_id = uuidv4();
 				await new Promise((resolve, reject) => {
 					connection.query("INSERT INTO current_board (user_id, startTime, game_id) VALUES (?, ?, ?)", [u_id, new Date(), game_id], (err) => {
-						if (err) console.log(err);
+						if (err) {
+							return next({
+								err,
+								msg: 'An error occurred while creating new user'
+							});
+						}
 
 						resolve();
 					});
@@ -774,8 +879,12 @@ app.post("/signup", async (req, res, next) => {
 
 				connection.query("INSERT INTO auth (user_id, authToken, tokenDeath) VALUES (?, ?, ?);",
 					[u_id, newUUID, 2629800000], (err) => {
-						if (err)
-							return next(err);
+						if (err) {
+							return next({
+								err,
+								msg: 'An error occurred while creating user session'
+							});
+						}
 
 						res.cookie("user_id", u_id, {
 							maxAge: 2629800000,
@@ -821,6 +930,13 @@ function getDifferenceInDays(date1, date2) {
 	return diffInMs / (1000 * 60 * 60 * 24);
 }
 
+/**
+ * Updates streak for given user as necessary. Resets if the user
+ *  has not logged in in more than 24 hours.
+ *
+ * @param {User} user
+ * @returns {Promise<null>}
+ */
 function streakUpdate(user) {
 	return new Promise((resolve, reject) => {
 		let lastLoginDate = new Date(user.lastLogin);
@@ -862,7 +978,12 @@ app.post("/login", (req, res, next) => {
 	connection.query(`SELECT id, username, password, lastLogin, currentStreak, bestStreak, bestScore, currentScore, wholeBoard, authToken, tokenDeath FROM user INNER JOIN
 		streak ON user.id=streak.user_id INNER JOIN game ON user.id=game.user_id INNER JOIN current_board ON user.id=current_board.user_id
 		INNER JOIN auth ON user.id=auth.user_id WHERE ${email_or_username}=?`, req.body.username_email, (err, user_password) => {
-		if (err || !user_password) return next(err);
+		if (err || !user_password) {
+			return next({
+				err,
+				msg: 'An error occurred while logging user in'
+			});
+		}
 
 		if (!user_password.length) {
 			res.send("2");
@@ -877,14 +998,21 @@ app.post("/login", (req, res, next) => {
 
 				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=2629800000;",
 					[user_password[0].id, newUUID, newUUID], async (err) => {
-						if (err)
-							return next(err);
+						if (err) {
+							return next({
+								err,
+								msg: 'An error occurred while logging user in'
+							});
+						}
 
 						// update streak
 						try {
 							await streakUpdate(user_password[0]);
-						} catch (error) {
-							return next(error);
+						} catch (err) {
+							return next({
+								err,
+								msg: 'An error occurred while updating user streak'
+							});
 						}
 
 						res.cookie("user_id", user_password[0].id, {
@@ -905,8 +1033,9 @@ app.post("/login", (req, res, next) => {
 						});
 						return;
 					});
-			} else
+			} else {
 				return res.send("3");
+			}
 		});
 	});
 });
@@ -924,7 +1053,12 @@ app.post("/recover", (req, res, next) => {
 	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
 	connection.query(`SELECT id, email FROM user WHERE ${email_or_username}=?`,
 		req.body.username_email, (err, user_password) => {
-		if (err || !user_password) return next(err);
+		if (err || !user_password) {
+			return next({
+				err,
+				msg: 'An error occurred while attempting email recovery'
+			});
+		}
 
 		if (!user_password.length) {
 			res.send("2");
@@ -934,14 +1068,17 @@ app.post("/recover", (req, res, next) => {
 		let nonce = uuidv4();
 		connection.query("UPDATE user SET recovery_nonce=? WHERE user_id=?",
 			[nonce, user_password[0].id], async (err) => {
-				if (err)
-					return next(err);
+				if (err) {
+					return next({
+						err,
+						msg: 'An error occurred while attempting email recovery'
+					});
+				}
 
-			// email send here
+			// TODO: email send here
 		});
 	});
 });
-
 
 app.listen("2048", () => {
 	console.log("server go vroom: 2048");
