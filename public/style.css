@@ -262,13 +262,22 @@ a {
 
   cursor: pointer;
 }
+.leaderboard-entry-username.no-hover:hover {
+  border: 2px solid transparent;
+  border-radius: 2px;
+
+  cursor: default;
+}
 .ultra-meta-leaderboard-holder.darkmode .leaderboard-entry-username:hover {
   border: 2px solid white;
+}
+.ultra-meta-leaderboard-holder.darkmode .leaderboard-entry-username.no-hover:hover {
+  border: 2px solid transparent;
 }
 
 .leaderboard-entry-score {
 	padding: 5px;
-	background: #ddcee2;
+	background: #0b0a0c;
 
 	display: flex;
 	justify-content: center;
@@ -432,6 +441,8 @@ a {
 
 	animation: drop-in 1s ease-out;
 	animation-fill-mode: forwards;
+
+  z-index: 100;
 }
 
 .dropdown-noti.slide-out {
@@ -761,6 +772,12 @@ a {
   margin-top: -20px;
 }
 
+#page-meta-link-back {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+}
+
 #page-body {
   width: 100%;
 }
@@ -776,12 +793,26 @@ a {
   height: 200px;
 }
 
+#page-subtitle {
+  margin: 0;
+  margin-top: -60px;
+
+	font-size: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+  height: 100px;
+}
+
 .shooter {
 	position: relative;
 	top: 0px;
 
 	display: inline-block;
 	margin-bottom: 0;
+
+  font-size: 100px;
 
 	animation: blipMargin 1.5s linear infinite;
 }
@@ -1159,7 +1190,9 @@ a.discrete:hover {
   border-bottom: solid 1px rgba(0, 0, 0, 0.2);
 }
 
-button {
+
+
+button, #page-meta-link-back {
   -webkit-appearance: none;
   width: auto;
   min-width: 100px;
@@ -1178,7 +1211,11 @@ button {
   outline: 0;
 }
 
-button:hover {
+button.darkmode, #page-meta-link-back.darkmode {
+  background-color: rgb(55, 36, 61);
+}
+
+button:hover, #page-meta-link-back:hover {
   transform: translateY(-3px);
 }
 
@@ -2113,6 +2150,13 @@ a.darkmode {
 @media only screen and (max-width: 980px) {
   #page-meta-info {
     width: 100%;
+  }
+
+  #page-meta-link-back {
+    position: relative;
+    left: 0;
+    margin-left: 0;
+    margin-bottom: 34px;
   }
 
 	.user-column {

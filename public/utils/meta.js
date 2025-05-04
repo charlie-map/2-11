@@ -61,7 +61,7 @@ const Meta = {
 		}
 	},
 
-	GetGenericError: (e) => {
+	GetGenericError: (_e) => {
 		let dropdown = $(".dropdown-noti");
 
 		$(dropdown).removeClass("logged-in-box");

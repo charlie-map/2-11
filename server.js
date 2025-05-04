@@ -71,10 +71,11 @@ function loggedIn(req, res, next) {
 }
 
 app.use(express.static(__dirname + "/public"));
+// app.use(express.static(__dirname + "/public/utils"));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use((err, req, res, next) => {
+app.use((err, _req, res, _next) => {
 	console.log("ERROR OCCURRED: ", err);
 
 	res.render("error", {
@@ -293,6 +294,74 @@ app.get("/l", loggedIn, (req, res, next) => {
 	});
 });
 
+app.get('/leaderboard/:property?', (req, res, next) => {
+	const leaderboardProperty = req.params.property ?? 0;
+
+	connection.query(`SELECT id, username, darkmode FROM user WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
+		if (err || !user_data) return res.render("error");
+		let u_dat = user_data[0] ? user_data[0] : null;
+
+		connection.query(`SELECT username, currentScore, bestScore, bestBlock, wins, averageScore,
+			totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[leaderboardProperty]}`,
+			(err, users) => {
+				if (err || !users) return res.render("error", {
+					error: err
+				});
+
+				let onLeaderboard = 0,
+					user_special_rank = 0;
+				let leaderboardIndex = [];
+
+				if (u_dat?.leaderboardProperty == 4) {
+					leaderboardSort(users, 0, users.length - 1);
+				}
+
+				for (let i = 0; i < users.length; i++) {
+					if (i >= 20) {
+						if (!onLeaderboard && users[i].username == u_dat.username) {
+							user_special_rank = i + 1;
+
+							break;
+						}
+
+						continue;
+					}
+					let u = users[i];
+					let newU = {};
+
+					newU.rank = i + 1;
+					newU.score = getPropertyValue(leaderboardProperty, u);
+
+					newU.username = u.username + (u.username == u_dat.username ? " <span id='leaderboard-personal' class='is-taken'>(you)</span>" : "");
+
+					if (u.username == u_dat?.username) {
+						onLeaderboard = 1;
+						user_special_rank = i;
+						newU.personal_user = "personal-user-points";
+					}
+
+					leaderboardIndex.push(newU);
+				}
+
+				res.render("leaderboard", {
+					LOGGED_IN: u_dat ? true : false,
+					USERNAME: u_dat?.username,
+
+					DARKMODE_ACTIVE: u_dat?.darkmode,
+					DARKMODE: u_dat?.darkmode == 1 ? "darkmode" : "",
+
+					LEADERBOARD_PROPERTY: propertiesUI[leaderboardProperty],
+					LARGE_LEADERBOARD_PROPERTY: leaderboardProperty == 3 ? true : false,
+					LEADERBOARD: leaderboardIndex,
+
+					USER_SPECIAL: onLeaderboard ? false : true,
+					USER_RANK: user_special_rank,
+					USER_SPECIAL_SCORE: getPropertyValue(leaderboardProperty, u_dat),
+				});
+			});
+	});
+});
+
 app.get("/user/:username/", loggedIn, (req, res, next) => {
 	connection.query("SELECT id, currentScore, bestScore FROM game INNER JOIN user ON game.user_id=user.id WHERE username=?", req.params.username, (err, user_data) => {
 		if (err) return next(err);
@@ -375,7 +444,6 @@ app.get("/updated-leaderboard", (req, res, next) => {
 		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
 			if (err || !users) return next(err);
 
-			let userBoardOpen;
 			let u_dat = user_data[0];
 			let leaderboardIndex = [];
 
@@ -449,8 +517,13 @@ app.get("/previous-board", loggedIn, (req, res, next) => {
 		(err, board) => {
 			if (err) return res.json(null);
 
-			board = JSON.parse(board[0].wholeBoard);
-			if (boardJS.canMove(board)) return res.json(board);
+			try {
+				board = board[0].wholeBoard
+				if (boardJS.canMove(board)) return res.json(board);
+			} catch (err) {
+				console.error(err);
+			}
+
 			res.json(null);
 		});
 });
@@ -540,7 +613,6 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 		let game = gameState[0];
 		game.currBestBlock = 2;
 		// check that we can move the board
-		game.wholeBoard = JSON.parse(game.wholeBoard);
 		if (!boardJS.canMove(game.wholeBoard))
 			// send back error response
 			return res.send("1");
@@ -586,7 +658,7 @@ function game_over(req, res, game, killerPiece) {
 
 	connection.query(`INSERT INTO board_history (user_id, game_id, wholeBoard, score, startTime, endTime)
 		VALUES (?, ?, ?, ?, ?, ?)`, [req.cookies.user_id, game.game_id,
-		JSON.stringify(game.wholeBoard), game.currentScore, game.startTime, new Date],
+	JSON.stringify(game.wholeBoard), game.currentScore, game.startTime, new Date],
 		async (err) => {
 			if (err) return res.send("1");
 
@@ -603,7 +675,7 @@ function game_over(req, res, game, killerPiece) {
 
 			// 		return x_prev > colBestBlock ? x_prev : colBestBlock;
 			// 	}, 2)
-			
+
 			await Promise.all([
 				new Promise(resolve => {
 					connection.query(`UPDATE game SET currentScore=?, bestBlock=?, averageScore=?,
@@ -611,9 +683,9 @@ function game_over(req, res, game, killerPiece) {
 				${killerPiece ? `killedBy${killerPiece}=(SELECT killedBy${killerPiece} FROM
 					game WHERE user_id=?)+1 ` : `giveUps=(SELECT giveUps FROM
 					game WHERE user_id=?)+1`} WHERE user_id=?`,
-					[0, game.bestBlock, newAverageScore, game.totalGames,
-						req.cookies.user_id, game.currBestBlock >= 2048, req.cookies.user_id, req.cookies.user_id
-					], resolve);
+						[0, game.bestBlock, newAverageScore, game.totalGames,
+							req.cookies.user_id, game.currBestBlock >= 2048, req.cookies.user_id, req.cookies.user_id
+						], resolve);
 				}),
 				new Promise(resolve => {
 					connection.query(`UPDATE current_board SET game_id=?, wholeBoard=?, startTime=?
@@ -869,7 +941,7 @@ app.post("/login", (req, res, next) => {
 			return;
 		}
 
-		bcrypt.compare(req.body.password, user_password[0].password, function(err, result) {
+		bcrypt.compare(req.body.password, user_password[0].password, function (err, result) {
 			if (err) return next(err);
 
 			if (result) {
@@ -924,22 +996,22 @@ app.post("/recover", (req, res, next) => {
 	let email_or_username = req.body.username_email.includes("@") ? "email" : "username";
 	connection.query(`SELECT id, email FROM user WHERE ${email_or_username}=?`,
 		req.body.username_email, (err, user_password) => {
-		if (err || !user_password) return next(err);
+			if (err || !user_password) return next(err);
 
-		if (!user_password.length) {
-			res.send("2");
-			return;
-		}
+			if (!user_password.length) {
+				res.send("2");
+				return;
+			}
 
-		let nonce = uuidv4();
-		connection.query("UPDATE user SET recovery_nonce=? WHERE user_id=?",
-			[nonce, user_password[0].id], async (err) => {
-				if (err)
-					return next(err);
+			let nonce = uuidv4();
+			connection.query("UPDATE user SET recovery_nonce=? WHERE user_id=?",
+				[nonce, user_password[0].id], async (err) => {
+					if (err)
+						return next(err);
 
-			// email send here
+					// email send here
+				});
 		});
-	});
 });
 
 
