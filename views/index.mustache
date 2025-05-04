@@ -160,163 +160,168 @@
 						New game
 					</div>
 				</div>
-			</div>
-		</main>
+			</main>
 
-		<div class="profile flex-item flex-center flex-column">
-			<div class="profile-header flex-item flex-between">
-				<h2 class="barlow">Profile tab</h2>
-				<div id="close-profile">
-					<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Close profile</title><path d="M289.94 256l95-95A24 24 0 00351 127l-95 95-95-95a24 24 0 00-34 34l95 95-95 95a24 24 0 1034 34l95-95 95 95a24 24 0 0034-34z"/></svg>
-				</div>
-			</div>
-			<div class="leaderboard-entry stay-in">
-				<div class="leaderboard-entry-rank rank-color-1">0</div>
-				<div class="leaderboard-entry-meta">
-					<div class="leaderboard-entry-username">Loading</div>
-				</div>
-			</div>
-			<div class="profile-stats flex-item">
-				<div class="profile-scores flex-item flex-column flex-between">
-					<div class="score-card current-score-card">
-						Score
-						<div class="sub-scorer">
-							<p id="add-to-current-score"></p>
-							<p id="current-score">...</p>
-						</div>
-					</div>
-					<div class="score-card best-score-card">
-						Best
-						<div class="sub-scorer">
-							<p id="best-score">...</p>
-						</div>
+			<div class="profile flex-item flex-center flex-column">
+				<div class="profile-header flex-item flex-between">
+					<h2 class="barlow">Profile tab</h2>
+					<div id="close-profile">
+						<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512"><title>Close profile</title><path d="M289.94 256l95-95A24 24 0 00351 127l-95 95-95-95a24 24 0 00-34 34l95 95-95 95a24 24 0 1034 34l95-95 95 95a24 24 0 0034-34z"/></svg>
 					</div>
 				</div>
-				<div class="profile-stats-recent-context flex-item flex-column">
-					<h3 class="barlow">Activity last 7 days (total games)</h3>
-					<div class="profile-stats-recent flex-item flex-around">
-						<!-- bar heights:
-							max: full length bar (100%)
-							up-mid: medium full length bar (75%)
-							down-mid: medium short length bar (50%)
-							min: very short length bar (25%)
-						-->
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-						<div class="profile-stats-recent-inner flex-item flex-column">
-							<div class="bar"></div>
-							<p class="barlow">..</p>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div id="how-to-play">
-			<p>How to play:</p>
-			<p class="barlow" style="line-height: 26px">
-				Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
-			</p>
-			<a id="go-to-title" class="{{DARKMODE}}" href="#page-title">Start playing ➞</a>
-			<hr>
-			<p class="barlow" style="line-height: 26px">
-				This is the <span class="barlow" style="font-weight: bold">original version of</span> <span style="font-weight: bold">2^11 / 2-11</span>. Maintain
-				<span class="barlow" style="font-weight: bold; display: inline">prudence</span> towards all other versions that do not have the name <span style="font-weight: bold">2^11</span> or <span style="font-weight: bold">2-11</span>.
-			</p>
-			<hr>
-			<div class="final-tag">
-				<p class="barlow">
-					Created by <a class="barlow" href="https://charlie.city" target="_blank">charlie-map.</a> Based on <a class="barlow" href="https://apps.apple.com/us/app/1024/id823499224" target="_blank">1024 by Veewo Studio.</a>
-				</p>
-				<div class="card counter"></div>
-			</div>
-		</div>
-	</div>
-	{{#LOGGED_IN}}
-	<div class="leaderboard-property-choices barlow">
-		<h3 class="barlow" style="padding: 0px 16px; margin: 8px 0px;">Change leaderboard property:</h3>
-		<div class="board-options-show">
-			<p value="Best score" class="leaderboard-pick barlow" lead-prop="bestScore">Best score</p>
-			<p value="Best block" class="leaderboard-pick barlow" lead-prop="bestBlock">Best block</p>
-			<p value="Wins" class="leaderboard-pick barlow" lead-prop="wins">Wins</p>
-			<p value="Average score" class="leaderboard-pick barlow" lead-prop="averageScore">Average score</p>
-			<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
-		</div>
-	</div>
-	<div class="ultra-meta-leaderboard-holder">
-		<div class="meta-leaderboard-holder">
-			<div id="leaderboard" class="leaderboard">
-				{{#LEADERBOARD}}
-				<div class="leaderboard-entry">
-					<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+				<div class="leaderboard-entry stay-in">
+					<div class="leaderboard-entry-rank rank-color-1">0</div>
 					<div class="leaderboard-entry-meta">
-						<div class="leaderboard-entry-username">{{{username}}}</div>
-						<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+						<div class="leaderboard-entry-username">Loading</div>
 					</div>
 				</div>
-				{{/LEADERBOARD}}
+				<div class="profile-stats flex-item">
+					<div class="profile-scores flex-item flex-column flex-between">
+						<div class="score-card current-score-card">
+							Score
+							<div class="sub-scorer">
+								<p id="add-to-current-score"></p>
+								<p id="current-score">...</p>
+							</div>
+						</div>
+						<div class="score-card best-score-card">
+							Best
+							<div class="sub-scorer">
+								<p id="best-score">...</p>
+							</div>
+						</div>
+					</div>
+					<div class="profile-stats-recent-context flex-item flex-column">
+						<h3 class="barlow">Activity last 7 days (total games)</h3>
+						<div class="profile-stats-recent flex-item flex-around">
+							<!-- bar heights:
+								max: full length bar (100%)
+								up-mid: medium full length bar (75%)
+								down-mid: medium short length bar (50%)
+								min: very short length bar (25%)
+							-->
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+							<div class="profile-stats-recent-inner flex-item flex-column">
+								<div class="bar"></div>
+								<p class="barlow">..</p>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
-		{{#USER_SPECIAL}}
-		<div class="user-personal-low leaderboard-entry in-frame">
-			<div class="leaderboard-entry-rank rank-color-1">{{USER_RANK}}</div>
-			<div class="leaderboard-entry-meta">
-				<div class="leaderboard-entry-username">{{USERNAME}} <span id='leaderboard-personal' class='is-taken'>&#40;you&#41;</span></div>
-				<div class="leaderboard-entry-score personal-user-points">{{USER_SPECIAL_SCORE}}</div>
+
+			<a id="page-meta-link-back" href="/leaderboard">
+				Check leaderboard
+			</a>
+
+			<div id="how-to-play">
+				<p>How to play:</p>
+				<p class="barlow" style="line-height: 26px">
+					Use the <span class="barlow" style="font-weight: bold">arrow keys</span> to move tiles around the virtual space. When <span class="barlow" style="font-style: italic">two tiles</span> with the <span class="barlow" style="font-weight: bold !important">same number</span> touch, they <span class="barlow" style="font-weight: bold !important">merge!</span> Keep going until you reach <span style="font-weight: bold">2^11 (2048)!</span>
+				</p>
+				<a id="go-to-title" class="{{DARKMODE}}" href="#page-title">Start playing ➞</a>
+				<hr>
+				<p class="barlow" style="line-height: 26px">
+					This is the <span class="barlow" style="font-weight: bold">original version of</span> <span style="font-weight: bold">2^11 / 2-11</span>. Maintain
+					<span class="barlow" style="font-weight: bold; display: inline">prudence</span> towards all other versions that do not have the name <span style="font-weight: bold">2^11</span> or <span style="font-weight: bold">2-11</span>.
+				</p>
+				<hr>
+				<div class="final-tag">
+					<p class="barlow">
+						Created by <a class="barlow" href="https://charlie.city" target="_blank">charlie-map.</a> Based on <a class="barlow" href="https://apps.apple.com/us/app/1024/id823499224" target="_blank">1024 by Veewo Studio.</a>
+					</p>
+					<div class="card counter"></div>
+				</div>
 			</div>
+
+			{{#LOGGED_IN}}
+			<div class="leaderboard-property-choices barlow">
+				<h3 class="barlow" style="padding: 0px 16px; margin: 8px 0px;">Change leaderboard property:</h3>
+				<div class="board-options-show">
+					<p value="Best score" class="leaderboard-pick barlow" lead-prop="bestScore">Best score</p>
+					<p value="Best block" class="leaderboard-pick barlow" lead-prop="bestBlock">Best block</p>
+					<p value="Wins" class="leaderboard-pick barlow" lead-prop="wins">Wins</p>
+					<p value="Average score" class="leaderboard-pick barlow" lead-prop="averageScore">Average score</p>
+					<p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
+				</div>
+			</div>
+			<div class="ultra-meta-leaderboard-holder">
+				<div class="meta-leaderboard-holder">
+					<div id="leaderboard" class="leaderboard">
+						{{#LEADERBOARD}}
+						<div class="leaderboard-entry">
+							<div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+							<div class="leaderboard-entry-meta">
+								<div class="leaderboard-entry-username">{{{username}}}</div>
+								<div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+							</div>
+						</div>
+						{{/LEADERBOARD}}
+					</div>
+				</div>
+				{{#USER_SPECIAL}}
+				<div class="user-personal-low leaderboard-entry in-frame">
+					<div class="leaderboard-entry-rank rank-color-1">{{USER_RANK}}</div>
+					<div class="leaderboard-entry-meta">
+						<div class="leaderboard-entry-username">{{USERNAME}} <span id='leaderboard-personal' class='is-taken'>&#40;you&#41;</span></div>
+						<div class="leaderboard-entry-score personal-user-points">{{USER_SPECIAL_SCORE}}</div>
+					</div>
+				</div>
+				{{/USER_SPECIAL}}
+			</div>
+			{{/LOGGED_IN}}
 		</div>
-		{{/USER_SPECIAL}}
-	</div>
-	{{/LOGGED_IN}}
-	<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
-	<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-	<!-- META DATA -->
-	<script>
-		let board;
-		let moveBuildup, postMoveSync, framesSinceSync;
-		let currentWins = {{{WINS}}};
-		let highestPiece = {{{BEST_BLOCK}}}, mostRecentPiece = 2;
-		let loggedIn = {{{LOGGED_IN}}};
-		let darkmode = {{{DARKMODE_ACTIVE}}};
-		let hammer = undefined;
-		let endGame = 0;
-		let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
-		// stores background color, text color, and glow for a given tile
-		let levelConverter;
-		let bestPoints = {{{BEST_SCORE}}};
-		let points = 0, metaPoints = {{{CURRENT_SCORE}}};
-		let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
-		let activelyMovingLeaderboardRank = 0, needLeaderboardCheck = 0;
-		let activeLeaderboardProperty = "{{{LEADERBOARD_PROPERTY}}}";
-		let currentScoreAnimationTimeout;
-		let logging_in = undefined;
-	</script>
-	<script src="meta.js"></script>
-	<script src="piece.js"></script>
-	<script src="board.js"></script>
-	<script src="sketch.js" defer></script>
-	<script src="primary.js" defer></script>
-</body>
+		<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+		<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+		<!-- META DATA -->
+		<script>
+			let board;
+			let moveBuildup, postMoveSync, framesSinceSync;
+			let currentWins = {{{WINS}}};
+			let highestPiece = {{{BEST_BLOCK}}}, mostRecentPiece = 2;
+			let loggedIn = {{{LOGGED_IN}}};
+			let darkmode = {{{DARKMODE_ACTIVE}}};
+			let hammer = undefined;
+			let endGame = 0;
+			let opacityEndRoller = 60, rectEndFiller = [10, 87, 90];
+			// stores background color, text color, and glow for a given tile
+			let levelConverter;
+			let bestPoints = {{{BEST_SCORE}}};
+			let points = 0, metaPoints = {{{CURRENT_SCORE}}};
+			let wantsLeaderboardOpen = {{{LEADERBOARD_OPEN}}};
+			let activelyMovingLeaderboardRank = 0, needLeaderboardCheck = 0;
+			let activeLeaderboardProperty = "{{{LEADERBOARD_PROPERTY}}}";
+			let currentScoreAnimationTimeout;
+			let logging_in = undefined;
+		</script>
+		<script src="utils/meta.js"></script>
+		<script src="piece.js"></script>
+		<script src="board.js"></script>
+		<script src="utils/darkmode.js"></script>
+		<script src="sketch.js" defer></script>
+		<script src="primary.js" defer></script>
+	</body>
 </html>

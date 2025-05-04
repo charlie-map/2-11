@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<meta charset="utf-8" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Barlow&family=Koulen&display=swap" rel="stylesheet">
+
+		<script src="jquery-3.6.0.min.js"></script>
+		<link rel="icon" href="2-11TileIcon.png">
+		<title>2^11</title>
+	</head>
+	<body class="{{DARKMODE}} flex-item flex-center flex-column">
+        <a id="page-meta-link-back" href="/l">
+            Back to 2^11
+        </a>
+
+        <div id="page-meta-info" class="flex-item flex-column flex-center">
+            <div class="flex-item flex-center">
+                <div id="page-title" class="flex-item flex-center">2<p class="shooter">^</p>11</div>
+            </div>
+            <div class="flex-item flex-center">
+                <div id="page-subtitle" class="flex-item flex-center">leaderboard</div>
+            </div>
+        </div>
+        <div class="leaderboard-current-property {{^LEADERBOARD_OPEN}}hidden{{/LEADERBOARD_OPEN}}">
+            <div id="leaderboard-shown-property" class="barlow">{{LEADERBOARD_PROPERTY}}</div>
+            <div class="dropdown-property-choice">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+            </div>
+        </div>
+
+        {{#LOGGED_IN}}
+        <div class="leaderboard-property-choices barlow">
+            <h3 class="barlow" style="padding: 0px 16px; margin: 8px 0px;">Change leaderboard property:</h3>
+            <div class="board-options-show">
+                <p value="Best score" class="leaderboard-pick barlow" lead-prop="bestScore">Best score</p>
+                <p value="Best block" class="leaderboard-pick barlow" lead-prop="bestBlock">Best block</p>
+                <p value="Wins" class="leaderboard-pick barlow" lead-prop="wins">Wins</p>
+                <p value="Average score" class="leaderboard-pick barlow" lead-prop="averageScore">Average score</p>
+                <p value="% Wins" class="leaderboard-pick barlow" lead-prop="percentWins">% Wins</p>
+            </div>
+        </div>
+        <div class="ultra-meta-leaderboard-holder" style="width: 100%">
+            <div class="meta-leaderboard-holder">
+                <div id="leaderboard" class="leaderboard" style="width: 100%">
+                    {{#LEADERBOARD}}
+                    <div class="leaderboard-entry">
+                        <div class="leaderboard-entry-rank rank-color{{rank}}">{{rank}}</div>
+                        <div class="leaderboard-entry-meta">
+                            <div class="leaderboard-entry-username no-hover">{{{username}}}</div>
+                            <div class="leaderboard-entry-score {{personal_user}}">{{score}}</div>
+                        </div>
+                    </div>
+                    {{/LEADERBOARD}}
+                </div>
+            </div>
+            {{#USER_SPECIAL}}
+            <div class="user-personal-low leaderboard-entry in-frame">
+                <div class="leaderboard-entry-rank rank-color-1">{{USER_RANK}}</div>
+                <div class="leaderboard-entry-meta">
+                    <div class="leaderboard-entry-username">{{USERNAME}} <span id='leaderboard-personal' class='is-taken'>&#40;you&#41;</span></div>
+                    <div class="leaderboard-entry-score personal-user-points">{{USER_SPECIAL_SCORE}}</div>
+                </div>
+            </div>
+            {{/USER_SPECIAL}}
+        </div>
+        {{/LOGGED_IN}}
+        <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+        <!-- META DATA -->
+        <script>
+            let darkmode = {{{DARKMODE_ACTIVE}}};
+            let loggedIn = {{{LOGGED_IN}}};
+		    let wantsLeaderboardOpen = true;
+            // stores background color, text color, and glow for a given tile
+        </script>
+        <script src="utils/meta.js"></script>
+		<script src="utils/darkmode.js"></script>
+        <script src="leaderboard_primary.js" defer></script>
+    </body>
+</html>
