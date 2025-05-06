@@ -94,7 +94,6 @@ class Piece {
     let additional_h = adjusted_size * 3.5;
     
     let piece_color = levelConverter[this.num];
-    console.log(this.num, piece_color);
     
     push();
     noStroke();
