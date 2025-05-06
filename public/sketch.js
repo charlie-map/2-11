@@ -35,7 +35,7 @@ async function setup(isRestart) {
         success: (res) => {
           if (!res || res == null) return resolve();
 
-          oldBoard = res;
+          oldBoard = JSON.parse(res);
           resolve();
         },
 
