@@ -295,7 +295,7 @@ app.get("/l", loggedIn, (req, res, next) => {
 });
 
 app.get('/leaderboard/:property?', (req, res, next) => {
-	const leaderboardProperty = req.params.property || 0;
+	const leaderboardProperty = req.params.property ?? 0;
 
 	connection.query(`SELECT id, username, darkmode FROM user WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
 		if (err || !user_data) return res.render("error");
