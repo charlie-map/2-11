@@ -277,7 +277,7 @@ a {
 
 .leaderboard-entry-score {
 	padding: 5px;
-	background: #0b0a0c;
+	background: #ddcee2;
 
 	display: flex;
 	justify-content: center;
@@ -1201,7 +1201,6 @@ button, #page-meta-link-back {
   padding: 15px 40px;
   margin-top: 5px;
   background-color: #b08bf8;
-  color: #fff;
   font-size: 14px;
   margin-left: auto;
   font-weight: 500;

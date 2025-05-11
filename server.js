@@ -59,7 +59,7 @@ function loggedIn(req, res, next) {
 		if (authToken.length && authToken[0].authToken == req.cookies.auth_token && authToken[0].tokenDeath > 0) {
 			connection.query("UPDATE auth SET tokenDeath=2629800000 WHERE user_id=?", [req.cookies.user_id], (err) => {
 				if (err) {
-					console.log(err);
+					console.error(err);
 					return res.redirect("/");
 				}
 
@@ -76,7 +76,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use((err, _req, res, _next) => {
-	console.log("ERROR OCCURRED: ", err);
+	console.error("ERROR OCCURRED: ", err);
 
 	res.render("error", {
 		error: err
@@ -294,12 +294,12 @@ app.get("/l", loggedIn, (req, res, next) => {
 	});
 });
 
-app.get('/leaderboard/:property?', (req, res, next) => {
+app.get('/leaderboard/:property?', (req, res, _next) => {
 	const leaderboardProperty = req.params.property ?? 0;
 
-	connection.query(`SELECT id, username, darkmode FROM user WHERE user.id=?`, req.cookies.user_id, async (err, user_data) => {
+	connection.query(`SELECT id, username, darkmode FROM user WHERE user.id=?`, req.cookies.user_id ?? 0, async (err, user_data) => {
 		if (err || !user_data) return res.render("error");
-		let u_dat = user_data[0] ? user_data[0] : null;
+		let u_dat = user_data[0] ? user_data[0] : {};
 
 		connection.query(`SELECT username, currentScore, bestScore, bestBlock, wins, averageScore,
 			totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[leaderboardProperty]}`,
@@ -344,11 +344,11 @@ app.get('/leaderboard/:property?', (req, res, next) => {
 				}
 
 				res.render("leaderboard", {
-					LOGGED_IN: u_dat ? true : false,
-					USERNAME: u_dat?.username,
+					LOGGED_IN: !!u_dat,
+					USERNAME: u_dat.username,
 
-					DARKMODE_ACTIVE: u_dat?.darkmode,
-					DARKMODE: u_dat?.darkmode == 1 ? "darkmode" : "",
+					DARKMODE_ACTIVE: !!u_dat.darkmode,
+					DARKMODE: u_dat.darkmode == 1 ? "darkmode" : "",
 
 					LEADERBOARD_PROPERTY: propertiesUI[leaderboardProperty],
 					LARGE_LEADERBOARD_PROPERTY: leaderboardProperty == 3 ? true : false,
@@ -438,10 +438,12 @@ app.get("/leaderboard-property/:lbprop", loggedIn, (req, res, next) => {
 });
 
 app.get("/updated-leaderboard", (req, res, next) => {
-	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.cookies.user_id, (err, user_data) => {
+	connection.query("SELECT username, leaderboardOpen, leaderboardProperty FROM user INNER JOIN game ON user.id=game.user_id WHERE id=?", req.cookies.user_id ?? 0, (err, user_data) => {
 		if (err) return next(err);
+		user_data = user_data?.length ? user_data : [{}];
 
-		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty]}`, (err, users) => {
+		connection.query(`SELECT username, bestScore, bestBlock, wins, averageScore, totalGames FROM game
+			INNER JOIN user ON user.id=game.user_id ORDER BY ${propertiesSQL[user_data[0].leaderboardProperty ?? 0]}`, (err, users) => {
 			if (err || !users) return next(err);
 
 			let u_dat = user_data[0];
@@ -944,41 +946,42 @@ app.post("/login", (req, res, next) => {
 		bcrypt.compare(req.body.password, user_password[0].password, function (err, result) {
 			if (err) return next(err);
 
-			if (result) {
-				let newUUID = user_password[0].tokenDeath > 0 ? user_password[0].authToken : uuidv4();
-
-				connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=2629800000;",
-					[user_password[0].id, newUUID, newUUID], async (err) => {
-						if (err)
-							return next(err);
-
-						// update streak
-						try {
-							await streakUpdate(user_password[0]);
-						} catch (error) {
-							return next(error);
-						}
-
-						res.cookie("user_id", user_password[0].id, {
-							maxAge: 2629800000,
-							httpOnly: true
-						});
-						res.cookie("auth_token", newUUID, {
-							maxAge: 2629800000,
-							httpOnly: true
-						});
-
-						res.json({
-							success: 1,
-							username: user_password[0].username,
-							bestScore: user_password[0].bestScore,
-							currentScore: user_password[0].currentScore,
-							board: user_password[0].wholeBoard
-						});
-						return;
-					});
-			} else
+			if (!result) {
 				return res.send("3");
+			}
+
+			let newUUID = user_password[0].tokenDeath > 0 ? user_password[0].authToken : uuidv4();
+
+			connection.query("INSERT INTO auth (user_id, authToken) VALUES (?, ?) ON DUPLICATE KEY UPDATE authToken=?, tokenDeath=2629800000;",
+				[user_password[0].id, newUUID, newUUID], async (err) => {
+					if (err)
+						return next(err);
+
+					// update streak
+					try {
+						await streakUpdate(user_password[0]);
+					} catch (error) {
+						return next(error);
+					}
+
+					res.cookie("user_id", user_password[0].id, {
+						maxAge: 2629800000,
+						httpOnly: true
+					});
+					res.cookie("auth_token", newUUID, {
+						maxAge: 2629800000,
+						httpOnly: true
+					});
+
+					res.json({
+						success: 1,
+						username: user_password[0].username,
+						bestScore: user_password[0].bestScore,
+						currentScore: user_password[0].currentScore,
+						board: user_password[0].wholeBoard
+					});
+					return;
+				});
 		});
 	});
 });

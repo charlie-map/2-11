@@ -69,6 +69,9 @@ function darkmodeOff() {
 
     $(".leaderboard-entry-rank").removeClass("darkmode");
 
+    // Buttons or links
+    $("button, a, #page-meta-link-back").removeClass("darkmode");
+
     if ($(".leaderboard-tab").hasClass("open")) {
         $(".leaderboard-tab rect").attr("fill", "#ddcee2");
     }

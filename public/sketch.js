@@ -35,7 +35,12 @@ async function setup(isRestart) {
         success: (res) => {
           if (!res || res == null) return resolve();
 
-          oldBoard = JSON.parse(res);
+          try {
+            oldBoard = JSON.parse(res);
+          } catch (_e) {
+            oldBoard = res;
+          }
+
           resolve();
         },
 
