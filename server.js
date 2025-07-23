@@ -613,6 +613,7 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 		if (err || !gameState || !gameState.length) return next(err);
 
 		let game = gameState[0];
+		game.wholeBoard = JSON.parse(game.wholeBoard);
 		game.currBestBlock = 2;
 		// check that we can move the board
 		if (!boardJS.canMove(game.wholeBoard))
@@ -623,6 +624,7 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 			let boardDiffs = moveBoard[move[play].move](game.wholeBoard, game.currBestBlock);
 
 			if (boardDiffs.error) {
+				console.error("board diff error", boardDiffs.error);
 				// something is wrong with their board
 				// let the frontend know so it resets
 				return res.send("2");
@@ -637,8 +639,10 @@ app.post("/move-game", loggedIn, (req, res, next) => {
 			let newPiece = move[play].piece;
 
 			if (newPiece) {
-				if (game.wholeBoard[newPiece.x][newPiece.y] || !allowed_new_blocks[newPiece.num])
+				if (game.wholeBoard[newPiece.x][newPiece.y] || !allowed_new_blocks[newPiece.num]) {
+					console.error("Invalid Block place or illegal Block piece");
 					return res.send("2");
+				}
 
 				game.wholeBoard[newPiece.x][newPiece.y] = newPiece.num;
 			}
